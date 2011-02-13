@@ -1,9 +1,17 @@
-package DataFlow::Node::Null;
+package DataFlow::Item;
 
 use Moose;
-extends 'DataFlow::Node::NOP';
+use DataFlow::Meta;
 
-override 'input' => sub { };
+has meta => (
+    is  => 'ro',
+    isa => 'DataFlow::Meta',
+);
+
+has data => (
+    is  => 'ro',
+    isa => 'Any',
+);
 
 1;
 
@@ -13,40 +21,61 @@ __END__
 
 =head1 NAME
 
-DataFlow::Node::Null - A null node, will discard any input and return undef in the output
+DataFlow::Item - A DataFlow item with the associated metadata
 
 =head1 SYNOPSIS
 
-    use DataFlow::Null;
-
-    my $null = DataFlow::Node::Null->new;
-    
-    my $result = $null->process( 'abc' );
-    # $result == undef
+    use DataFlow::Item;
 
 =head1 DESCRIPTION
 
-This class represents a null node: it will return undef regardless of any input
-provided to it.
+
+=head1 ATTRIBUTES
+
 
 =head1 METHODS
 
-The interface for C<DataFlow::Node::Null> is the same of
-C<DataFlow::Node>.
 
 =head1 DEPENDENCIES
 
-L<DataFlow::Node>
+=for author to fill in:
+    A list of all the other modules that this module relies upon,
+    including any restrictions on versions, and an indication whether
+    the module is part of the standard Perl distribution, part of the
+    module's distribution, or must be installed separately. ]
+
+L<Scalar::Util>
+
+L<Queue::Base>
 
 =head1 INCOMPATIBILITIES
+
+=for author to fill in:
+    A list of any modules that this module cannot be used in conjunction
+    with. This may be due to name conflicts in the interface, or
+    competition for system or program resources, or due to internal
+    limitations of Perl (for example, many modules that use source code
+    filters are mutually incompatible).
 
 None reported.
 
 =head1 BUGS AND LIMITATIONS
 
+=for author to fill in:
+    A list of known problems with the module, together with some
+    indication Whether they are likely to be fixed in an upcoming
+    release. Also a list of restrictions on the features the module
+    does provide: data types that cannot be handled, performance issues
+    and the circumstances in which they may arise, practical
+    limitations on the size of data sets, special cases that are not
+    (yet) handled, etc.
+
+No bugs have been reported.
+
 Please report any bugs or feature requests to
 C<bug-dataflow@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
+
 
 =head1 AUTHOR
 

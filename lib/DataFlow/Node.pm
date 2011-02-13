@@ -562,7 +562,7 @@ None reported.
 No bugs have been reported.
 
 Please report any bugs or feature requests to
-C<bug-opendata@rt.cpan.org>, or through the web interface at
+C<bug-dataflow@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
 
 
@@ -573,7 +573,7 @@ Alexei Znamensky  C<< <russoz@cpan.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2010, Alexei Znamensky C<< <russoz@cpan.org> >>. All rights reserved.
+Copyright (c) 2010-2011, Alexei Znamensky C<< <russoz@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

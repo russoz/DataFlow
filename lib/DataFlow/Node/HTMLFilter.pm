@@ -166,7 +166,7 @@ None reported.
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests to
-C<bug-opendata@rt.cpan.org>, or through the web interface at
+C<bug-dataflow@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
 
 =head1 AUTHOR
