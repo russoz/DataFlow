@@ -1,7 +1,19 @@
-* Módulo para passar html entities para utf8.
-
-- Transform::OCR
 
 Flow
-- Node que executa um comando externo (system ou IPC::Run, ou ...) e usa
-  input,out,err como stdin, stdout e stderr
+* use overload operators to create chains ('=>' or maybe '|' or '+')
+* a JSON iand/or YAML based constructor(s)
+* in a chain, the output from the previous node should be the same object in
+  memory as the input of the next node
+* a threshold parameter taht controls how many items can be passed, at most,
+  in a single run
+* do not assume, internally, that nodes want all data available at once (it
+  is doing that now, must fix)
+* start messing with parallel runs, via fork or threads
+
+Nodes
+* char encoding node (there is a first attempt there already, needs to work
+  on it and write tests for it)
+* an OCR decoding module (any OCR perl modules out-there?)
+* a node that runs an external command (system(), or IPC::Run, or...) and maps
+  stdin, stdout, stderr respectively to input, output and error queues
+* split and join nodes, to allow flows to follow multiple paths
