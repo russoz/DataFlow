@@ -6,13 +6,13 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
-use aliased 'OpenData::Flow::Node';
-use aliased 'OpenData::Flow::Node::Chain';
-use aliased 'OpenData::Flow::Node::LiteralData';
-use aliased 'OpenData::Flow::Node::HTMLFilter';
-use aliased 'OpenData::Flow::Node::URLRetriever';
-use aliased 'OpenData::Flow::Node::MultiPageURLGenerator';
-use aliased 'OpenData::Flow::Node::SQL';
+use aliased 'DataFlow::Node';
+use aliased 'DataFlow::Node::Chain';
+use aliased 'DataFlow::Node::LiteralData';
+use aliased 'DataFlow::Node::HTMLFilter';
+use aliased 'DataFlow::Node::URLRetriever';
+use aliased 'DataFlow::Node::MultiPageURLGenerator';
+use aliased 'DataFlow::Node::SQL';
 
 #use Scalar::Util qw/reftype/;
 
@@ -39,11 +39,11 @@ my $chain = Chain->new(
             produce_last_page => sub {
                 my $url = shift;
 
-                use OpenData::Get;
+                use DataFlow::Node::URLRetriever::Get;
                 use HTML::TreeBuilder::XPath;
 
                 #print STDERR qq{produce_last_page url = $url\n};
-                my $get  = OpenData::Get->new;
+                my $get  = DataFlow::Node::URLRetriever::Get->new;
                 my $html = $get->get($url);
 
                 #print STDERR 'html = '.$html."\n";

@@ -2,11 +2,11 @@ use Test::More tests => 20;
 
 use strict;
 
-use OpenData::Flow::Node;
+use DataFlow::Node;
 
 # tests: 2
 diag('constructor and basic tests');
-my $uc = OpenData::Flow::Node->new(
+my $uc = DataFlow::Node->new(
     process_item => sub {
         shift;
         return eval { uc(shift) };

@@ -2,40 +2,32 @@
 
 use inc::Module::Install;
 
-name 'OpenData';
+name 'DataFlow';
 license 'perl';
-version_from 'lib/OpenData.pm';
+version_from 'lib/DataFlow/Node.pm';
 
 requires 'Moose';
-requires 'MooseX::Traits';
-
 requires 'namespace::autoclean';
-requires 'File::Slurp';
-requires 'Text::CSV';
 requires 'Scalar::Util';
 requires 'List::Util';
 requires 'List::MoreUtils';
 requires 'Queue::Base';
-requires 'LWP::Curl';
 requires 'HTML::TreeBuilder::XPath';
-requires 'DBI';
-requires 'DBD::SQLite';
-requires 'MongoDB';
+
+# URLRetriever
+requires 'LWP::Curl';
 requires 'WWW::Mechanize';
-requires 'Test::Memory::Cycle';
-requires 'MooseX::App::Cmd';
-requires 'aliased';
+
 requires 'MooseX::OneArgNew';
 requires 'MooseX::Types::IO';
 requires 'version' => 0.86;
-
-recommends 'Text::CSV_XS' => '0.50';
 
 test_requires 'Test::More';
 test_requires 'Test::Pod' => '1.41';
 test_requires 'Test::Pod::Coverage' => '1.08';
 test_requires 'Pod::Coverage::TrustPod';
 test_requires 'Test::UseAllModules';
+test_requires 'aliased';
 
 tests 't/*.t t/*/*t t/*/*/*t t/*/*/*/*t';
 

@@ -2,10 +2,10 @@ use Test::More tests => 11;
 
 use strict;
 
-use OpenData::Flow::Node;
+use DataFlow::Node;
 
 # tests: 2
-my $n = OpenData::Flow::Node->new(
+my $n = DataFlow::Node->new(
     deref        => 1,
     process_item => sub { shift; return shift },
 );

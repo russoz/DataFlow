@@ -3,7 +3,7 @@ use Test::More tests => 12;
 
 package Repeat;
 use Moose;
-extends 'OpenData::Flow::Node';
+extends 'DataFlow::Node';
 has times => ( is => 'ro', isa => 'Int', required => 1 );
 has '+process_item' => (
     default => sub {
@@ -16,22 +16,22 @@ has '+process_item' => (
 
 package main;
 
-use OpenData::Flow::Node;
-use OpenData::Flow::Node::Chain;
+use DataFlow::Node;
+use DataFlow::Node::Chain;
 use common::sense;
 
 # tests: 3
-my $uc = OpenData::Flow::Node->new(
+my $uc = DataFlow::Node->new(
     name         => 'UpperCase',
     process_item => sub { shift; return uc(shift) }
 );
 ok($uc);
-my $rv = OpenData::Flow::Node->new(
+my $rv = DataFlow::Node->new(
     name         => 'Reverse',
     process_item => sub { shift; return scalar reverse $_[0]; }
 );
 ok($rv);
-my $chain = OpenData::Flow::Node::Chain->new( links => [ $uc, $rv ] );
+my $chain = DataFlow::Node::Chain->new( links => [ $uc, $rv ] );
 ok($chain);
 
 #use Data::Dumper;
@@ -51,10 +51,10 @@ ok( $abc eq 'CBA' );
 my $rp5 = Repeat->new( times => 5 );
 ok($rp5);
 my $cc =
-  OpenData::Flow::Node->new( process_item => sub { shift; return length(shift) }
+  DataFlow::Node->new( process_item => sub { shift; return length(shift) }
   );
 ok($cc);
-my $chain2 = OpenData::Flow::Node::Chain->new( links => [ $rp5, $cc ] );
+my $chain2 = DataFlow::Node::Chain->new( links => [ $rp5, $cc ] );
 ok($chain2);
 
 # tests: 2
@@ -72,7 +72,7 @@ my $fifteen = $chain2->output;
 #use Data::Dumper; diag( Dumper($fifteen) );
 ok( $fifteen == 15 );
 
-my $chain3 = OpenData::Flow::Node::Chain->new( links => [] );
+my $chain3 = DataFlow::Node::Chain->new( links => [] );
 ok($chain3);
 
 eval { $chain3->process('some text') };

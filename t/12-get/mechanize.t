@@ -3,7 +3,7 @@ use Test::More tests => 1;
 
 use strict;
 
-use_ok('OpenData::Get::Mechanize');
+use_ok('DataFlow::Node::URLRetriever::Get::Mechanize');
 
 1;
 

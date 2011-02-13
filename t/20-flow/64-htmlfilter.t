@@ -2,13 +2,13 @@
 use Test::More tests => 9;
 
 BEGIN {
-    use_ok('OpenData::Flow::Node::HTMLFilter');
+    use_ok('DataFlow::Node::HTMLFilter');
 }
 
-my $fail = eval q{OpenData::Flow::Node::HTMLFilter->new};
+my $fail = eval q{DataFlow::Node::HTMLFilter->new};
 ok($@);
 
-my $filter1 = OpenData::Flow::Node::HTMLFilter->new( search_xpath => '//td', );
+my $filter1 = DataFlow::Node::HTMLFilter->new( search_xpath => '//td', );
 ok($filter1);
 
 my $undef = $filter1->process();
@@ -37,7 +37,7 @@ $filter1->input($html);
 my @res = $filter1->output;
 ok( $res[2] eq '<td>c1 potatoes</td>' );
 
-my $filter2 = OpenData::Flow::Node::HTMLFilter->new(
+my $filter2 = DataFlow::Node::HTMLFilter->new(
     search_xpath => '//td',
     result_type  => 'VALUE',
 );
@@ -49,7 +49,7 @@ my @res2 = $filter2->output;
 #use Data::Dumper; diag( 'res2 = '. Dumper(@res2) );
 ok( $res2[2] eq 'c1 potatoes' );
 
-my $filter3 = OpenData::Flow::Node::HTMLFilter->new(
+my $filter3 = DataFlow::Node::HTMLFilter->new(
     search_xpath => '//td',
     result_type  => 'VALUE',
     ref_result   => 1,

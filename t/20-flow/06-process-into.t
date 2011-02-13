@@ -1,10 +1,10 @@
 use Test::More tests => 6;
 
-use OpenData::Flow::Node;
+use DataFlow::Node;
 use common::sense;
 
 # tests: 1
-my $uc = OpenData::Flow::Node->new(
+my $uc = DataFlow::Node->new(
     process_item => sub { shift; return uc(shift) },
     process_into => 1,
 );

@@ -1,11 +1,11 @@
 use Test::More tests => 7;
 
-use_ok('OpenData::Flow::Node::LiteralData');
+use_ok('DataFlow::Node::LiteralData');
 
-eval { $fail = OpenData::Flow::Node::LiteralData->new };
+eval { $fail = DataFlow::Node::LiteralData->new };
 ok($@);
 
-my $data = OpenData::Flow::Node::LiteralData->new( data => 'aaa' );
+my $data = DataFlow::Node::LiteralData->new( data => 'aaa' );
 
 #use Data::Dumper;
 #diag(Dumper( $data ));
@@ -19,6 +19,6 @@ eval { $data->input('more input') };
 ok( !$@ );
 ok( !( $data->output ) );
 
-$data = OpenData::Flow::Node::LiteralData->new( data => [qw/oh my goodness/] );
+$data = DataFlow::Node::LiteralData->new( data => [qw/oh my goodness/] );
 is_deeply( $data->output, [qw/oh my goodness/] );
 

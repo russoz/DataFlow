@@ -1,11 +1,11 @@
 
 use Test::More tests => 5;
 
-use_ok('OpenData::Flow::Node::Null');
+use_ok('DataFlow::Node::Null');
 
-use OpenData::Flow::Node::Null;
+use DataFlow::Node::Null;
 
-my $nop = OpenData::Flow::Node::Null->new;
+my $nop = DataFlow::Node::Null->new;
 ok($nop);
 ok( !defined( $nop->process('yadayadayada') ) );
 ok( !defined( $nop->process(42) ) );
