@@ -27,15 +27,6 @@ my $chain = Chain->new(
         MultiPageURLGenerator->new(
             first_page => -2,
             #last_page     => 35,
-            make_page_url => sub {
-                my ( $self, $url, $page ) = @_;
-
-                use URI;
-
-                my $u = URI->new($url);
-                $u->query_form( $u->query_form, Pagina => $page );
-                return $u->as_string;
-            },
             produce_last_page => sub {
                 my $url = shift;
 
@@ -52,6 +43,15 @@ my $chain = Chain->new(
                   ->findvalue('//p[@class="paginaAtual"]');
                 die q{Não conseguiu determinar a última página} unless $texto;
                 return $1 if $texto =~ /\d\/(\d+)/;
+            },
+            make_page_url => sub {
+                my ( $self, $url, $page ) = @_;
+
+                use URI;
+
+                my $u = URI->new($url);
+                $u->query_form( $u->query_form, Pagina => $page );
+                return $u->as_string;
             },
         ),
         #DumperNode->new,
