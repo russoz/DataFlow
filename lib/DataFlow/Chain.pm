@@ -1,4 +1,4 @@
-package DataFlow::Node::Chain;
+package DataFlow::Chain;
 
 use Moose;
 extends 'DataFlow::Node';
@@ -40,14 +40,14 @@ __END__
 
 =head1 NAME
 
-DataFlow::Node::Chain - A "super-node" that can link a sequence of nodes
+DataFlow::Chain - A "super-node" that can link a sequence of nodes
 
 =head1 SYNOPSIS
 
     use DataFlow::Node;
-    use DataFlow::Node::Chain;
+    use DataFlow::Chain;
 
-    my $chain = DataFlow::Node::Chain->new(
+    my $chain = DataFlow::Chain->new(
         links => [
             DataFlow::Node->new(
                 process_item => sub {
@@ -72,7 +72,7 @@ a data-flow.
 One might think of it as the actual definition of the data flow, but this is a 
 limited, linear, flow, and there is room for a lot of improvements.
 
-A C<DataFlow::Node::Chain> object accepts input like a regular
+A C<DataFlow::Chain> object accepts input like a regular
 C<DataFlow::Node>, but it injects that input into the first link of the
 chain, and pumps the output of each link into the input of the next one,
 similarly to pipes in a shell command line. The output of the last link of the
@@ -87,7 +87,7 @@ actual "chain" of nodes to process the data.
 
 =head1 METHODS
 
-The interface for C<DataFlow::Node::Chain> is the same of
+The interface for C<DataFlow::Chain> is the same of
 C<DataFlow::Node>, except for the accessor method for C<links>.
 
 =head1 DEPENDENCIES

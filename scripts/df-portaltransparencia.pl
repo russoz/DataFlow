@@ -7,7 +7,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
 use aliased 'DataFlow::Node';
-use aliased 'DataFlow::Node::Chain';
+use aliased 'DataFlow::Chain';
 use aliased 'DataFlow::Node::LiteralData';
 use aliased 'DataFlow::Node::HTMLFilter';
 use aliased 'DataFlow::Node::URLRetriever';

@@ -17,7 +17,7 @@ has '+process_item' => (
 package main;
 
 use DataFlow::Node;
-use DataFlow::Node::Chain;
+use DataFlow::Chain;
 use common::sense;
 
 # tests: 3
@@ -31,7 +31,7 @@ my $rv = DataFlow::Node->new(
     process_item => sub { shift; return scalar reverse $_[0]; }
 );
 ok($rv);
-my $chain = DataFlow::Node::Chain->new( links => [ $uc, $rv ] );
+my $chain = DataFlow::Chain->new( links => [ $uc, $rv ] );
 ok($chain);
 
 #use Data::Dumper;
@@ -54,7 +54,7 @@ my $cc =
   DataFlow::Node->new( process_item => sub { shift; return length(shift) }
   );
 ok($cc);
-my $chain2 = DataFlow::Node::Chain->new( links => [ $rp5, $cc ] );
+my $chain2 = DataFlow::Chain->new( links => [ $rp5, $cc ] );
 ok($chain2);
 
 # tests: 2
@@ -72,7 +72,7 @@ my $fifteen = $chain2->output;
 #use Data::Dumper; diag( Dumper($fifteen) );
 ok( $fifteen == 15 );
 
-my $chain3 = DataFlow::Node::Chain->new( links => [] );
+my $chain3 = DataFlow::Chain->new( links => [] );
 ok($chain3);
 
 eval { $chain3->process('some text') };
