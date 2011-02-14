@@ -1,14 +1,20 @@
+TODO List
 
 Flow
 * use overload operators to create chains ('=>' or maybe '|' or '+')
 * a JSON iand/or YAML based constructor(s)
-* in a chain, the output from the previous node should be the same object in
-  memory as the input of the next node
-* a threshold parameter taht controls how many items can be passed, at most,
+* a threshold parameter that controls how many items can be passed, at most,
   in a single run
 * do not assume, internally, that nodes want all data available at once (it
   is doing that now, must fix)
 * start messing with parallel runs, via fork or threads
+
+Chain
+* in a chain, the output from the previous node should be the same object in
+  memory as the input of the next node
+* the chain's input queue must be the same object as the first link's input
+  queue, and conversely, the last link's output queue must be the same object
+  as the chain's output queue
 
 Nodes
 * char encoding node (there is a first attempt there already, needs to work
