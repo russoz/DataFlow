@@ -7,6 +7,7 @@ license 'perl';
 version_from 'lib/DataFlow/Node.pm';
 
 requires 'Moose';
+requires 'version' => 0.86;
 requires 'namespace::autoclean';
 requires 'Scalar::Util';
 requires 'List::Util';
@@ -20,7 +21,7 @@ requires 'WWW::Mechanize';
 
 requires 'MooseX::OneArgNew';
 requires 'MooseX::Types::IO';
-requires 'version' => 0.86;
+requires 'SQL::Abstract';
 
 test_requires 'Test::More';
 test_requires 'Test::Pod' => '1.41';
