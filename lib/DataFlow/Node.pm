@@ -2,7 +2,7 @@ package DataFlow::Node;
 
 use Moose;
 
-use version; our $VERSION = qv('0.90.01');
+use version; our $VERSION = qv('0.91.00');
 
 use Scalar::Util qw/blessed reftype/;
 use Queue::Base;
@@ -48,38 +48,32 @@ has process_item => (
 ##############################################################################
 # node input queue
 
-has '_inputq' => (
+has 'inputq' => (
     is      => 'ro',
     isa     => 'Queue::Base',
     default => sub { Queue::Base->new },
     handles => {
         _add_input      => 'add',
+        input           => 'add',
         _is_input_empty => 'empty',
         _dequeue_input  => sub {
             my $self = shift;
-            return $self->_inputq->remove unless wantarray;
-            return $self->_inputq->remove( $self->_inputq->size );
+            return $self->inputq->remove unless wantarray;
+            return $self->inputq->remove( $self->inputq->size );
         },
         clear_input => 'clear',
         has_input   => sub {
-            return 0 < shift->_inputq->size;
+            return !shift->inputq->empty;
         },
     },
 );
-
-sub input {
-    my $self = shift;
-
-    $self->_add_input(@_);
-
-    #use Data::Dumper; warn 'input self (after)= ' .Dumper($self);
-}
 
 sub process_input {
     my $self = shift;
     return unless $self->has_input;
 
-    $self->_add_output( $self->_handle_list( $self->_dequeue_input ) );
+    my $item = $self->_dequeue_input();
+    $self->_add_output( $self->_handle_list($item) );
 
     #use Data::Dumper; warn 'process_input :: self :: after = ' . Dumper($self);
 }
@@ -87,7 +81,7 @@ sub process_input {
 ##############################################################################
 # node output queue
 
-has '_outputq' => (
+has 'outputq' => (
     is      => 'ro',
     isa     => 'Queue::Base',
     default => sub { Queue::Base->new },
@@ -97,18 +91,20 @@ has '_outputq' => (
         _clear_output_queue => 'clear',
         _dequeue_output     => sub {
             my $self = shift;
-            return $self->_outputq->remove unless wantarray;
-            return $self->_outputq->remove( $self->_outputq->size );
+            return $self->outputq->remove unless wantarray;
+            return $self->outputq->remove( $self->outputq->size );
         },
         has_output => sub {
-            return 0 < shift->_outputq->size;
+            return 0 < shift->outputq->size;
         },
     },
 );
 
 sub output {
     my $self = shift;
-    $self->process_input if $self->auto_process;
+    if ( $self->auto_process ) {
+        $self->process_input if $self->outputq->empty;
+    }
 
     #use Data::Dumper; warn 'output self = ' .Dumper($self);
     return ( $self->_dequeue_output ) if wantarray;
@@ -132,8 +128,10 @@ sub has_queued_data {
 sub process {
     my $self = shift;
     return unless @_;
-    $self->input(@_);
-    $self->process_input;
+    foreach (@_) {
+        $self->input($_);
+        $self->process_input;
+    }
     return wantarray ? $self->output : scalar $self->output;
 }
 
