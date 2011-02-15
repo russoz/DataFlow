@@ -10,6 +10,7 @@ Flow
 * start messing with parallel runs, via fork or threads
 * method output() receives a positive integer, and returns at most that much
   elements
+* require Queue::Base 2.0 and use remove_all()
 
 Chain
 * in a chain, the output from the previous node should be the same object in
