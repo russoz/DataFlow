@@ -12,6 +12,9 @@ has links => (
     required => 1,
 );
 
+sub _first_link { shift->links->[0] }
+sub _last_link  { shift->links->[-1] }
+
 has '+process_item' => (
     default => sub {
         return sub {
@@ -23,14 +26,47 @@ has '+process_item' => (
             $self->confess('Chain has no nodes, cannot process_item()')
               unless scalar @{ $self->links };
 
-            $self->links->[0]->input($item);
-            my $last =
-              reduce { $a->process_input; $b->input( $a->output ); $b }
-            @{ $self->links };
-            return $last->output;
+            $self->_first_link->input($item);
+            return $self->_reduce->output;
         },;
     },
 );
+
+sub _reduce {
+    return reduce {
+        $a->process_input;
+
+        # always flush the output queue
+        $b->input( $a->output );
+        $b;
+    }
+    @{ shift->links };
+}
+
+override 'process_input' => sub {
+    my $self = shift;
+    return unless ( $self->has_input || $self->_chain_has_data );
+
+    # empty existing data in the pipe
+    while ( $self->_chain_has_data ) {
+        my $last = $self->_reduce;
+        $self->_add_output( $last->output );
+    }
+
+    unless ( $self->has_output ) {
+        my $item = $self->_dequeue_input;
+        $self->_add_output( $self->_handle_list($item) );
+    }
+};
+
+sub _chain_has_data {
+    return 0 != scalar( grep { $_->has_input } @{ shift->links } );
+}
+
+before 'flush' => sub {
+    my $self = shift;
+    $self->_first_link->input( $self->_dequeue_input );
+};
 
 1;
 
