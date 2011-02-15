@@ -25,3 +25,8 @@ Nodes
 * a node that runs an external command (system(), or IPC::Run, or...) and maps
   stdin, stdout, stderr respectively to input, output and error queues
 * split and join nodes, to allow flows to follow multiple paths
+
+Other
+* create a DataFlow::Maker class that will read JSON/YAML/something config
+  files and create DataFlows out of them
+
