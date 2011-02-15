@@ -8,6 +8,8 @@ Flow
 * do not assume, internally, that nodes want all data available at once (it
   is doing that now, must fix)
 * start messing with parallel runs, via fork or threads
+* method output() receives a positive integer, and returns at most that much
+  elements
 
 Chain
 * in a chain, the output from the previous node should be the same object in
