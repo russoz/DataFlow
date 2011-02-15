@@ -75,7 +75,7 @@ has '+process_item' => (
             #use Data::Dumper;
             #warn 'url list = ' . Dumper($result);
             $self->clear_paged_url;
-            return @result;
+            return [@result];
           }
     },
 );
