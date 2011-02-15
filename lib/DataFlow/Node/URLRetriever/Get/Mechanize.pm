@@ -16,6 +16,7 @@ sub _make_obj {
 
 sub _content {
     my ( $self, $response ) = @_;
+
     #print STDERR "mech _content\n";
     return $response->content;
 }

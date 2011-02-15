@@ -9,7 +9,7 @@ use Data::Dumper;
 has '+process_item' => (
     default => sub {
         return sub {
-            my ($self, $data) = @_;
+            my ( $self, $data ) = @_;
             print STDERR Dumper($data);
             return $data;
           }

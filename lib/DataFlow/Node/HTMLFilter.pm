@@ -41,7 +41,7 @@ has '+process_item' => (
             #warn 'xpath is built';
             #warn 'values if VALUES';
             return $html->findvalues( $self->search_xpath )
-	          if $self->result_type eq 'VALUE';
+              if $self->result_type eq 'VALUE';
 
             #warn 'not values, find nodes';
             my @result = $html->findnodes( $self->search_xpath );
@@ -53,7 +53,7 @@ has '+process_item' => (
             #warn 'wants HTML';
             return map { $_->as_HTML } @result;
         };
-        
+
         return $self->ref_result ? sub { return [ $proc->(@_) ] } : $proc;
     },
 );

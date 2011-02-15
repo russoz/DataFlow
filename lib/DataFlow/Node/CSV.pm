@@ -30,18 +30,20 @@ has 'eol' => (
 
 sub BUILD {
     my ($self) = @_;
-    $csv->print( $self->filehandle, [ map { utf8::upgrade( my $x = $_ ); $x } @{ $self->header } ] )
-        if $self->header;
+    $csv->print( $self->filehandle,
+        [ map { utf8::upgrade( my $x = $_ ); $x } @{ $self->header } ] )
+      if $self->header;
     print $self->eol;
 }
 
 has '+process_item' => (
     default => sub {
         return sub {
-            my ($self, $data)= @_;
-            $csv->print( $self->filehandle, [ map { utf8::upgrade( my $x = $_ ); $x } @{$data} ] );
+            my ( $self, $data ) = @_;
+            $csv->print( $self->filehandle,
+                [ map { utf8::upgrade( my $x = $_ ); $x } @{$data} ] );
             print $self->eol;
-            }
+          }
     }
 );
 
