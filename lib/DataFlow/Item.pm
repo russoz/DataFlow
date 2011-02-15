@@ -3,7 +3,7 @@ package DataFlow::Item;
 use Moose;
 use DataFlow::Meta;
 
-has meta => (
+has metadata => (
     is  => 'ro',
     isa => 'DataFlow::Meta',
 );
