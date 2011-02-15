@@ -11,6 +11,7 @@ Flow
 * method output() receives a positive integer, and returns at most that much
   elements
 * require Queue::Base 2.0 and use remove_all()
+* make classes immutable
 
 Chain
 * in a chain, the output from the previous node should be the same object in
