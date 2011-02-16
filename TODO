@@ -2,7 +2,6 @@ TODO List
 
 Flow
 * use overload operators to create chains ('=>' or maybe '|' or '+')
-* a JSON iand/or YAML based constructor(s)
 * a threshold parameter that controls how many items can be passed, at most,
   in a single run
 * do not assume, internally, that nodes want all data available at once (it

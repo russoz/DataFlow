@@ -2,11 +2,7 @@ package DataFlow::Node;
 
 use Moose;
 
-<<<<<<< HEAD
 use version; our $VERSION = qv('0.91.00');
-=======
-use version; our $VERSION = qv('0.90.01');
->>>>>>> a8d202f1e5fe5bb708053311150029adbc4f46af
 
 use Scalar::Util qw/blessed reftype/;
 use Queue::Base;
