@@ -58,8 +58,8 @@ has 'inputq' => (
         _is_input_empty => 'empty',
         _dequeue_input  => sub {
             my $self = shift;
-            return $self->inputq->remove unless wantarray;
-            return $self->inputq->remove( $self->inputq->size );
+            return
+              wantarray ? $self->inputq->remove_all : $self->inputq->remove;
         },
         clear_input => 'clear',
         has_input   => sub {
@@ -91,8 +91,8 @@ has 'outputq' => (
         _clear_output_queue => 'clear',
         _dequeue_output     => sub {
             my $self = shift;
-            return $self->outputq->remove unless wantarray;
-            return $self->outputq->remove( $self->outputq->size );
+            return
+              wantarray ? $self->outputq->remove_all : $self->outputq->remove;
         },
         has_output => sub {
             return 0 < shift->outputq->size;
@@ -147,8 +147,8 @@ has '_errorq' => (
         _is_error_empty => 'empty',
         _dequeue_error  => sub {
             my $self = shift;
-            return $self->_errorq->remove unless wantarray;
-            return $self->_errorq->remove( $self->_errorq->size );
+            return
+              wantarray ? $self->errorq->remove_all : $self->errorq->remove;
         },
         flush_error => 'clear',
         clear_error => 'clear',
@@ -261,6 +261,8 @@ sub _handle_code_ref {
     my ( $self, $item ) = @_;
     return sub { $self->process_item->( $self, $item->() ) };
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

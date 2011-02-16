@@ -12,7 +12,7 @@ requires 'namespace::autoclean';
 requires 'Scalar::Util';
 requires 'List::Util';
 requires 'List::MoreUtils';
-requires 'Queue::Base';
+requires 'Queue::Base' => '2.0';
 requires 'HTML::TreeBuilder::XPath';
 
 # URLRetriever
