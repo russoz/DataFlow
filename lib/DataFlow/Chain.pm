@@ -68,6 +68,8 @@ before 'flush' => sub {
     $self->_first_link->input( $self->_dequeue_input );
 };
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__

@@ -104,5 +104,7 @@ override 'process_input' => sub {
     $self->_add_output( $self->_handle_list(@item) );
 };
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 

@@ -10,6 +10,8 @@ has author       => ( is => 'rw', isa => 'Str', );
 has original     => ( is => 'rw', isa => 'Str', );
 has restrictions => ( is => 'rw', isa => 'Str', );
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
