@@ -20,6 +20,13 @@ Chain
   queue, and conversely, the last link's output queue must be the same object
   as the chain's output queue
 
+Chain
+* in a chain, the output from the previous node should be the same object in
+  memory as the input of the next node
+* the chain's input queue must be the same object as the first link's input
+  queue, and conversely, the last link's output queue must be the same object
+  as the chain's output queue
+
 Nodes
 * char encoding node (there is a first attempt there already, needs to work
   on it and write tests for it)
