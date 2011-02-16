@@ -51,8 +51,7 @@ ok( $abc eq 'CBA' );
 my $rp5 = Repeat->new( times => 5 );
 ok($rp5);
 my $cc =
-  DataFlow::Node->new( process_item => sub { shift; return length(shift) }
-  );
+  DataFlow::Node->new( process_item => sub { shift; return length(shift) } );
 ok($cc);
 my $chain2 = DataFlow::Chain->new( links => [ $rp5, $cc ] );
 ok($chain2);

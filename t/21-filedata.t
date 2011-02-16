@@ -3,7 +3,8 @@ use Test::More tests => 17;
 use_ok('DataFlow::Node::FileData');
 new_ok('DataFlow::Node::FileData');
 
-my $data = DataFlow::Node::FileData->new( initial_data => [ './examples/filedata.test' ] );
+my $data =
+  DataFlow::Node::FileData->new( initial_data => ['./examples/filedata.test'] );
 
 #use Data::Dumper;
 #diag(Dumper( $data ));
@@ -18,13 +19,14 @@ ok( $data->output eq 'linha 5' );
 ok( $data->output eq 'linha 6' );
 ok( $data->output eq 'linha 7' );
 
-ok( ! defined( $data->output ) );
+ok( !defined( $data->output ) );
 
 my $data2 = DataFlow::Node::FileData->new(
-  initial_data => [ './examples/filedata.test' ],
-  do_slurp => 1,
+    initial_data => ['./examples/filedata.test'],
+    do_slurp     => 1,
 );
 my $res2 = $data2->output;
+
 #use Data::Dumper; print STDERR 'slurpy '.Dumper($res2);
 ok( $res2->[0] eq 'linha 1' );
 ok( $res2->[1] eq 'linha 2' );

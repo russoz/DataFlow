@@ -60,8 +60,8 @@ my $chain = Chain->new(
         ),
         NOP->new( deref => 1, name => 'nop' ),
 
-		#Node->new( name => 'snoopy', process_item => sub { no strict; use Data::Dumper; print STDERR 'snoop: '.Dumper(eval '$chain')."\n" } ),
-		#DumperNode->new,
+#Node->new( name => 'snoopy', process_item => sub { no strict; use Data::Dumper; print STDERR 'snoop: '.Dumper(eval '$chain')."\n" } ),
+#DumperNode->new,
         URLRetriever->new( process_into => 1, ),
 
         #DumperNode->new,
