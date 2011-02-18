@@ -26,7 +26,7 @@ DataFlow::Node::NOP - A No-Op node, input data is passed unmodified to the outpu
     use DataFlow::NOP;
 
     my $nop = DataFlow::Node::NOP->new;
-    
+
     my $result = $nop->process( 'abc' );
     # $result == 'abc'
 

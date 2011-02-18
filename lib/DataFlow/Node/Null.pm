@@ -22,7 +22,7 @@ DataFlow::Node::Null - A null node, will discard any input and return undef in t
     use DataFlow::Null;
 
     my $null = DataFlow::Node::Null->new;
-    
+
     my $result = $null->process( 'abc' );
     # $result == undef
 

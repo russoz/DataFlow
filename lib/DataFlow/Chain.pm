@@ -105,9 +105,9 @@ DataFlow::Chain - A "super-node" that can link a sequence of nodes
 
 =head1 DESCRIPTION
 
-This is a L<Moose> based class that provides the idea of a chain of steps in 
-a data-flow. 
-One might think of it as the actual definition of the data flow, but this is a 
+This is a L<Moose> based class that provides the idea of a chain of steps in
+a data-flow.
+One might think of it as the actual definition of the data flow, but this is a
 limited, linear, flow, and there is room for a lot of improvements.
 
 A C<DataFlow::Chain> object accepts input like a regular
