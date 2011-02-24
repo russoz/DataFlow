@@ -1,4 +1,5 @@
 package DataFlow::Item;
+#ABSTRACT: A piece of information to be processed
 
 use strict;
 use warnings;
@@ -25,10 +26,6 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 =pod
-
-=head1 NAME
-
-DataFlow::Item - A DataFlow item with the associated metadata
 
 =head1 SYNOPSIS
 

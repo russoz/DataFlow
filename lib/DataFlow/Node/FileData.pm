@@ -1,4 +1,5 @@
 package DataFlow::Node::FileData;
+#ABSTRACT: A node that reads that from a file
 
 use strict;
 use warnings;

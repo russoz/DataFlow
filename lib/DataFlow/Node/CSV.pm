@@ -1,4 +1,5 @@
 package DataFlow::Node::CSV;
+#ABSTRACT: A CSV converting node
 
 use strict;
 use warnings;

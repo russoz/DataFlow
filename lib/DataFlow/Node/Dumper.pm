@@ -1,4 +1,5 @@
 package DataFlow::Node::Dumper;
+#ABSTRACT: A debugging node that will dump data to STDERR
 
 use strict;
 use warnings;

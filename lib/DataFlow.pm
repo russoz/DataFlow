@@ -1,4 +1,5 @@
 package DataFlow;
+#ABSTRACT: A framework for dataflow processing
 
 use strict;
 use warnings;
@@ -8,10 +9,6 @@ use warnings;
 1;
 
 =pod
-
-=head1 NAME
-
-DataFlow - A framework for dataflow processing
 
 =head1 SYNOPSIS
 

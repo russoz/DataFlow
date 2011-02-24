@@ -1,4 +1,5 @@
 package DataFlow::Meta;
+#ABSTRACT: A piece of information metadata
 
 use strict;
 use warnings;
@@ -22,10 +23,6 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 =pod
-
-=head1 NAME
-
-DataFlow::Meta - Meta-data required for DataFlow::Item
 
 =head1 SYNOPSIS
 

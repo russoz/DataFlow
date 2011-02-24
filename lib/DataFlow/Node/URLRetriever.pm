@@ -1,4 +1,5 @@
 package DataFlow::Node::URLRetriever;
+#ABSTRACT: An URL-retriever node
 
 use strict;
 use warnings;

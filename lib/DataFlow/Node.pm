@@ -1,4 +1,5 @@
 package DataFlow::Node;
+#ABSTRACT: A generic processing node in a data flow
 
 use strict;
 use warnings;
@@ -268,10 +269,6 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 =pod
-
-=head1 NAME
-
-DataFlow::Node - A generic processing node in a data flow
 
 =head1 SYNOPSIS
 

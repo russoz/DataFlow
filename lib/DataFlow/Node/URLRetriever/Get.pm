@@ -1,4 +1,5 @@
 package DataFlow::Node::URLRetriever::Get;
+#ABSTRACT: A HTTP Getter
 
 use strict;
 use warnings;
