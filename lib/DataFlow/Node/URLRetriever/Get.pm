@@ -1,4 +1,10 @@
 package DataFlow::Node::URLRetriever::Get;
+
+use strict;
+use warnings;
+
+# VERSION
+
 use Moose;
 
 with 'MooseX::Traits';
@@ -36,7 +42,7 @@ has obj => (
     default   => sub {
         my $self = shift;
         my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
-        eval "with q($mod)";
+        eval { with $mod };
         $self->confess($@) if $@;
         return $self->_make_obj;
     },
@@ -58,7 +64,7 @@ has content_sub => (
         my $self = shift;
         my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
 
-        eval "with q($mod)";
+        eval { with $mod };
         $self->confess($@) if $@;
 
         return sub { return $self->_content(shift); }
@@ -67,6 +73,12 @@ has content_sub => (
         return sub { return shift }
     },
 );
+
+=head2 get URL
+
+Issues a HTTP GET request to the URL
+
+=cut
 
 sub get {
     my ( $self, $url ) = @_;
@@ -86,12 +98,19 @@ sub get {
     return;
 }
 
+=head2 post URL
+
+Issues a HTTP POST request to the URL
+
+=cut
+
 sub post {
     my ( $self, $url, $form ) = @_;
     for ( 1 .. $self->attempts ) {
         my $content = $self->obj->post( $url, $form, $self->referer );
         return $self->content_sub->($content) if $content;
     }
+	return;
 }
 
 1;

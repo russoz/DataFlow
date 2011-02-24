@@ -1,5 +1,10 @@
 package DataFlow::Item;
 
+use strict;
+use warnings;
+
+# VERSION
+
 use Moose;
 use DataFlow::Meta;
 

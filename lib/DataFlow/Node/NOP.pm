@@ -1,5 +1,10 @@
 package DataFlow::Node::NOP;
 
+use strict;
+use warnings;
+
+# VERSION
+
 use Moose;
 extends 'DataFlow::Node';
 

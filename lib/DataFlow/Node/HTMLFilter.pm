@@ -1,5 +1,9 @@
-
 package DataFlow::Node::HTMLFilter;
+
+use strict;
+use warnings;
+
+# VERSION
 
 use Moose;
 extends 'DataFlow::Node';

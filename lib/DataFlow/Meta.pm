@@ -1,5 +1,10 @@
 package DataFlow::Meta;
 
+use strict;
+use warnings;
+
+# VERSION
+
 use Moose;
 use DateTime;
 

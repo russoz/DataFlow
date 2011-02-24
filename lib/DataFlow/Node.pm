@@ -1,5 +1,10 @@
 package DataFlow::Node;
 
+use strict;
+use warnings;
+
+# VERSION
+
 use Moose;
 
 use Scalar::Util qw/blessed reftype/;
@@ -74,6 +79,7 @@ sub process_input {
     $self->_add_output( $self->_handle_list($item) );
 
     #use Data::Dumper; warn 'process_input :: self :: after = ' . Dumper($self);
+	return;
 }
 
 ##############################################################################
@@ -124,9 +130,9 @@ sub has_queued_data {
 }
 
 sub process {
-    my $self = shift;
-    return unless @_;
-    foreach (@_) {
+    my ($self,@args) = @_;
+    return unless @args;
+    foreach (@args) {
         $self->input($_);
         $self->process_input;
     }
@@ -162,25 +168,20 @@ sub get_error {
 # code to handle different types of input
 #   ex: array-refs, hash-refs, code-refs, etc...
 
-use constant {
-    SVALUE => 'SVALUE',
-    OBJECT => 'OBJECT',
-};
-
 sub _param_type {
     my $p = shift;
     my $r = reftype($p);
-    return SVALUE unless $r;
-    return OBJECT if blessed($p);
+    return 'SVALUE' unless $r;
+    return 'OBJECT' if blessed($p);
     return $r;
 }
 
 sub _handle_list {
-    my $self   = shift;
+    my ($self,@args) = @_;
     my @result = ();
 
     #use Data::Dumper; warn '_handle_list(params) = '.Dumper(@_);
-    foreach my $item (@_) {
+    foreach my $item (@args) {
         my $type = _param_type($item);
         $self->confess('There is no handler for this parameter type!')
           unless exists $self->_handlers->{$type};
@@ -202,30 +203,30 @@ sub _handle_list {
 
 has '_handlers' => (
     is      => 'ro',
-    isa     => 'HashRef',
+    isa     => 'HashRef[CodeRef]',
     lazy    => 1,
     default => sub {
         my $me           = shift;
         my $type_handler = {
-            SVALUE => \&_handle_svalue,
-            OBJECT => \&_handle_svalue,
-            SCALAR => $me->process_into
+            'SVALUE' => \&_handle_svalue,
+            'OBJECT' => \&_handle_svalue,
+            'SCALAR' => $me->process_into
             ? \&_handle_scalar_ref
             : \&_handle_svalue,
-            ARRAY => $me->process_into ? \&_handle_array_ref : \&_handle_svalue,
-            HASH  => $me->process_into ? \&_handle_hash_ref  : \&_handle_svalue,
-            CODE  => $me->process_into ? \&_handle_code_ref  : \&_handle_svalue,
+            'ARRAY' => $me->process_into ? \&_handle_array_ref : \&_handle_svalue,
+            'HASH'  => $me->process_into ? \&_handle_hash_ref  : \&_handle_svalue,
+            'CODE'  => $me->process_into ? \&_handle_code_ref  : \&_handle_svalue,
         };
-        return $me->deref
-          ? {
-            SVALUE => $type_handler->{SVALUE},
-            OBJECT => $type_handler->{OBJECT},
-            SCALAR => sub { ${ $type_handler->{SCALAR}->(@_) } },
-            ARRAY  => sub { @{ $type_handler->{ARRAY}->(@_) } },
-            HASH   => sub { %{ $type_handler->{HASH}->(@_) } },
-            CODE   => sub { $type_handler->{CODE}->(@_)->() },
-          }
-          : $type_handler;
+		return $type_handler unless $me->deref;
+
+        return {
+            'SVALUE' => sub { $type_handler->{'SVALUE'}->(@_) },
+            'OBJECT' => sub { $type_handler->{'OBJECT'}->(@_) },
+            'SCALAR' => sub { ${ $type_handler->{'SCALAR'}->(@_) } },
+            'ARRAY'  => sub { @{ $type_handler->{'ARRAY'}->(@_) } },
+            'HASH'   => sub { %{ $type_handler->{'HASH'}->(@_) } },
+            'CODE'   => sub { $type_handler->{'CODE'}->(@_)->() },
+        };
     },
 );
 

@@ -1,5 +1,9 @@
-
 package DataFlow::Node::FileData;
+
+use strict;
+use warnings;
+
+# VERSION
 
 use Moose;
 use MooseX::Types::IO 'IO';
@@ -77,6 +81,7 @@ sub _check_eof {
         $self->_handle->close;
         $self->clear_handle;
     }
+	return;
 }
 
 override 'process_input' => sub {

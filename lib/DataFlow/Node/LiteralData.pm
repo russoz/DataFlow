@@ -1,5 +1,9 @@
-
 package DataFlow::Node::LiteralData;
+
+use strict;
+use warnings;
+
+# VERSION
 
 use Moose;
 with(

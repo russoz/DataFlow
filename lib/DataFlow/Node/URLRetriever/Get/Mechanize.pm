@@ -1,5 +1,9 @@
-
 package DataFlow::Node::URLRetriever::Get::Mechanize;
+
+use strict;
+use warnings;
+
+# VERSION
 
 use Moose::Role;
 
@@ -9,7 +13,7 @@ sub _make_obj {
     my $self = shift;
     return WWW::Mechanize->new(
         agent   => $self->agent,
-        onerror => sub { $self->debug(@_) },
+        onerror => sub { $self->confess(@_) },
         timeout => $self->timeout
     );
 }

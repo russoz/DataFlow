@@ -1,5 +1,9 @@
-
 package DataFlow::Node::URLRetriever::Get::Curl;
+
+use strict;
+use warnings;
+
+# VERSION
 
 use Moose::Role;
 

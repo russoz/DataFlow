@@ -1,5 +1,10 @@
 package DataFlow::Chain;
 
+use strict;
+use warnings;
+
+# VERSION
+
 use Moose;
 extends 'DataFlow::Node';
 
@@ -12,8 +17,8 @@ has links => (
     required => 1,
 );
 
-sub _first_link { shift->links->[0] }
-sub _last_link  { shift->links->[-1] }
+sub _first_link { return shift->links->[0] }
+sub _last_link  { return shift->links->[-1] }
 
 has '+process_item' => (
     default => sub {
