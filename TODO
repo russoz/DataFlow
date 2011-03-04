@@ -16,12 +16,15 @@ Chain
   as the chain's output queue
 
 Nodes
+* file reading/writing node
 * char encoding node (there is a first attempt there already, needs to work
   on it and write tests for it)
 * an OCR decoding module (any OCR perl modules out-there?)
 * a node that runs an external command (system(), or IPC::Run, or...) and maps
   stdin, stdout, stderr respectively to input, output and error queues
 * split and join nodes, to allow flows to follow multiple paths
+* node(s) to read from and write to message queues (AMQP, MQSeries, ...)
+* node that generates RDF content
 
 Other
 * create a DataFlow::Maker class that will read JSON/YAML/something config
