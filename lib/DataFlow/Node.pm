@@ -25,7 +25,7 @@ has deref => (
 has process_into => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 0,
+    default => 1,
 );
 
 has auto_process => (
