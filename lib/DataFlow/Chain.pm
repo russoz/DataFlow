@@ -1,4 +1,5 @@
 package DataFlow::Chain;
+
 #ABSTRACT: A "super-node" that can link a sequence of nodes
 
 use strict;

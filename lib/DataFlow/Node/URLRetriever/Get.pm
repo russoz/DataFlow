@@ -1,4 +1,5 @@
 package DataFlow::Node::URLRetriever::Get;
+
 #ABSTRACT: A HTTP Getter
 
 use strict;
@@ -111,7 +112,7 @@ sub post {
         my $content = $self->obj->post( $url, $form, $self->referer );
         return $self->content_sub->($content) if $content;
     }
-	return;
+    return;
 }
 
 1;
