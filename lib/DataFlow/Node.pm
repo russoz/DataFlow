@@ -1,4 +1,5 @@
 package DataFlow::Node;
+
 #ABSTRACT: A generic processing node in a data flow
 
 use strict;
@@ -19,18 +20,21 @@ has name => (
 has deref => (
     is      => 'ro',
     isa     => 'Bool',
+    lazy    => 1,
     default => 0,
 );
 
 has process_into => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 0,
+    lazy    => 1,
+    default => 1,
 );
 
 has auto_process => (
     is      => 'ro',
     isa     => 'Bool',
+    lazy    => 1,
     default => 1,
 );
 
@@ -39,8 +43,50 @@ has initial_data => (
     isa     => 'ArrayRef',
     trigger => sub {
         my ( $self, $new ) = @_;
-        $self->_add_input( @{$new} );
+        $self->input( @{$new} );
     },
+);
+
+has _dumper => (
+    is      => 'ro',
+    isa     => 'CodeRef',
+    lazy    => 1,
+    default => sub {
+        use Data::Dumper;
+        return sub {
+            return Dumper(@_);
+        };
+    },
+    handles => {
+        prefix_dumper => sub {
+            my ( $self, $prefix, @args ) = @_;
+            print STDERR $prefix;
+            if (@args) {
+                print STDERR ' ' . $self->_dumper->(@args);
+            }
+            else {
+                print STDERR "\n";
+            }
+        },
+        raw_dumper => sub {
+            my $self = shift;
+            print STDERR $self->_dumper->(@_);
+        },
+    },
+);
+
+has dump_input => (
+    is      => 'ro',
+    isa     => 'Bool',
+    lazy    => 1,
+    default => 0,
+);
+
+has dump_output => (
+    is      => 'ro',
+    isa     => 'Bool',
+    lazy    => 1,
+    default => 0,
 );
 
 has process_item => (
@@ -57,20 +103,19 @@ has 'inputq' => (
     isa     => 'Queue::Base',
     default => sub { Queue::Base->new },
     handles => {
-        _add_input      => 'add',
-        input           => 'add',
-        _is_input_empty => 'empty',
-        _dequeue_input  => sub {
-            my $self = shift;
-            return
-              wantarray ? $self->inputq->remove_all : $self->inputq->remove;
-        },
-        clear_input => 'clear',
-        has_input   => sub {
-            return !shift->inputq->empty;
-        },
+        _add_input => 'add',
+        input      => sub { my $self = shift; return $self->_add_input(@_); },
+        _dequeue_input => sub { return shift->inputq->remove(1); },
+        clear_input    => 'clear',
+        has_input      => sub { return !shift->inputq->empty; },
     },
 );
+
+before '_add_input' => sub {
+    my $self = shift;
+    return unless @_;
+    $self->prefix_dumper( '>>>', @_ ) if $self->dump_input;
+};
 
 sub process_input {
     my $self = shift;
@@ -80,7 +125,7 @@ sub process_input {
     $self->_add_output( $self->_handle_list($item) );
 
     #use Data::Dumper; warn 'process_input :: self :: after = ' . Dumper($self);
-	return;
+    return;
 }
 
 ##############################################################################
@@ -91,10 +136,8 @@ has 'outputq' => (
     isa     => 'Queue::Base',
     default => sub { Queue::Base->new },
     handles => {
-        _add_output         => 'add',
-        _is_output_empty    => 'empty',
-        _clear_output_queue => 'clear',
-        _dequeue_output     => sub {
+        _add_output     => 'add',
+        _dequeue_output => sub {
             my $self = shift;
             return
               wantarray ? $self->outputq->remove_all : $self->outputq->remove;
@@ -104,6 +147,12 @@ has 'outputq' => (
         },
     },
 );
+
+before '_add_output' => sub {
+    my $self = shift;
+    return unless @_;
+    $self->prefix_dumper( '<<<', @_ ) if $self->dump_output;
+};
 
 sub output {
     my $self = shift;
@@ -131,7 +180,7 @@ sub has_queued_data {
 }
 
 sub process {
-    my ($self,@args) = @_;
+    my ( $self, @args ) = @_;
     return unless @args;
     foreach (@args) {
         $self->input($_);
@@ -146,6 +195,7 @@ sub process {
 has '_errorq' => (
     is      => 'ro',
     isa     => 'Queue::Base',
+    lazy    => 1,
     default => sub { Queue::Base->new },
     handles => {
         _enqueue_error  => 'add',
@@ -178,7 +228,7 @@ sub _param_type {
 }
 
 sub _handle_list {
-    my ($self,@args) = @_;
+    my ( $self, @args ) = @_;
     my @result = ();
 
     #use Data::Dumper; warn '_handle_list(params) = '.Dumper(@_);
@@ -211,14 +261,14 @@ has '_handlers' => (
         my $type_handler = {
             'SVALUE' => \&_handle_svalue,
             'OBJECT' => \&_handle_svalue,
-            'SCALAR' => $me->process_into
-            ? \&_handle_scalar_ref
+            'SCALAR' => $me->process_into ? \&_handle_scalar_ref
             : \&_handle_svalue,
-            'ARRAY' => $me->process_into ? \&_handle_array_ref : \&_handle_svalue,
-            'HASH'  => $me->process_into ? \&_handle_hash_ref  : \&_handle_svalue,
-            'CODE'  => $me->process_into ? \&_handle_code_ref  : \&_handle_svalue,
+            'ARRAY' => $me->process_into ? \&_handle_array_ref
+            : \&_handle_svalue,
+            'HASH' => $me->process_into ? \&_handle_hash_ref : \&_handle_svalue,
+            'CODE' => $me->process_into ? \&_handle_code_ref : \&_handle_svalue,
         };
-		return $type_handler unless $me->deref;
+        return $type_handler unless $me->deref;
 
         return {
             'SVALUE' => sub { $type_handler->{'SVALUE'}->(@_) },

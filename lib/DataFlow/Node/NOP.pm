@@ -1,4 +1,5 @@
 package DataFlow::Node::NOP;
+
 #ABSTRACT: A No-Op node, input data is passed unmodified to the output
 
 use strict;
@@ -11,7 +12,7 @@ extends 'DataFlow::Node';
 
 has '+process_item' => (
     default => sub {
-        return sub { shift; return shift; }
+        return sub { shift; my $item = shift; return $item; }
     },
 );
 

@@ -1,4 +1,5 @@
 package DataFlow::Node::Encoding;
+
 #ABSTRACT: A encoding conversion node
 
 use strict;
