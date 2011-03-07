@@ -1,4 +1,4 @@
-package DataFlow::Node::FileData;
+package DataFlow::Node::FileInput;
 
 #ABSTRACT: A node that reads that from a file
 
@@ -8,29 +8,8 @@ use warnings;
 # VERSION
 
 use Moose;
-use MooseX::Types::IO 'IO';
-
 extends 'DataFlow::Node::NOP';
-
-has _handle => (
-    is        => 'rw',
-    isa       => 'IO',
-    coerce    => 1,
-    predicate => 'has_handle',
-    clearer   => 'clear_handle',
-);
-
-has nochomp => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
-);
-
-has do_slurp => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
-);
+with 'DataFlow::Role::File';
 
 has _get_item => (
     is       => 'ro',
@@ -76,15 +55,6 @@ has _get_item => (
         }
     },
 );
-
-sub _check_eof {
-    my $self = shift;
-    if ( $self->_handle->eof ) {
-        $self->_handle->close;
-        $self->clear_handle;
-    }
-    return;
-}
 
 override 'process_input' => sub {
     my $self = shift;
