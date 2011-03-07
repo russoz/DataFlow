@@ -28,10 +28,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-DataFlow::Node::Null - A null node, will discard any input and return undef in the output
-
 =head1 SYNOPSIS
 
     use DataFlow::Null;
@@ -54,15 +50,5 @@ C<DataFlow::Node>.
 =head1 DEPENDENCIES
 
 L<DataFlow::Node>
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-dataflow@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
 
 =cut
