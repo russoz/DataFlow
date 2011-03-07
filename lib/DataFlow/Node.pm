@@ -156,13 +156,23 @@ before '_add_output' => sub {
 
 sub output {
     my $self = shift;
-    if ( $self->auto_process ) {
-        $self->process_input if $self->outputq->empty;
+	my $num = shift;
+
+	$self->process_input if ($self->outputq->empty && $self->auto_process);
+
+	return $self->outputq->remove unless wantarray;
+
+	if( defined($num) ) {
+		if ( $self->auto_process ) {
+			while( $self->outputq->size < $num && $self->has_input ) {
+				$self->process_input;
+			}
+		}
+		return $self->outputq->remove($num);
     }
 
     #use Data::Dumper; warn 'output self = ' .Dumper($self);
-    return ( $self->_dequeue_output ) if wantarray;
-    return scalar $self->_dequeue_output;
+    return $self->outputq->remove_all;
 }
 
 sub flush {

@@ -1,4 +1,4 @@
-use Test::More tests => 20;
+use Test::More tests => 25;
 
 use strict;
 
@@ -47,3 +47,11 @@ ok( $uc->output eq 'BASE' );
 $uc->flush;
 ok( !$uc->output );
 
+$uc->input( qw/aa bb cc dd ee ff gg hh ii jj/ );
+my @r3 = $uc->output(3);
+is( scalar @r3, 3 );
+ok( $r[0] eq 'AA' );
+ok( $r[1] eq 'BB' );
+ok( $r[2] eq 'CC' );
+my @rall = $uc->output;
+is( scalar @rall, 7 );
