@@ -72,10 +72,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-DataFlow::Node::HTMLFilter - A filter node for HTML content.
-
 =head1 SYNOPSIS
 
     use DataFlow::Node::HTMLFilter;
@@ -166,16 +162,6 @@ L<DataFlow::Node>
 L<HTML::TreeBuilder::XPath>
 
 L<HTML::Element>
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-dataflow@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
 
 =cut
 

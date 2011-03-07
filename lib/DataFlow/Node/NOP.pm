@@ -24,10 +24,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-DataFlow::Node::NOP - A No-Op node, input data is passed unmodified to the output
-
 =head1 SYNOPSIS
 
     use DataFlow::NOP;
@@ -52,15 +48,5 @@ C<DataFlow::Node>.
 =head1 DEPENDENCIES
 
 L<DataFlow::Node>
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-dataflow@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
 
 =cut
