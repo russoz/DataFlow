@@ -1,4 +1,5 @@
 package DataFlow::Node::Null;
+
 #ABSTRACT: A null node, will discard any input and return undef in the output
 
 use strict;
@@ -7,9 +8,13 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node::NOP';
+extends 'DataFlow::Node';
 
-override 'input' => sub { };
+has '+process_item' => (
+    'default' => sub {
+        return sub { shift; return; }
+    },
+);
 
 __PACKAGE__->meta->make_immutable;
 

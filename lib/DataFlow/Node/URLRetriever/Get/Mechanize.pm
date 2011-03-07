@@ -1,4 +1,5 @@
 package DataFlow::Node::URLRetriever::Get::Mechanize;
+
 #ABSTRACT: A HTTP Getter implementation using WWW::Mechanize
 
 use strict;

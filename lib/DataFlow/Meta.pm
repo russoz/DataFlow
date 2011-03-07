@@ -1,4 +1,5 @@
 package DataFlow::Meta;
+
 #ABSTRACT: A piece of information metadata
 
 use strict;
