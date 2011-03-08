@@ -11,7 +11,7 @@ use Moose;
 extends 'DataFlow::Node';
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub { shift; my $item = shift; return $item; }
     },
 );

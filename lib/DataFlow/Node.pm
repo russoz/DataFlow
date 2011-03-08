@@ -12,53 +12,53 @@ use Moose;
 use Scalar::Util qw/blessed reftype/;
 use Queue::Base;
 
-has name => (
-    is  => 'ro',
-    isa => 'Str',
+has 'name' => (
+    'is'  => 'ro',
+    'isa' => 'Str',
 );
 
-has deref => (
-    is      => 'ro',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => 0,
+has 'deref' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'lazy'    => 1,
+    'default' => 0,
 );
 
-has process_into => (
-    is      => 'ro',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => 1,
+has 'process_into' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'lazy'    => 1,
+    'default' => 1,
 );
 
-has auto_process => (
-    is      => 'ro',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => 1,
+has 'auto_process' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'lazy'    => 1,
+    'default' => 1,
 );
 
-has initial_data => (
-    is      => 'ro',
-    isa     => 'ArrayRef',
-    trigger => sub {
+has 'initial_data' => (
+    'is'      => 'ro',
+    'isa'     => 'ArrayRef',
+    'trigger' => sub {
         my ( $self, $new ) = @_;
         $self->input( @{$new} );
     },
 );
 
-has _dumper => (
-    is      => 'ro',
-    isa     => 'CodeRef',
-    lazy    => 1,
-    default => sub {
+has '_dumper' => (
+    'is'      => 'ro',
+    'isa'     => 'CodeRef',
+    'lazy'    => 1,
+    'default' => sub {
         use Data::Dumper;
         return sub {
             return Dumper(@_);
         };
     },
-    handles => {
-        prefix_dumper => sub {
+    'handles' => {
+        'prefix_dumper' => sub {
             my ( $self, $prefix, @args ) = @_;
             print STDERR $prefix;
             if (@args) {
@@ -68,46 +68,46 @@ has _dumper => (
                 print STDERR "\n";
             }
         },
-        raw_dumper => sub {
+        'raw_dumper' => sub {
             my $self = shift;
             print STDERR $self->_dumper->(@_);
         },
     },
 );
 
-has dump_input => (
-    is      => 'ro',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => 0,
+has 'dump_input' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'lazy'    => 1,
+    'default' => 0,
 );
 
-has dump_output => (
-    is      => 'ro',
-    isa     => 'Bool',
-    lazy    => 1,
-    default => 0,
+has 'dump_output' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'lazy'    => 1,
+    'default' => 0,
 );
 
-has process_item => (
-    is       => 'ro',
-    isa      => 'CodeRef',
-    required => 1,
+has 'process_item' => (
+    'is'       => 'ro',
+    'isa'      => 'CodeRef',
+    'required' => 1,
 );
 
 ##############################################################################
 # node input queue
 
 has 'inputq' => (
-    is      => 'ro',
-    isa     => 'Queue::Base',
-    default => sub { Queue::Base->new },
-    handles => {
-        _add_input => 'add',
-        input      => sub { my $self = shift; return $self->_add_input(@_); },
-        _dequeue_input => sub { return shift->inputq->remove(1); },
-        clear_input    => 'clear',
-        has_input      => sub { return !shift->inputq->empty; },
+    'is'      => 'ro',
+    'isa'     => 'Queue::Base',
+    'default' => sub { Queue::Base->new },
+    'handles' => {
+        '_add_input' => 'add',
+        'input'      => sub { my $self = shift; return $self->_add_input(@_); },
+        '_dequeue_input' => sub { return shift->inputq->remove(1); },
+        'clear_input'    => 'clear',
+        'has_input'      => sub { return !shift->inputq->empty; },
     },
 );
 
@@ -132,17 +132,17 @@ sub process_input {
 # node output queue
 
 has 'outputq' => (
-    is      => 'ro',
-    isa     => 'Queue::Base',
-    default => sub { Queue::Base->new },
-    handles => {
-        _add_output     => 'add',
-        _dequeue_output => sub {
+    'is'      => 'ro',
+    'isa'     => 'Queue::Base',
+    'default' => sub { Queue::Base->new },
+    'handles' => {
+        '_add_output'     => 'add',
+        '_dequeue_output' => sub {
             my $self = shift;
             return
               wantarray ? $self->outputq->remove_all : $self->outputq->remove;
         },
-        has_output => sub {
+        'has_output' => sub {
             return 0 < shift->outputq->size;
         },
     },
@@ -193,20 +193,20 @@ sub process {
 # node error queue
 
 has '_errorq' => (
-    is      => 'ro',
-    isa     => 'Queue::Base',
-    lazy    => 1,
-    default => sub { Queue::Base->new },
-    handles => {
-        _enqueue_error  => 'add',
-        _is_error_empty => 'empty',
-        _dequeue_error  => sub {
+    'is'      => 'ro',
+    'isa'     => 'Queue::Base',
+    'lazy'    => 1,
+    'default' => sub { Queue::Base->new },
+    'handles' => {
+        '_enqueue_error'  => 'add',
+        '_is_error_empty' => 'empty',
+        '_dequeue_error'  => sub {
             my $self = shift;
             return
               wantarray ? $self->errorq->remove_all : $self->errorq->remove;
         },
-        flush_error => 'clear',
-        clear_error => 'clear',
+        'flush_error' => 'clear',
+        'clear_error' => 'clear',
     },
 );
 
@@ -253,10 +253,10 @@ sub _handle_list {
 #
 
 has '_handlers' => (
-    is      => 'ro',
-    isa     => 'HashRef[CodeRef]',
-    lazy    => 1,
-    default => sub {
+    'is'      => 'ro',
+    'isa'     => 'HashRef[CodeRef]',
+    'lazy'    => 1,
+    'default' => sub {
         my $me           = shift;
         my $type_handler = {
             'SVALUE' => \&_handle_svalue,

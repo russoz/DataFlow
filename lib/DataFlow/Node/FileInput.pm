@@ -11,12 +11,12 @@ use Moose;
 extends 'DataFlow::Node::NOP';
 with 'DataFlow::Role::File';
 
-has _get_item => (
-    is       => 'ro',
-    isa      => 'CodeRef',
-    required => 1,
-    lazy     => 1,
-    default  => sub {
+has '_get_item' => (
+    'is'       => 'ro',
+    'isa'      => 'CodeRef',
+    'required' => 1,
+    'lazy'     => 1,
+    'default'  => sub {
         my $self = shift;
 
         #use Data::Dumper; print STDERR Dumper($self);

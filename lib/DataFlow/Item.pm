@@ -10,14 +10,14 @@ use warnings;
 use Moose;
 use DataFlow::Meta;
 
-has metadata => (
-    is  => 'ro',
-    isa => 'DataFlow::Meta',
+has 'metadata' => (
+    'is'  => 'ro',
+    'isa' => 'DataFlow::Meta',
 );
 
-has data => (
-    is  => 'ro',
-    isa => 'Any',
+has 'data' => (
+    'is'  => 'ro',
+    'isa' => 'Any',
 );
 
 __PACKAGE__->meta->make_immutable;

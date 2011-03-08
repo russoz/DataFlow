@@ -11,7 +11,7 @@ use Moose;
 extends 'DataFlow::Node';
 
 has '+process_into' => (
-	default => 0,
+	'default' => 0,
 );
 
 has '+process_item' => (

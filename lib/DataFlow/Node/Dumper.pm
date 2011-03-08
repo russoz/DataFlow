@@ -13,7 +13,7 @@ extends 'DataFlow::Node';
 use Data::Dumper;
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub {
             my ( $self, $item ) = @_;
             $self->raw_dumper($item);
