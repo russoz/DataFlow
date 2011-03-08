@@ -44,8 +44,8 @@ has 'csv' => (
         };
         return $make_csv->() unless $self->inject_header;
 
-        croak
-'Thou hast requested to inject headers but,'. 'alas, no header has been provided'
+        croak 'Thou hast requested to inject headers but,'
+          . 'alas, no header has been provided'
           unless ( $self->has_header );
 
         $self->_add_output( $self->deref ? @{ $self->header } : $self->header );
