@@ -13,7 +13,7 @@ extends 'DataFlow::Node';
 use Data::Dumper;
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub {
             my ( $self, $item ) = @_;
             $self->raw_dumper($item);
@@ -29,10 +29,6 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 =pod
-
-=head1 NAME
-
-DataFlow::Node::Dumper - Dumper node, will print every input item to STDERR with Data::Dumper
 
 =head1 SYNOPSIS
 
@@ -58,15 +54,5 @@ C<DataFlow::Node>.
 L<Data::Dumper>
 
 L<DataFlow::Node>
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-dataflow@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
 
 =cut

@@ -13,29 +13,29 @@ extends 'DataFlow::Node';
 use Moose::Util::TypeConstraints;
 use HTML::TreeBuilder::XPath;
 
-has search_xpath => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1,
+has 'search_xpath' => (
+    'is'       => 'ro',
+    'isa'      => 'Str',
+    'required' => 1,
 );
 
-enum _result_type => [qw(NODE HTML VALUE)];
+enum '_result_type' => [qw(NODE HTML VALUE)];
 
-has result_type => (
-    is      => 'ro',
-    isa     => '_result_type',
-    default => 'HTML',
+has 'result_type' => (
+    'is'      => 'ro',
+    'isa'     => '_result_type',
+    'default' => 'HTML',
 );
 
-has ref_result => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
+has 'ref_result' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'default' => 0,
 );
 
 has '+process_item' => (
-    lazy    => 1,
-    default => sub {
+    'lazy'    => 1,
+    'default' => sub {
         my $self = shift;
 
         my $proc = sub {
@@ -71,10 +71,6 @@ __PACKAGE__->meta->make_immutable;
 __END__
 
 =pod
-
-=head1 NAME
-
-DataFlow::Node::HTMLFilter - A filter node for HTML content.
 
 =head1 SYNOPSIS
 
@@ -166,16 +162,6 @@ L<DataFlow::Node>
 L<HTML::TreeBuilder::XPath>
 
 L<HTML::Element>
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-dataflow@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
 
 =cut
 

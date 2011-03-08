@@ -12,18 +12,18 @@ extends 'DataFlow::Node';
 
 use Carp;
 
-has first_page => (
-    is      => 'ro',
-    isa     => 'Int',
-    default => 1,
+has 'first_page' => (
+    'is'      => 'ro',
+    'isa'     => 'Int',
+    'default' => 1,
 );
 
-has last_page => (
-    is       => 'ro',
-    isa      => 'Int',
-    required => 1,
-    lazy     => 1,
-    default  => sub {
+has 'last_page' => (
+    'is'       => 'ro',
+    'isa'      => 'Int',
+    'required' => 1,
+    'lazy'     => 1,
+    'default'  => sub {
         my $self = shift;
 
         #warn 'last_page';
@@ -36,32 +36,32 @@ has last_page => (
 # calling convention for the sub:
 #   - $self
 #   - $url (Str)
-has produce_last_page => (
-    is      => 'ro',
-    isa     => 'CodeRef',
-    lazy    => 1,
-    default => sub { shift->confess(q{produce_last_page not implemented!}); },
+has 'produce_last_page' => (
+    'is'      => 'ro',
+    'isa'     => 'CodeRef',
+    'lazy'    => 1,
+    'default' => sub { shift->confess(q{produce_last_page not implemented!}); },
 );
 
 # calling convention for the sub:
 #   - $self
 #   - $paged_url (Str)
 #   - $page      (Int)
-has make_page_url => (
-    is       => 'ro',
-    isa      => 'CodeRef',
-    required => 1,
+has 'make_page_url' => (
+    'is'       => 'ro',
+    'isa'      => 'CodeRef',
+    'required' => 1,
 );
 
-has _paged_url => (
-    is        => 'rw',
-    isa       => 'Str',
-    predicate => 'has_paged_url',
-    clearer   => 'clear_paged_url',
+has '_paged_url' => (
+    'is'        => 'rw',
+    'isa'       => 'Str',
+    'predicate' => 'has_paged_url',
+    'clearer'   => 'clear_paged_url',
 );
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub {
             my ( $self, $url ) = @_;
 

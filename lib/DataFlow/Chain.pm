@@ -13,17 +13,17 @@ extends 'DataFlow::Node';
 use DataFlow::Node;
 use List::Util qw/reduce/;
 
-has links => (
-    is       => 'ro',
-    isa      => 'ArrayRef[DataFlow::Node]',
-    required => 1,
+has 'links' => (
+    'is'       => 'ro',
+    'isa'      => 'ArrayRef[DataFlow::Node]',
+    'required' => 1,
 );
 
 sub _first_link { return shift->links->[0] }
 sub _last_link  { return shift->links->[-1] }
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub {
             my ( $self, $item ) = @_;
 
@@ -83,10 +83,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-DataFlow::Chain - A "super-node" that can link a sequence of nodes
-
 =head1 SYNOPSIS
 
     use DataFlow::Node;
@@ -123,32 +119,10 @@ chain, and pumps the output of each link into the input of the next one,
 similarly to pipes in a shell command line. The output of the last link of the
 chain will be used as the output of the entire chain.
 
-=head1 ATTRIBUTES
-
-=head2 links
-
-This attribute is a C<< ArrayRef[DataFlow::Node] >>, and it holds the
-actual "chain" of nodes to process the data.
-
-=head1 METHODS
-
-The interface for C<DataFlow::Chain> is the same of
-C<DataFlow::Node>, except for the accessor method for C<links>.
-
 =head1 DEPENDENCIES
 
 L<DataFlow::Node>
 
 L<List::Util>
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-Please report any bugs or feature requests to
-C<bug-dataflow@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
 
 =cut

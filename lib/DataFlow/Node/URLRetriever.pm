@@ -12,21 +12,21 @@ extends 'DataFlow::Node';
 
 use DataFlow::Node::URLRetriever::Get;
 
-has _get => (
-    is      => 'rw',
-    isa     => 'DataFlow::Node::URLRetriever::Get',
-    lazy    => 1,
-    default => sub { DataFlow::Node::URLRetriever::Get->new }
+has '_get' => (
+    'is'      => 'rw',
+    'isa'     => 'DataFlow::Node::URLRetriever::Get',
+    'lazy'    => 1,
+    'default' => sub { DataFlow::Node::URLRetriever::Get->new }
 );
 
-has baseurl => (
-    is        => 'ro',
-    isa       => 'Str',
-    predicate => 'has_baseurl',
+has 'baseurl' => (
+    'is'        => 'ro',
+    'isa'       => 'Str',
+    'predicate' => 'has_baseurl',
 );
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub {
             my ( $self, $item ) = @_;
 

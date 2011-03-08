@@ -1,10 +1,10 @@
 use Test::More tests => 17;
 
-use_ok('DataFlow::Node::FileData');
-new_ok('DataFlow::Node::FileData');
+use_ok('DataFlow::Node::FileInput');
+new_ok('DataFlow::Node::FileInput');
 
 my $data =
-  DataFlow::Node::FileData->new( initial_data => ['./examples/filedata.test'] );
+  DataFlow::Node::FileInput->new( initial_data => ['./examples/file.test'] );
 
 #use Data::Dumper;
 #diag(Dumper( $data ));
@@ -21,8 +21,8 @@ ok( $data->output eq 'linha 7' );
 
 ok( !defined( $data->output ) );
 
-my $data2 = DataFlow::Node::FileData->new(
-    initial_data => ['./examples/filedata.test'],
+my $data2 = DataFlow::Node::FileInput->new(
+    initial_data => ['./examples/file.test'],
     do_slurp     => 1,
 );
 my $res2 = $data2->output;
