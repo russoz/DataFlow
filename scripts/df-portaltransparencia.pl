@@ -13,7 +13,8 @@ use aliased 'DataFlow::Node::NOP';
 use aliased 'DataFlow::Node::HTMLFilter';
 use aliased 'DataFlow::Node::URLRetriever';
 use aliased 'DataFlow::Node::MultiPageURLGenerator';
-use aliased 'DataFlow::Node::Dumper' => 'DumperNode';
+
+#use aliased 'DataFlow::Node::Dumper' => 'DumperNode';
 use aliased 'DataFlow::Node::SQL';
 
 my $base = join( '/',
@@ -22,9 +23,7 @@ my $base = join( '/',
 
 my $chain = Chain->new(
     links => [
-        LiteralData->new($base),
-
-        #DumperNode->new,
+        LiteralData->new( data => $base, ),
         MultiPageURLGenerator->new(
             name       => 'multipage',
             first_page => -2,
@@ -58,7 +57,7 @@ my $chain = Chain->new(
                 return $u->as_string;
             },
         ),
-        NOP->new( deref => 1, name => 'nop' ),
+        NOP->new( deref => 1, name => 'nop', ),
         URLRetriever->new( process_into => 1, ),
         HTMLFilter->new(
             process_into => 1,
@@ -80,7 +79,7 @@ my $chain = Chain->new(
                 return $_;
             }
         ),
-        DumperNode->new,
+        NOP->new( dump_output => 1 ),
     ],
 );
 

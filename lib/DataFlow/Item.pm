@@ -1,4 +1,5 @@
 package DataFlow::Item;
+
 #ABSTRACT: A piece of information to be processed
 
 use strict;

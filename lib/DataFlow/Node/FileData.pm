@@ -1,4 +1,5 @@
 package DataFlow::Node::FileData;
+
 #ABSTRACT: A node that reads that from a file
 
 use strict;
@@ -82,7 +83,7 @@ sub _check_eof {
         $self->_handle->close;
         $self->clear_handle;
     }
-	return;
+    return;
 }
 
 override 'process_input' => sub {

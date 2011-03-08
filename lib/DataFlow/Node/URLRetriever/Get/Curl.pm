@@ -1,4 +1,5 @@
 package DataFlow::Node::URLRetriever::Get::Curl;
+
 #ABSTRACT: A HTTP Getter implementation using Curl
 
 use strict;

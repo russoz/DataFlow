@@ -1,4 +1,5 @@
 package DataFlow::Node::Dumper;
+
 #ABSTRACT: A debugging node that will dump data to STDERR
 
 use strict;
@@ -14,9 +15,8 @@ use Data::Dumper;
 has '+process_item' => (
     default => sub {
         return sub {
-            shift;
-            my $item = shift;
-            print STDERR Dumper($item);
+            my ( $self, $item ) = @_;
+            $self->raw_dumper($item);
             return $item;
           }
     }

@@ -1,4 +1,5 @@
 package DataFlow::Node::MultiPageURLGenerator;
+
 #ABSTRACT: A node that generates multi-paged URL lists
 
 use strict;
