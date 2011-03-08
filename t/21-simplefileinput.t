@@ -4,7 +4,8 @@ use_ok('DataFlow::Node::SimpleFileInput');
 new_ok('DataFlow::Node::SimpleFileInput');
 
 my $data =
-  DataFlow::Node::SimpleFileInput->new( initial_data => ['./examples/file.test'] );
+  DataFlow::Node::SimpleFileInput->new(
+    initial_data => ['./examples/file.test'] );
 
 #use Data::Dumper;
 #diag(Dumper( $data ));
