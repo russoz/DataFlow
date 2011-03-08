@@ -4,9 +4,8 @@ use DataFlow::Node;
 use common::sense;
 
 # tests: 1
-my $uc = DataFlow::Node->new(
-    process_item => sub { shift; return uc(shift) },
-);
+my $uc =
+  DataFlow::Node->new( process_item => sub { shift; return uc(shift) }, );
 ok($uc);
 
 # tests: 2
@@ -45,7 +44,7 @@ ok( $uc->process($cref)->() eq 'GGG' );
 
 my $not_into = DataFlow::Node->new(
     process_item => sub { shift; return uc(shift) },
-	process_into => 0,
+    process_into => 0,
 );
 ok($not_into);
 
@@ -53,6 +52,6 @@ my $valnot = 'yabadabadoo';
 ok( $not_into->process($valnot) eq 'YABADABADOO' );
 
 my $refnot = \$valnot;
-my $resnot = $not_into->process( $refnot );
+my $resnot = $not_into->process($refnot);
 isnt( $resnot, $refnot );
 
