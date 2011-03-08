@@ -26,6 +26,16 @@ Nodes
 * node(s) to read from and write to message queues (AMQP, MQSeries, ...)
 * node that generates RDF content
 
+Item
+* start using DataFlow::Item to carry data and metadata through the flow
+* autoboxing of data into an Item?
+* autofill metadata?
+* revamp everything so that nodes may have "types" - scalar, arrayrefs, 
+  DataFLow::Item ??
+  - one might declare a node to handle only specific types of input
+  - if input fails to meet the expected type, one can choose to dicard that
+    input or to pass it through unmodified.
+
 Other
 * create a DataFlow::Maker class that will read JSON/YAML/something config
   files and create DataFlows out of them
