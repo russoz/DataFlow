@@ -115,5 +115,7 @@ sub post {
     return;
 }
 
+no Moose;
+
 1;
 
