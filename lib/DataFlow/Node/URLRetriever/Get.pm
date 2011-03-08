@@ -12,36 +12,36 @@ use Moose;
 with 'MooseX::Traits';
 has '+_trait_namespace' => ( default => 'DataFlow::Node::URLRetriever::Get' );
 
-has referer => (
-    is      => 'rw',
-    isa     => 'Str',
-    default => '',
+has 'referer' => (
+    'is'      => 'rw',
+    'isa'     => 'Str',
+    'default' => '',
 );
 
-has timeout => (
-    is      => 'rw',
-    isa     => 'Int',
-    default => 30
+has 'timeout' => (
+    'is'      => 'rw',
+    'isa'     => 'Int',
+    'default' => 30
 );
 
-has agent => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => 'Linux Mozilla'
+has 'agent' => (
+    'is'      => 'ro',
+    'isa'     => 'Str',
+    'default' => 'Linux Mozilla'
 );
 
-has attempts => (
-    is      => 'ro',
-    isa     => 'Int',
-    default => 5
+has 'attempts' => (
+    'is'      => 'ro',
+    'isa'     => 'Int',
+    'default' => 5
 );
 
-has obj => (
-    is        => 'ro',
-    isa       => 'Any',
-    lazy      => 1,
-    predicate => 'has_obj',
-    default   => sub {
+has 'obj' => (
+    'is'        => 'ro',
+    'isa'       => 'Any',
+    'lazy'      => 1,
+    'predicate' => 'has_obj',
+    'default'   => sub {
         my $self = shift;
         my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
         eval { with $mod };
@@ -50,19 +50,19 @@ has obj => (
     },
 );
 
-has browser => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1,
-    lazy     => 1,
-    default  => 'Mechanize',
+has 'browser' => (
+    'is'       => 'ro',
+    'isa'      => 'Str',
+    'required' => 1,
+    'lazy'     => 1,
+    'default'  => 'Mechanize',
 );
 
-has content_sub => (
-    is      => 'ro',
-    isa     => 'CodeRef',
-    lazy    => 1,
-    default => sub {
+has 'content_sub' => (
+    'is'      => 'ro',
+    'isa'     => 'CodeRef',
+    'lazy'    => 1,
+    'default' => sub {
         my $self = shift;
         my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
 

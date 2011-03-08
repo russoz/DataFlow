@@ -13,17 +13,17 @@ extends 'DataFlow::Node';
 use DataFlow::Node;
 use List::Util qw/reduce/;
 
-has links => (
-    is       => 'ro',
-    isa      => 'ArrayRef[DataFlow::Node]',
-    required => 1,
+has 'links' => (
+    'is'       => 'ro',
+    'isa'      => 'ArrayRef[DataFlow::Node]',
+    'required' => 1,
 );
 
 sub _first_link { return shift->links->[0] }
 sub _last_link  { return shift->links->[-1] }
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub {
             my ( $self, $item ) = @_;
 

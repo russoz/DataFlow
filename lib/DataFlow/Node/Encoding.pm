@@ -13,19 +13,19 @@ extends 'DataFlow::Node';
 use Encode;
 
 has 'input_encoding' => (
-    is        => 'ro',
-    isa       => 'Str',
-    predicate => 'has_input_encoding',
+    'is'        => 'ro',
+    'isa'       => 'Str',
+    'predicate' => 'has_input_encoding',
 );
 
 has 'output_encoding' => (
-    is        => 'ro',
-    isa       => 'Str',
-    predicate => 'has_output_encoding',
+    'is'        => 'ro',
+    'isa'       => 'Str',
+    'predicate' => 'has_output_encoding',
 );
 
 has '+process_item' => (
-    default => sub {
+    'default' => sub {
         return sub {
             my ( $me, $item ) = @_;
             return $item unless ref($item) ne '';

@@ -10,24 +10,24 @@ use warnings;
 use Moose::Role;
 use MooseX::Types::IO 'IO';
 
-has _handle => (
-    is        => 'rw',
-    isa       => 'IO',
-    coerce    => 1,
-    predicate => 'has_handle',
-    clearer   => 'clear_handle',
+has '_handle' => (
+    'is'        => 'rw',
+    'isa'       => 'IO',
+    'coerce'    => 1,
+    'predicate' => 'has_handle',
+    'clearer'   => 'clear_handle',
 );
 
-has nochomp => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
+has 'nochomp' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'default' => 0,
 );
 
-has do_slurp => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
+has 'do_slurp' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'default' => 0,
 );
 
 sub _check_eof {
