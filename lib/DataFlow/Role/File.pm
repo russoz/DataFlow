@@ -1,21 +1,22 @@
 package DataFlow::Role::File;
 
-#ABSTRACT: A role that provides a file-handle for nodes
-
 use strict;
 use warnings;
+
+# ABSTRACT: A role that provides a file-handle for nodes
+# ENCODING: utf8
 
 # VERSION
 
 use Moose::Role;
 use MooseX::Types::IO 'IO';
 
-has '_handle' => (
+has 'file' => (
     'is'        => 'rw',
     'isa'       => 'IO',
     'coerce'    => 1,
-    'predicate' => 'has_handle',
-    'clearer'   => 'clear_handle',
+    'predicate' => 'has_file',
+    'clearer'   => 'clear_file',
 );
 
 has 'nochomp' => (
@@ -32,9 +33,9 @@ has 'do_slurp' => (
 
 sub _check_eof {
     my $self = shift;
-    if ( $self->_handle->eof ) {
-        $self->_handle->close;
-        $self->clear_handle;
+    if ( $self->file->eof ) {
+        $self->file->close;
+        $self->clear_file;
     }
     return;
 }

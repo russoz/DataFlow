@@ -1,9 +1,10 @@
 package DataFlow::Node::NOP;
 
-#ABSTRACT: A No-Op node, input data is passed unmodified to the output
-
 use strict;
 use warnings;
+
+# ABSTRACT: A No-Op node, input data is passed unmodified to the output
+# ENCODING: utf8
 
 # VERSION
 
@@ -17,6 +18,7 @@ has '+process_item' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

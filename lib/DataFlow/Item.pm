@@ -1,9 +1,10 @@
 package DataFlow::Item;
 
-#ABSTRACT: A piece of information to be processed
-
 use strict;
 use warnings;
+
+# ABSTRACT: A piece of information to be processed
+# ENCODING: utf8
 
 # VERSION
 
@@ -21,6 +22,7 @@ has 'data' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

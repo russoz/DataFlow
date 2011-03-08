@@ -1,9 +1,10 @@
 package DataFlow;
 
-#ABSTRACT: A framework for dataflow processing
-
 use strict;
 use warnings;
+
+# ABSTRACT: A framework for dataflow processing
+# ENCODING: utf8
 
 # VERSION
 

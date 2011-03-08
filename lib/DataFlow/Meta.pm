@@ -1,9 +1,10 @@
 package DataFlow::Meta;
 
-#ABSTRACT: A piece of information metadata
-
 use strict;
 use warnings;
+
+# ABSTRACT: A piece of information metadata
+# ENCODING: utf8
 
 # VERSION
 
@@ -18,6 +19,7 @@ has 'original'     => ( is => 'rw', isa => 'Str', );
 has 'restrictions' => ( is => 'rw', isa => 'Str', );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

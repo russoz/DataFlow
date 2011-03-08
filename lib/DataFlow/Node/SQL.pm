@@ -1,9 +1,10 @@
 package DataFlow::Node::SQL;
 
-#ABSTRACT: A node that generates SQL clauses
-
 use strict;
 use warnings;
+
+# ABSTRACT: A node that generates SQL clauses
+# ENCODING: utf8
 
 # VERSION
 
@@ -34,6 +35,7 @@ has '+process_item' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

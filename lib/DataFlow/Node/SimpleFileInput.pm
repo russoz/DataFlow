@@ -1,9 +1,10 @@
-package DataFlow::Node::FileInput;
-
-#ABSTRACT: A node that reads that from a file
+package DataFlow::Node::SimpleFileInput;
 
 use strict;
 use warnings;
+
+# ABSTRACT: A node that reads that from a file
+# ENCODING: utf8
 
 # VERSION
 
@@ -24,7 +25,7 @@ has '_get_item' => (
         return sub {
 
             #use Data::Dumper; print STDERR 'slurpy ' .Dumper($self);
-            my $fh    = $self->_handle;
+            my $fh    = $self->file;
             my @slurp = <$fh>;
             chomp @slurp unless $self->nochomp;
 
@@ -38,7 +39,7 @@ has '_get_item' => (
             return sub {
 
                 #use Data::Dumper; print STDERR 'nochompy ' .Dumper($self);
-                my $fh   = $self->_handle;
+                my $fh   = $self->file;
                 my $item = <$fh>;
                 return $item;
             };
@@ -47,7 +48,7 @@ has '_get_item' => (
             return sub {
 
                 #use Data::Dumper; print STDERR 'chompy ' .Dumper($self);
-                my $fh   = $self->_handle;
+                my $fh   = $self->file;
                 my $item = <$fh>;
                 chomp $item;
                 return $item;
@@ -59,11 +60,11 @@ has '_get_item' => (
 override 'process_input' => sub {
     my $self = shift;
 
-    until ( $self->has_handle ) {
+    until ( $self->has_file ) {
         return unless $self->has_input;
         my $nextfile = $self->_dequeue_input;
 
-        eval { $self->_handle($nextfile) };
+        eval { $self->file($nextfile) };
         $self->confess($@) if $@;
 
         # check for EOF
@@ -82,6 +83,7 @@ override 'process_input' => sub {
 };
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

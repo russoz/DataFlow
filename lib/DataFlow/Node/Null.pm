@@ -1,18 +1,17 @@
 package DataFlow::Node::Null;
 
-#ABSTRACT: A null node, will discard any input and return undef in the output
-
 use strict;
 use warnings;
+
+# ABSTRACT: A null node, will discard any input and return undef in the output
+# ENCODING: utf8
 
 # VERSION
 
 use Moose;
 extends 'DataFlow::Node';
 
-has '+process_into' => (
-	'default' => 0,
-);
+has '+process_into' => ( 'default' => 0, );
 
 has '+process_item' => (
     'default' => sub {
@@ -21,6 +20,7 @@ has '+process_item' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

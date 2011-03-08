@@ -1,9 +1,10 @@
 package DataFlow::Node::URLRetriever::Get::Curl;
 
-#ABSTRACT: A HTTP Getter implementation using Curl
-
 use strict;
 use warnings;
+
+# ABSTRACT: A HTTP Getter implementation using Curl
+# ENCODING: utf8
 
 # VERSION
 

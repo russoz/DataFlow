@@ -1,9 +1,10 @@
 package DataFlow::Node::LiteralData;
 
-#ABSTRACT: A node provides its initialization data for flow processing
-
 use strict;
 use warnings;
+
+# ABSTRACT: A node provides its initialization data for flow processing
+# ENCODING: utf8
 
 # VERSION
 
@@ -32,6 +33,7 @@ has 'data' => (
 override 'input' => sub { };
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

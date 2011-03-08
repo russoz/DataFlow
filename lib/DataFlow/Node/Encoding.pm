@@ -1,9 +1,10 @@
 package DataFlow::Node::Encoding;
 
-#ABSTRACT: A encoding conversion node
-
 use strict;
 use warnings;
+
+# ABSTRACT: A encoding conversion node
+# ENCODING: utf8
 
 # VERSION
 
@@ -41,6 +42,7 @@ has '+process_item' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

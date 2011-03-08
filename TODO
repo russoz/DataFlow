@@ -5,8 +5,18 @@ Flow
 * a threshold parameter that controls how many items can be passed, at most,
   in a single run
 * start messing with parallel runs, via fork or threads
-* method output() receives a positive integer, and returns at most that much
-  elements
+* use some logging facility
+  - make a proper error handling/alerting code
+* refactor Node and Chain and the underlying logic:
+  - create a Processor class (or role? gotta think more)
+    - a Processor has only the processing logic
+	- the Node will have the queues
+	- a Processor receives (inputq,outputq) for the processing call
+	  (this will allow to easily modify, dynamically, the input/output queues
+	   being used - useful for Chain and for process() )
+  - Node becomes a 'runner' for a Processor
+  - Chain will have an array of queues, and processing items through the pipe
+    becomes a matter of calling the processors with each pair of queues
 
 Chain
 * in a chain, the output from the previous node should be the same object in
@@ -25,6 +35,16 @@ Nodes
 * split and join nodes, to allow flows to follow multiple paths
 * node(s) to read from and write to message queues (AMQP, MQSeries, ...)
 * node that generates RDF content
+
+Item
+* start using DataFlow::Item to carry data and metadata through the flow
+* autoboxing of data into an Item?
+* autofill metadata?
+* revamp everything so that nodes may have "types" - scalar, arrayrefs, 
+  DataFLow::Item ??
+  - one might declare a node to handle only specific types of input
+  - if input fails to meet the expected type, one can choose to dicard that
+    input or to pass it through unmodified.
 
 Other
 * create a DataFlow::Maker class that will read JSON/YAML/something config

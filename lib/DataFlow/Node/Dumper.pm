@@ -1,9 +1,10 @@
 package DataFlow::Node::Dumper;
 
-#ABSTRACT: A debugging node that will dump data to STDERR
-
 use strict;
 use warnings;
+
+# ABSTRACT: A debugging node that will dump data to STDERR
+# ENCODING: utf8
 
 # VERSION
 
@@ -23,6 +24,7 @@ has '+process_item' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

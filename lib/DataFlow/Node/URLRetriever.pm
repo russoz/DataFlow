@@ -1,9 +1,10 @@
 package DataFlow::Node::URLRetriever;
 
-#ABSTRACT: An URL-retriever node
-
 use strict;
 use warnings;
+
+# ABSTRACT: An URL-retriever node
+# ENCODING: utf8
 
 # VERSION
 
@@ -43,6 +44,7 @@ has '+process_item' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 

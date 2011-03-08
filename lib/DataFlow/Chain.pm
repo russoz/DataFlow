@@ -1,9 +1,10 @@
 package DataFlow::Chain;
 
-#ABSTRACT: A "super-node" that can link a sequence of nodes
-
 use strict;
 use warnings;
+
+# ABSTRACT: A "super-node" that can link a sequence of nodes
+# ENCODING: utf8
 
 # VERSION
 
@@ -76,6 +77,7 @@ before 'flush' => sub {
 };
 
 __PACKAGE__->meta->make_immutable;
+no Moose;
 
 1;
 
