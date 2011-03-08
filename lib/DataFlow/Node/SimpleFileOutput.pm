@@ -13,24 +13,24 @@ extends 'DataFlow::Node';
 with 'DataFlow::Role::File';
 
 has 'ors' => (
-	'is' => 'ro',
-	'isa' => 'Str',
-	'lazy' => 1,
-	'default' => "\n",
-	'predicate' => 'has_ors',
-	'documentation' => 'Output record separator',
+    'is'            => 'ro',
+    'isa'           => 'Str',
+    'lazy'          => 1,
+    'default'       => "\n",
+    'predicate'     => 'has_ors',
+    'documentation' => 'Output record separator',
 );
 
 has '+process_item' => (
-	'default' => sub {
-		return sub {
-			my ($self, $item) = @_;
-			my $fh = $self->file;
-			local $\ = $self->ors if $self->has_ors;
-			print $fh $item;
-			return $item;
-		}
-	},
+    'default' => sub {
+        return sub {
+            my ( $self, $item ) = @_;
+            my $fh = $self->file;
+            local $\ = $self->ors if $self->has_ors;
+            print $fh $item;
+            return $item;
+          }
+    },
 );
 
 __PACKAGE__->meta->make_immutable;
