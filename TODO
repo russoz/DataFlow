@@ -5,8 +5,8 @@ Flow
 * a threshold parameter that controls how many items can be passed, at most,
   in a single run
 * start messing with parallel runs, via fork or threads
-* method output() receives a positive integer, and returns at most that much
-  elements
+* use some logging facility
+  - make a proper error handling/alerting code
 
 Chain
 * in a chain, the output from the previous node should be the same object in
