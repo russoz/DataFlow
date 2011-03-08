@@ -1,9 +1,10 @@
 package DataFlow::Node::LiteralData;
 
-#ABSTRACT: A node provides its initialization data for flow processing
-
 use strict;
 use warnings;
+
+# ABSTRACT: A node provides its initialization data for flow processing
+# ENCODING: utf8
 
 # VERSION
 

@@ -1,9 +1,10 @@
 package DataFlow::Node::URLRetriever::Get::Mechanize;
 
-#ABSTRACT: A HTTP Getter implementation using WWW::Mechanize
-
 use strict;
 use warnings;
+
+# ABSTRACT: A HTTP Getter implementation using WWW::Mechanize
+# ENCODING: utf8
 
 # VERSION
 

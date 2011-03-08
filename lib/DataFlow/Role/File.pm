@@ -1,9 +1,10 @@
 package DataFlow::Role::File;
 
-#ABSTRACT: A role that provides a file-handle for nodes
-
 use strict;
 use warnings;
+
+# ABSTRACT: A role that provides a file-handle for nodes
+# ENCODING: utf8
 
 # VERSION
 

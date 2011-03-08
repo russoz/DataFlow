@@ -1,9 +1,10 @@
 package DataFlow::Node::HTMLFilter;
 
-#ABSTRACT: A HTML filtering node
-
 use strict;
 use warnings;
+
+# ABSTRACT: A HTML filtering node
+# ENCODING: utf8
 
 # VERSION
 

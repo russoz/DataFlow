@@ -1,9 +1,10 @@
 package DataFlow::Node::Encoding;
 
-#ABSTRACT: A encoding conversion node
-
 use strict;
 use warnings;
+
+# ABSTRACT: A encoding conversion node
+# ENCODING: utf8
 
 # VERSION
 

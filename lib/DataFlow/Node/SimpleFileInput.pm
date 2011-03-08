@@ -1,9 +1,10 @@
 package DataFlow::Node::SimpleFileInput;
 
-#ABSTRACT: A node that reads that from a file
-
 use strict;
 use warnings;
+
+# ABSTRACT: A node that reads that from a file
+# ENCODING: utf8
 
 # VERSION
 

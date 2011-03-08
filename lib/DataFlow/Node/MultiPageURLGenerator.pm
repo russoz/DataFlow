@@ -1,9 +1,10 @@
 package DataFlow::Node::MultiPageURLGenerator;
 
-#ABSTRACT: A node that generates multi-paged URL lists
-
 use strict;
 use warnings;
+
+# ABSTRACT: A node that generates multi-paged URL lists
+# ENCODING: utf8
 
 # VERSION
 

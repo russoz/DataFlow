@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 # ABSTRACT: A CSV converting node
+# ENCODING: utf8
+
 # VERSION
 
 use Moose;

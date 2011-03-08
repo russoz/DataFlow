@@ -1,9 +1,10 @@
 package DataFlow::Node;
 
-#ABSTRACT: A generic processing node in a data flow
-
 use strict;
 use warnings;
+
+# ABSTRACT: A generic processing node in a data flow
+# ENCODING: utf8
 
 # VERSION
 

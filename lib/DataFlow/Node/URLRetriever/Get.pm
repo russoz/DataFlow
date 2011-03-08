@@ -1,9 +1,10 @@
 package DataFlow::Node::URLRetriever::Get;
 
-#ABSTRACT: A HTTP Getter
-
 use strict;
 use warnings;
+
+# ABSTRACT: A HTTP Getter
+# ENCODING: utf8
 
 # VERSION
 

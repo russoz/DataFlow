@@ -1,9 +1,10 @@
 package DataFlow::Node::SimpleFileOutput;
 
-#ABSTRACT: A node that writes data to a file
-
 use strict;
 use warnings;
+
+# ABSTRACT: A node that writes data to a file
+# ENCODING: utf8
 
 # VERSION
 
