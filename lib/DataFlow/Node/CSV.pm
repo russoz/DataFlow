@@ -36,9 +36,9 @@ has 'direction' => (
 );
 
 has 'text_csv_opts' => (
-    'is'  => 'ro',
-    'isa' => 'HashRef',
-	'predicate' => 'has_text_csv_opts',
+    'is'        => 'ro',
+    'isa'       => 'HashRef',
+    'predicate' => 'has_text_csv_opts',
 );
 
 has 'csv' => (
@@ -47,47 +47,45 @@ has 'csv' => (
     'default' => sub {
         my $self = shift;
 
-        return $self->has_text_csv_opts ?
-		Text::CSV->new( $self->text_csv_opts ):
-        Text::CSV->new();
+        return $self->has_text_csv_opts
+          ? Text::CSV->new( $self->text_csv_opts )
+          : Text::CSV->new();
     },
 );
 
 sub _combine {
-	my ($self,$e) = @_;
-	$self->csv->combine( @{ $e } );
-	return $self->csv->string;
+    my ( $self, $e ) = @_;
+    $self->csv->combine( @{$e} );
+    return $self->csv->string;
 }
 
 sub _to_csv {
     my ( $self, $data ) = @_;
-	if( $self->_header_unused ) {
-		$self->_header_unused(0);
-		return ( $self->_combine( $self->headers ), $self->_combine( $data ) );
-	}
+    if ( $self->_header_unused ) {
+        $self->_header_unused(0);
+        return ( $self->_combine( $self->headers ), $self->_combine($data) );
+    }
 
-    return $self->_combine( $data );
+    return $self->_combine($data);
 }
 
 sub _parse {
-	my ($self,$line) = @_;
+    my ( $self, $line ) = @_;
     $self->csv->parse($line);
     return [ $self->csv->fields ];
 }
 
 sub _from_csv {
     my ( $self, $csv_line ) = @_;
-	if( $self->_header_unused ) {
-		$self->_header_unused(0);
-		$self->headers( $self->_parse($csv_line) );
-		return;
-	}
-	return $self->_parse($csv_line);
+    if ( $self->_header_unused ) {
+        $self->_header_unused(0);
+        $self->headers( $self->_parse($csv_line) );
+        return;
+    }
+    return $self->_parse($csv_line);
 }
 
-has '+process_into' => (
-	'default' => 0,
-);
+has '+process_into' => ( 'default' => 0, );
 
 has '+process_item' => (
     'lazy'    => 1,
