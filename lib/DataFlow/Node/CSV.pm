@@ -15,13 +15,13 @@ use Moose::Util::TypeConstraints;
 use Text::CSV;
 
 has 'headers' => (
-    'is'        => 'ro',
+    'is'        => 'rw',
     'isa'       => 'ArrayRef[Str]',
     'predicate' => 'have_headers',
 );
 
 has '_header_unused' => (
-    'is'      => 'ro',
+    'is'      => 'rw',
     'isa'     => 'Bool',
     'default' => 1,
     'clearer' => '_use_header',
@@ -38,6 +38,7 @@ has 'direction' => (
 has 'text_csv_opts' => (
     'is'  => 'ro',
     'isa' => 'HashRef',
+	'predicate' => 'has_text_csv_opts',
 );
 
 has 'csv' => (
@@ -46,38 +47,47 @@ has 'csv' => (
     'default' => sub {
         my $self = shift;
 
-        my $make_csv = sub {
-            return Text::CSV->new( $self->text_csv_opts );
-        };
-        return $make_csv->() unless $self->have_headers;
-
-        # use headers
-        if ( $self->direction eq 'TO_CSV' ) {
-            $self->input( $self->headers );
-        }
-
-        return $make_csv->();
+        return $self->has_text_csv_opts ?
+		Text::CSV->new( $self->text_csv_opts ):
+        Text::CSV->new();
     },
 );
 
-before 'process_input' => sub {
-    my $self = shift;
-    return unless $self->direction eq 'TO_CSV';
-    $self->add_output( $self->headers );
-    $self->_use_header;
-};
+sub _combine {
+	my ($self,$e) = @_;
+	$self->csv->combine( @{ $e } );
+	return $self->csv->string;
+}
 
 sub _to_csv {
     my ( $self, $data ) = @_;
-    $self->csv->combine( @{$data} );
-    return $self->csv->string;
+	if( $self->_header_unused ) {
+		$self->_header_unused(0);
+		return ( $self->_combine( $self->headers ), $self->_combine( $data ) );
+	}
+
+    return $self->_combine( $data );
+}
+
+sub _parse {
+	my ($self,$line) = @_;
+    $self->csv->parse($line);
+    return [ $self->csv->fields ];
 }
 
 sub _from_csv {
-    my ( $self, $csvline ) = @_;
-    $self->csv->parse($csvline);
-    return [ $self->csv->fields ];
+    my ( $self, $csv_line ) = @_;
+	if( $self->_header_unused ) {
+		$self->_header_unused(0);
+		$self->headers( $self->_parse($csv_line) );
+		return;
+	}
+	return $self->_parse($csv_line);
 }
+
+has '+process_into' => (
+	'default' => 0,
+);
 
 has '+process_item' => (
     'lazy'    => 1,
