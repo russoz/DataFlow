@@ -13,9 +13,8 @@ use aliased 'DataFlow::Node::NOP';
 use aliased 'DataFlow::Node::HTMLFilter';
 use aliased 'DataFlow::Node::URLRetriever';
 use aliased 'DataFlow::Node::MultiPageURLGenerator';
-
-#use aliased 'DataFlow::Node::Dumper' => 'DumperNode';
-use aliased 'DataFlow::Node::SQL';
+use aliased 'DataFlow::Node::CSV';
+use aliased 'DataFlow::Node::SimpleFileOutput';
 
 my $base = join( '/',
     q{http://www.portaltransparencia.gov.br},
@@ -25,9 +24,9 @@ my $chain = Chain->new(
     links => [
         LiteralData->new( data => $base, ),
         MultiPageURLGenerator->new(
-            name       => 'multipage',
-            first_page => -2,
+            name => 'multipage',
 
+            #first_page => -2,
             #last_page     => 35,
             produce_last_page => sub {
                 my $url = shift;
@@ -35,11 +34,9 @@ my $chain = Chain->new(
                 use DataFlow::Node::URLRetriever::Get;
                 use HTML::TreeBuilder::XPath;
 
-                #print STDERR qq{produce_last_page url = $url\n};
                 my $get  = DataFlow::Node::URLRetriever::Get->new;
                 my $html = $get->get($url);
 
-                #print STDERR 'html = '.$html."\n";
                 my $texto =
                   HTML::TreeBuilder::XPath->new_from_content($html)
                   ->findvalue('//p[@class="paginaAtual"]');
@@ -79,7 +76,20 @@ my $chain = Chain->new(
                 return $_;
             }
         ),
-        NOP->new( dump_output => 1 ),
+        CSV->new(
+            direction     => 'TO_CSV',
+            text_csv_opts => { binary => 1 },
+            headers       => [
+                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
+                'Tipo',       'Data Inicial',
+                'Data Final', 'Nome do Órgão/Entidade',
+                'UF',         'Fonte',
+                'Data'
+            ],
+        ),
+        SimpleFileOutput->new( file => '> /tmp/ceis.csv', ors => "\n" ),
+
+        #NOP->new( dump_output => 1 ),
     ],
 );
 
