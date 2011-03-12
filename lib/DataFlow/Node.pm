@@ -11,7 +11,7 @@ use warnings;
 use Moose;
 
 use Scalar::Util qw/blessed reftype looks_like_number/;
-use Queue::Base;
+use Queue::Base 2.1;
 
 has 'name' => (
     'is'  => 'ro',
