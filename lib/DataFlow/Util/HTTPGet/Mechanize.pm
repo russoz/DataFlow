@@ -1,4 +1,4 @@
-package DataFlow::Node::URLRetriever::Get::Mechanize;
+package DataFlow::Util::HTTPGet::Mechanize;
 
 use strict;
 use warnings;

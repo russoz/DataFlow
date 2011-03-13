@@ -1,4 +1,4 @@
-package DataFlow::Node::URLRetriever::Get::Curl;
+package DataFlow::Util::HTTPGet::Curl;
 
 use strict;
 use warnings;

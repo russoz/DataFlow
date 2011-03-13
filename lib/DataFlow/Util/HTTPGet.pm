@@ -1,4 +1,4 @@
-package DataFlow::Node::URLRetriever::Get;
+package DataFlow::Util::HTTPGet;
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use warnings;
 use Moose;
 
 with 'MooseX::Traits';
-has '+_trait_namespace' => ( default => 'DataFlow::Node::URLRetriever::Get' );
+has '+_trait_namespace' => ( default => 'DataFlow::Util::HTTPGet' );
 
 has 'referer' => (
     'is'      => 'rw',
@@ -44,7 +44,7 @@ has 'obj' => (
     'predicate' => 'has_obj',
     'default'   => sub {
         my $self = shift;
-        my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
+        my $mod  = q{DataFlow::Util::HTTPGet::} . $self->browser;
         eval { with $mod };
         confess($@) if $@;
         return $self->_make_obj;
@@ -65,7 +65,7 @@ has 'content_sub' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
-        my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
+        my $mod  = q{DataFlow::Util::HTTPGet::} . $self->browser;
 
         eval { with $mod };
         confess($@) if $@;

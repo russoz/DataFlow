@@ -11,13 +11,13 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
-use DataFlow::Node::URLRetriever::Get;
+use DataFlow::Util::HTTPGet;
 
 has '_get' => (
     'is'      => 'ro',
-    'isa'     => 'DataFlow::Node::URLRetriever::Get',
+    'isa'     => 'DataFlow::Util::HTTPGet',
     'lazy'    => 1,
-    'default' => sub { DataFlow::Node::URLRetriever::Get->new }
+    'default' => sub { DataFlow::Util::HTTPGet->new }
 );
 
 has 'baseurl' => (

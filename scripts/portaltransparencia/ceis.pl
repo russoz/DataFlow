@@ -31,10 +31,10 @@ my $chain = Chain->new(
             produce_last_page => sub {
                 my $url = shift;
 
-                use DataFlow::Node::URLRetriever::Get;
+                use DataFlow::Util::HTTPGet;
                 use HTML::TreeBuilder::XPath;
 
-                my $get  = DataFlow::Node::URLRetriever::Get->new;
+                my $get  = DataFlow::Util::HTTPGet->new;
                 my $html = $get->get($url);
 
                 my $texto =
