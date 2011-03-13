@@ -1,17 +1,17 @@
-package DataFlow::Node::CSV;
+package DataFlow::Proc::CSV;
 
 use strict;
 use warnings;
 
-# ABSTRACT: A CSV converting node
+# ABSTRACT: A CSV converting processor
 # ENCODING: utf8
 
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints 1.01;
 use Text::CSV;
 
 has 'headers' => (
@@ -27,11 +27,9 @@ has '_header_unused' => (
     'clearer' => '_use_header',
 );
 
-enum '_direction_type' => [qw/FROM_CSV TO_CSV/];
-
 has 'direction' => (
     'is'       => 'ro',
-    'isa'      => '_direction_type',
+    'isa'      => enum( [qw/FROM_CSV TO_CSV/] ),
     'required' => 1,
 );
 
@@ -59,40 +57,41 @@ sub _combine {
     return $self->csv->string;
 }
 
-sub _to_csv {
-    my ( $self, $data ) = @_;
-    if ( $self->_header_unused ) {
-        $self->_header_unused(0);
-        return ( $self->_combine( $self->headers ), $self->_combine($data) );
-    }
-
-    return $self->_combine($data);
-}
-
 sub _parse {
     my ( $self, $line ) = @_;
     $self->csv->parse($line);
     return [ $self->csv->fields ];
 }
 
-sub _from_csv {
-    my ( $self, $csv_line ) = @_;
-    if ( $self->_header_unused ) {
-        $self->_header_unused(0);
-        $self->headers( $self->_parse($csv_line) );
-        return;
-    }
-    return $self->_parse($csv_line);
-}
-
 has '+process_into' => ( 'default' => 0, );
 
-has '+process_item' => (
+has '+p' => (
     'lazy'    => 1,
     'default' => sub {
-        return \&_to_csv if shift->direction eq 'TO_CSV';
-        return \&_from_csv;
-    }
+        my $self = shift;
+
+        return sub {
+            my $data = shift;
+            if ( $self->_header_unused ) {
+                $self->_header_unused(0);
+                return ( $self->_combine( $self->headers ),
+                    $self->_combine($data) );
+            }
+
+            return $self->_combine($data);
+          }
+          if shift->direction eq 'TO_CSV';
+
+        return sub {
+            my $csv_line = shift;
+            if ( $self->_header_unused ) {
+                $self->_header_unused(0);
+                $self->headers( $self->_parse($csv_line) );
+                return;
+            }
+            return $self->_parse($csv_line);
+        };
+    },
 );
 
 __PACKAGE__->meta->make_immutable;

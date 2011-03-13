@@ -1,4 +1,4 @@
-package DataFlow::Node::Encoding;
+package DataFlow::Proc::Encoding;
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 
 use Encode;
 
@@ -25,19 +25,20 @@ has 'output_encoding' => (
     'predicate' => 'has_output_encoding',
 );
 
-has '+process_item' => (
+has '+p' => (
     'default' => sub {
+        my $self = shift;
         return sub {
-            my ( $me, $item ) = @_;
+            my $item = shift;
             return $item unless ref($item) ne '';
             my $data =
-              $me->has_input_encoding
-              ? decode( $me->input_encoding, $item )
+              $self->has_input_encoding
+              ? decode( $self->input_encoding, $item )
               : $item;
-            return $me->has_output_encoding
-              ? encode( $me->output_encoding, $data )
+            return $self->has_output_encoding
+              ? encode( $self->output_encoding, $data )
               : $data;
-          }
+        };
     },
 );
 

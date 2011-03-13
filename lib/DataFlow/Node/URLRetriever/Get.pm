@@ -46,7 +46,7 @@ has 'obj' => (
         my $self = shift;
         my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
         eval { with $mod };
-        $self->confess($@) if $@;
+        confess($@) if $@;
         return $self->_make_obj;
     },
 );
@@ -68,7 +68,7 @@ has 'content_sub' => (
         my $mod  = q{DataFlow::Node::URLRetriever::Get::} . $self->browser;
 
         eval { with $mod };
-        $self->confess($@) if $@;
+        confess($@) if $@;
 
         return sub { return $self->_content(shift); }
           if $self->can('_content');

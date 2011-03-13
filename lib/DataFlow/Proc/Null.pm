@@ -1,4 +1,4 @@
-package DataFlow::Node::Null;
+package DataFlow::Proc::Null;
 
 use strict;
 use warnings;
@@ -9,13 +9,12 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 
 has '+process_into' => ( 'default' => 0, );
-
-has '+process_item' => (
+has '+p' => (
     'default' => sub {
-        return sub { shift; return; }
+        return sub { }
     },
 );
 
@@ -32,7 +31,7 @@ __END__
 
     use DataFlow::Null;
 
-    my $null = DataFlow::Node::Null->new;
+    my $null = DataFlow::Proc::Null->new;
 
     my $result = $null->process( 'abc' );
     # $result == undef
@@ -44,11 +43,7 @@ provided to it.
 
 =head1 METHODS
 
-The interface for C<DataFlow::Node::Null> is the same of
-C<DataFlow::Node>.
-
-=head1 DEPENDENCIES
-
-L<DataFlow::Node>
+The interface for C<DataFlow::Proc::Null> is the same of
+C<DataFlow::Proc>.
 
 =cut

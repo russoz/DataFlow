@@ -1,17 +1,17 @@
-package DataFlow::Node::HTMLFilter;
+package DataFlow::Proc::HTMLFilter;
 
 use strict;
 use warnings;
 
-# ABSTRACT: A HTML filtering node
+# ABSTRACT: A HTML filtering processor
 # ENCODING: utf8
 
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints 1.01;
 use HTML::TreeBuilder::XPath;
 
 has 'search_xpath' => (
@@ -20,11 +20,9 @@ has 'search_xpath' => (
     'required' => 1,
 );
 
-enum '_result_type' => [qw(NODE HTML VALUE)];
-
 has 'result_type' => (
     'is'      => 'ro',
-    'isa'     => '_result_type',
+    'isa'     => enum( [qw(NODE HTML VALUE)] ),
     'default' => 'HTML',
 );
 
@@ -34,15 +32,14 @@ has 'ref_result' => (
     'default' => 0,
 );
 
-has '+process_item' => (
+has '+p' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
 
         my $proc = sub {
-            my ( $self, $item ) = @_;
+            my $item = shift;
 
-            #use Data::Dumper; warn 'htmlfilter::process_item: '.Dumper($item);
             my $html = HTML::TreeBuilder::XPath->new_from_content($item);
 
             #warn 'xpath is built';
@@ -76,14 +73,14 @@ __END__
 
 =head1 SYNOPSIS
 
-    use DataFlow::Node::HTMLFilter;
+    use DataFlow::Proc::HTMLFilter;
 
-    my $filter_html = DataFlow::Node::HTMLFilter->new(
+    my $filter_html = DataFlow::Proc::HTMLFilter->new(
         search_xpath => '//td',
     	result_type  => 'HTML',
 	);
 
-    my $filter_value = DataFlow::Node::HTMLFilter->new(
+    my $filter_value = DataFlow::Proc::HTMLFilter->new(
         search_xpath => '//td',
     	result_type  => 'VALUE',
 	);
@@ -97,10 +94,10 @@ __END__
     </html></body>
     EOM
 
-    $filter_html->input( $input );
+    $filter_html->process_one( $input );
     # @result == '<td>Line 1</td>', ... '<td>L2, Column 2</td>'
 
-    $filter_value->input( $input );
+    $filter_value->process_one( $input );
     # @result == q{Line 1}, ... q{L2, Column 2}
 
 =head1 DESCRIPTION
@@ -151,15 +148,7 @@ On the other hand, by keeping C<ref_result> as 0 (false), one HTML item
 may produce any number of items as result,
 i.e. it is a one-to-many mapping.
 
-=head1 METHODS
-
-The interface for C<DataFlow::Node::HTMLFilter> is the same of
-C<DataFlow::Node>, plus the accessor methods for the attributes
-described above.
-
 =head1 DEPENDENCIES
-
-L<DataFlow::Node>
 
 L<HTML::TreeBuilder::XPath>
 

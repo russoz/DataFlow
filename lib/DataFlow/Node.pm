@@ -9,6 +9,7 @@ use warnings;
 # VERSION
 
 use Moose;
+with 'DataFlow::Role::Dumper';
 
 use Scalar::Util qw/blessed reftype looks_like_number/;
 use Queue::Base 2.1;
@@ -37,43 +38,6 @@ has 'auto_process' => (
     'isa'     => 'Bool',
     'lazy'    => 1,
     'default' => 1,
-);
-
-has 'initial_data' => (
-    'is'      => 'ro',
-    'isa'     => 'ArrayRef',
-    'trigger' => sub {
-        my ( $self, $new ) = @_;
-        $self->input( @{$new} );
-    },
-);
-
-has '_dumper' => (
-    'is'      => 'ro',
-    'isa'     => 'CodeRef',
-    'lazy'    => 1,
-    'default' => sub {
-        use Data::Dumper;
-        return sub {
-            return Dumper(@_);
-        };
-    },
-    'handles' => {
-        'prefix_dumper' => sub {
-            my ( $self, $prefix, @args ) = @_;
-            print STDERR $prefix;
-            if (@args) {
-                print STDERR ' ' . $self->_dumper->(@args);
-            }
-            else {
-                print STDERR "\n";
-            }
-        },
-        'raw_dumper' => sub {
-            my $self = shift;
-            print STDERR $self->_dumper->(@_);
-        },
-    },
 );
 
 has 'dump_input' => (
@@ -164,9 +128,9 @@ sub output {
     return $self->outputq->remove unless wantarray;
 
     if ( defined($num) ) {
-        $self->confess(qq{"$num" does not look like a number})
+        confess(qq{"$num" does not look like a number})
           unless looks_like_number($num);
-        $self->confess(qq{"$num" must be a positive integer}) if $num < 1;
+        confess(qq{"$num" must be a positive integer}) if $num < 1;
         if ( $self->auto_process ) {
             while ( $self->outputq->size < $num && $self->has_input ) {
                 $self->process_input;
@@ -204,32 +168,6 @@ sub process {
 }
 
 ##############################################################################
-# node error queue
-
-has '_errorq' => (
-    'is'      => 'ro',
-    'isa'     => 'Queue::Base',
-    'lazy'    => 1,
-    'default' => sub { Queue::Base->new },
-    'handles' => {
-        '_enqueue_error'  => 'add',
-        '_is_error_empty' => 'empty',
-        '_dequeue_error'  => sub {
-            my $self = shift;
-            return
-              wantarray ? $self->errorq->remove_all : $self->errorq->remove;
-        },
-        'flush_error' => 'clear',
-        'clear_error' => 'clear',
-    },
-);
-
-sub get_error {
-    my $self = shift;
-    return $self->_dequeue_error;
-}
-
-##############################################################################
 # code to handle different types of input
 #   ex: array-refs, hash-refs, code-refs, etc...
 
@@ -248,7 +186,7 @@ sub _handle_list {
     #use Data::Dumper; warn '_handle_list(params) = '.Dumper(@_);
     foreach my $item (@args) {
         my $type = _param_type($item);
-        $self->confess('There is no handler for this parameter type!')
+        confess('There is no handler for this parameter type!')
           unless exists $self->_handlers->{$type};
         push @result, $self->_handlers->{$type}->( $self, $item );
     }

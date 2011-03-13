@@ -1,22 +1,20 @@
-use Test::More tests => 9;
+use Test::More tests => 10;
 
-use DataFlow::Node;
-use common::sense;
+use DataFlow::Proc;
 
 # tests: 1
-my $uc =
-  DataFlow::Node->new( process_item => sub { shift; return uc(shift) }, );
+my $uc = DataFlow::Proc->new( p => sub { return uc(shift) }, );
 ok($uc);
 
 # tests: 2
 my $val = 'yabadabadoo';
-ok( $uc->process($val) eq 'YABADABADOO' );
-my $res = $uc->process( \$val );
-ok( $$res eq 'YABADABADOO' );
+is( $uc->process_one($val), 'YABADABADOO' );
+my $res = $uc->process_one( \$val );
+is( $$res, 'YABADABADOO' );
 
 # tests: 1
 my $aref = [qw/ww xx yy zz/];
-is_deeply( $uc->process($aref), [qw/WW XX YY ZZ/] );
+is_deeply( $uc->process_one($aref), [qw/WW XX YY ZZ/] );
 
 # tests: 1
 my $href = {
@@ -26,7 +24,7 @@ my $href = {
     44 => 'dd',
 };
 is_deeply(
-    $uc->process($href),
+    $uc->process_one($href),
     {
         11 => 'AA',
         22 => 'BB',
@@ -37,21 +35,22 @@ is_deeply(
 
 # tests: 1
 my $cref = sub { return 'ggg' };
-ok( $uc->process($cref)->() eq 'GGG' );
+is( $uc->process_one($cref)->(), 'GGG' );
 
 # do not process_into
 #
 
-my $not_into = DataFlow::Node->new(
-    process_item => sub { shift; return uc(shift) },
+my $not_into = DataFlow::Proc->new(
+    p            => sub { return ucfirst(shift) },
     process_into => 0,
 );
 ok($not_into);
 
 my $valnot = 'yabadabadoo';
-ok( $not_into->process($valnot) eq 'YABADABADOO' );
+is( $not_into->process_one($valnot), 'Yabadabadoo' );
 
-my $refnot = \$valnot;
-my $resnot = $not_into->process($refnot);
-isnt( $resnot, $refnot );
+my $copy   = $valnot;
+my $resnot = $not_into->process_one( \$copy );
+is( ref($resnot), '' );
+isnt( $resnot, $valnot );
 

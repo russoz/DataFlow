@@ -31,7 +31,7 @@ has '+process_item' => (
             #use Data::Dumper;
             #warn 'chain          = '.Dumper($self);
             #warn 'chain :: links = '.Dumper($self->links);
-            $self->confess('Chain has no nodes, cannot process_item()')
+            confess('Chain has no nodes, cannot process_item()')
               unless scalar @{ $self->links };
 
             $self->_first_link->input($item);

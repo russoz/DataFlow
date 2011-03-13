@@ -1,4 +1,4 @@
-package DataFlow::Node::SQL;
+package DataFlow::Proc::SQL;
 
 use strict;
 use warnings;
@@ -9,11 +9,16 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 
 use SQL::Abstract;
 
-my $sql = SQL::Abstract->new;
+has '_sql' => (
+    'is'      => 'ro',
+    'isa'     => 'SQL::Abstract',
+    'lazy'    => 1,
+    'default' => sub { return SQL::Abstract->new; },
+);
 
 has 'table' => (
     'is'       => 'ro',
@@ -21,10 +26,14 @@ has 'table' => (
     'required' => 1
 );
 
-has '+process_item' => (
+has '+p' => (
     'default' => sub {
+        my $self = shift;
+        my $sql  = $self->_sql;
+
         return sub {
-            my ( $self, $data ) = @_;
+            my $data = shift;
+
             my ( $insert, @bind ) = $sql->insert( $self->table, $data );
 
             # TODO: regex ?

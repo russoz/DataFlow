@@ -1,30 +1,26 @@
-use Test::More tests => 7;
+use Test::More tests => 6;
 
-use_ok('DataFlow::Node::LiteralData');
+use_ok('DataFlow::Proc::LiteralData');
 
-eval { $fail = DataFlow::Node::LiteralData->new };
+eval { $fail = DataFlow::Proc::LiteralData->new };
 ok($@);
-
-my $node = DataFlow::Node::LiteralData->new( data => 'aaa', );
 
 #use Data::Dumper;
 #diag(Dumper( $node ));
 #diag(Dumper( $node->output ));
 #my $res = $node->output;
 #diag( 'res = '.$res );
-my $aaa = $node->output;
-is( $aaa, 'aaa' );
+my $aaa = DataFlow::Proc::LiteralData->new('aaa');
+is( $aaa->process_one(), 'aaa' );
 
 #ok( $node->output eq 'aaa' );
-ok( !( $node->output ) );
-
-eval { $node->input('more input') };
-ok( !$@ );
-my $empty = $node->output;
-ok( !defined($empty) );
+ok( !defined( $aaa->process_one() ) );
+ok( !defined( $aaa->process_one('more input') ) );
 
 my $data = [qw/oh my goodness/];
-$node = DataFlow::Node::LiteralData->new( data => $data, );
-my $res = $node->output;
+my $ref  = DataFlow::Proc::LiteralData->new($data);
+my $res  = $ref->process_one();
 is_deeply( $res, $data );
 
+# test with 'infinite' option enabled
+# my $bbb = DataFlow::Proc::LiteralData->new(
