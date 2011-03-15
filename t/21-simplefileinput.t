@@ -8,16 +8,16 @@ my $file = './examples/file.test';
 my $data = DataFlow::Proc::SimpleFileInput->new;
 
 is( $data->process_one($file), 'linha 1' );
-is( $data->process_one(), 'linha 2' );
-is( $data->process_one(), 'linha 3' );
-is( $data->process_one(), 'linha 4' );
-is( $data->process_one(), 'linha 5' );
-is( $data->process_one(), 'linha 6' );
-is( $data->process_one(), 'linha 7' );
+is( $data->process_one(),      'linha 2' );
+is( $data->process_one(),      'linha 3' );
+is( $data->process_one(),      'linha 4' );
+is( $data->process_one(),      'linha 5' );
+is( $data->process_one(),      'linha 6' );
+is( $data->process_one(),      'linha 7' );
 
-ok( !defined( $data->process_one()) );
+ok( !defined( $data->process_one() ) );
 
-my $data2 = DataFlow::Proc::SimpleFileInput->new( do_slurp     => 1 );
+my $data2 = DataFlow::Proc::SimpleFileInput->new( do_slurp => 1 );
 my $res2 = $data2->process_one($file);
 
 is( $res2->[0], 'linha 1' );
