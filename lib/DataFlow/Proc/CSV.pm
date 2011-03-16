@@ -80,7 +80,7 @@ has '+p' => (
 
             return $self->_combine($data);
           }
-          if shift->direction eq 'TO_CSV';
+          if $self->direction eq 'TO_CSV';
 
         return sub {
             my $csv_line = shift;

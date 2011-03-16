@@ -4,24 +4,23 @@ use strict;
 use warnings;
 
 use FindBin qw($Bin);
-use lib "$Bin/../lib";
+use lib "$Bin/../../lib";
 
-use aliased 'DataFlow::Node';
-use aliased 'DataFlow::Chain';
-use aliased 'DataFlow::Node::LiteralData';
-use aliased 'DataFlow::Node::NOP';
-use aliased 'DataFlow::Node::HTMLFilter';
-use aliased 'DataFlow::Node::URLRetriever';
-use aliased 'DataFlow::Node::MultiPageURLGenerator';
-use aliased 'DataFlow::Node::CSV';
-use aliased 'DataFlow::Node::SimpleFileOutput';
+use aliased 'DataFlow';
+use aliased 'DataFlow::Proc::LiteralData';
+use aliased 'DataFlow::Proc::NOP';
+use aliased 'DataFlow::Proc::HTMLFilter';
+use aliased 'DataFlow::Proc::URLRetriever';
+use aliased 'DataFlow::Proc::MultiPageURLGenerator';
+use aliased 'DataFlow::Proc::CSV';
+use aliased 'DataFlow::Proc::SimpleFileOutput';
 
 my $base = join( '/',
     q{http://www.portaltransparencia.gov.br},
     q{ceis}, q{EmpresasSancionadas.asp?paramEmpresa=0} );
 
-my $chain = Chain->new(
-    links => [
+my $flow = DataFlow->new(
+    procs => [
         LiteralData->new( data => $base, ),
         MultiPageURLGenerator->new(
             name => 'multipage',
@@ -65,17 +64,14 @@ my $chain = Chain->new(
             search_xpath => '//td',
             result_type  => 'VALUE',
             ref_result   => 1,
+			dump_output => 1,
         ),
-        Node->new(
-            process_into => 1,
-            process_item => sub {
-                shift;
-                local $_ = shift;
-                s/^\s*//;
-                s/\s*$//;
-                return $_;
-            }
-        ),
+        sub {    # remove leading and trailing spaces
+            local $_ = shift;
+            s/^\s*//;
+            s/\s*$//;
+            return $_;
+        },
         CSV->new(
             direction     => 'TO_CSV',
             text_csv_opts => { binary => 1 },
@@ -93,5 +89,5 @@ my $chain = Chain->new(
     ],
 );
 
-$chain->flush;
+$flow->flush;
 

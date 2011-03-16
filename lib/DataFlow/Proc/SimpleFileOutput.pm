@@ -23,13 +23,15 @@ has 'ors' => (
 
 has '+p' => (
     'default' => sub {
+		my $self = shift;
+
         return sub {
-            my ( $self, $item ) = @_;
+            my $item = shift;
             my $fh = $self->file;
             local $\ = $self->ors if $self->has_ors;
             print $fh $item;
             return $item;
-          }
+          };
     },
 );
 

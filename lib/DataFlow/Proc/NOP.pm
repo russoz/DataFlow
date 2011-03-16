@@ -11,6 +11,7 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+has '+process_into' => ( 'default' => 0, );
 has '+p' => (
     'default' => sub {
         return sub { return $_[0]; }

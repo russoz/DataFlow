@@ -3,7 +3,7 @@ package DataFlow::Proc;
 use strict;
 use warnings;
 
-# ABSTRACT: A generic processing node in a data flow
+# ABSTRACT: A placeholder class for a data processor
 # ENCODING: utf8
 
 # VERSION
@@ -182,35 +182,35 @@ __END__
 
 =head1 SYNOPSIS
 
-    use DataFlow::Proc;
+use DataFlow::Proc;
 
-    my $uc = DataFlow::Proc->new(
-        process_item => sub {
-            shift; return uc(shift);
-        }
-    );
+my $uc = DataFlow::Proc->new(
+process_item => sub {
+shift; return uc(shift);
+}
+);
 
-    my @res = $uc->process_one( 'something' );
-    # @res == qw/SOMETHING/;
+my @res = $uc->process_one( 'something' );
+# @res == qw/SOMETHING/;
 
-    my @res = $uc->process_one( [qw/aaa bbb ccc/] );
-    # @res == [qw/AAA BBB CCC/];
+my @res = $uc->process_one( [qw/aaa bbb ccc/] );
+# @res == [qw/AAA BBB CCC/];
 
 Or
 
-    my $uc_deref = DataFlow::Proc->new(
-        deref        => 1,
-        process_item => sub {
-            shift; return uc(shift);
-        }
-    );
+my $uc_deref = DataFlow::Proc->new(
+deref        => 1,
+process_item => sub {
+shift; return uc(shift);
+}
+);
 
-    my @res = $uc_deref->process_one( [qw/aaa bbb ccc/] );
-    # @res == qw/AAA BBB CCC/;
+my @res = $uc_deref->process_one( [qw/aaa bbb ccc/] );
+# @res == qw/AAA BBB CCC/;
 
 =head1 DESCRIPTION
 
-This is a L<Moose> based class that provides the idea of a procesing step in a
+This is a L<Moose> based class that provides the idea of a processing step in a
 data-flow.  It attemps to be as generic and unassuming as possible, in order to
 provide flexibility for implementors to make their own nodes as they see fit.
 
@@ -221,22 +221,77 @@ provides the transformed data as output.
 
 =head1 ATTRIBUTES
 
+=head2 name
+
+[Str] A descriptive name for the dataflow. (OPTIONAL)
+
+=head2 allows_undef_input
+
+[Bool] It controls whether C<$self->p->()> will be handed C<undef> as input
+of if DataFlow::Proc will filter those out. (DEFAULT = false)
+
 =head2 deref
 
-A boolean attribute that signals whether the output of the node will be
-de-referenced or if C<Node> will preserve the original reference.
+[Bool] Signals whether the result of the processing will be de-referenced
+upon output or if DataFlow::Proc will preserve the original reference.
+(DEFAULT = false)
 
 =head2 process_into
 
-A boolean attribute that signals whether references should be dereferenced or
-not. If process_into is true, then C<process_item> will be applied into the
-values referenced by any scalar, array or hash reference and onto the result
-of running any code reference.
+[Bool] It signals whether this processor will attempt to process data within
+references or not. If process_into is true, then C<process_item> will be
+applied into the values referenced by any scalar, array or hash reference and
+onto the result of running any code reference.
+(DEFAULT = true)
+
+=head2 dump_input
+
+[Bool] Dumps the input parameter to STDERR before processing. See
+L<DataFlow::Role::Dumper>. (DEFAULT = false)
+
+=head2 dump_output
+
+[Bool] Dumps the results to STDERR after processing. See
+L<DataFlow::Role::Dumper>. (DEFAULT = false)
 
 =head2 p
 
-A code reference that is the actual work horse for this class. It is a
-mandatory attribute, and must follow the calling conventions described above.
+[CodeRef] The actual work horse for this class. It is treated as a function,
+not as a method, as in:
+
+my $proc = DataFlow::Proc->new(
+p => sub {
+my $data = shift;
+return ucfirst($data);
+}
+);
+
+It only makes sense to access C<$self> when one is sub-classing DataFlow::Proc
+and adding new attibutes or methods, in which case one can do as below:
+
+package MyProc;
+
+use Moose;
+extends 'DataFlow::Proc';
+
+has 'x_factor' => ( isa => 'Int' );
+
+has '+p' => (
+default => sub {        # not the p value, but the sub that returns it
+my $self = shift;
+return sub {
+my $data = shift;
+return $data * int( rand( $self->x_factor ) );
+};
+},
+);
+
+package main;
+
+my $proc = MyProc->new( x_factor => 5 );
+
+This sub will be called in array context. There is no other restriction on
+what this code reference can or should do. (REQUIRED)
 
 =head1 METHODS
 
@@ -244,16 +299,11 @@ mandatory attribute, and must follow the calling conventions described above.
 
 Processes one single scalar (or anything else that can be passed in on scalar,
 such as references or globs), and returns the application of the function
-C<p()> over the item.
+C<$self->p->()> over the item.
 
 =head1 DEPENDENCIES
-
-=for author to fill in:
-    A list of all the other modules that this module relies upon,
-    including any restrictions on versions, and an indication whether
-    the module is part of the standard Perl distribution, part of the
-    module's distribution, or must be installed separately. ]
 
 L<Scalar::Util>
 
 =cut
+
