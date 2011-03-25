@@ -16,16 +16,15 @@ use Queue::Base 2.1;
 use DataFlow::Proc;
 
 # subtypes
-subtype 'Processor' => as 'DataFlow::Proc';
-coerce 'Processor' => from 'CodeRef' => via {
-    DataFlow::Proc->new( p => $_ );
-};
-
 subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
   where { scalar @{$_} > 0 } =>
-  message { 'Chain must have at least one processor' };
+  message { 'DataFlow must have at least one processor' };
 coerce 'ProcessorChain' => from 'ArrayRef[Ref]' => via {
     [ map { ref($_) eq 'CODE' ? DataFlow::Proc->new( p => $_ ) : $_ } @{$_} ];
+};
+coerce 'ProcessorChain' => from 'DataFlow::Proc' => via { [$_] };
+coerce 'ProcessorChain' => from 'CodeRef' => via {
+    [ DataFlow::Proc->new( p => $_ ) ];
 };
 
 # attributes
@@ -55,17 +54,29 @@ has '_queues' => (
     'default' => sub { return _make_queues( shift->procs ); },
     'handles' => {
         '_firstq'         => sub { return shift->_queues->[0] },
-        '_lastq'          => sub { return shift->_queues->[-1] },
-        'has_queued_data' => sub { return _queues_have_data( shift->_queues ) },
+        'has_queued_data' => sub {
+            return _count_queued_items( shift->_queues );
+        },
     },
 );
 
+has '_lastq' => (
+    'is'      => 'ro',
+    'isa'     => 'Queue::Base',
+    'lazy'    => 1,
+    'default' => sub { return Queue::Base->new },
+);
+
 # functions
-sub _queues_have_data {
-    my $q = shift;
-	my $count = 0;
-	map { $count = $count + $_->size } @{$q};
-	return $count;
+sub _count_queued_items {
+    my $q     = shift;
+    my $count = 0;
+
+    #use Data::Dumper; print 'COUNT: '.Dumper($q);
+    map { $count = $count + $_->size } @{$q};
+
+    #print 'COUNT = ' . $count . "\n";
+    return $count;
 }
 
 sub _process_queues {
@@ -79,20 +90,22 @@ sub _process_queues {
 
 sub _make_queues {
     my $procs  = shift;
-    my @queues = ( Queue::Base->new );
-    push @queues, Queue::Base->new() foreach ( @{$procs} );
+    my @queues = map { Queue::Base->new() } @{$procs};
     return [@queues];
 }
 
 sub _reduce {
-    my ( $p, $q ) = @_;
-
-    my @procs = @{$p};
-    map { _process_queues( $p->[$_], $q->[$_], $q->[ $_ + 1 ] ); } 0 .. $#procs;
+    my ( $p, @q ) = @_;
+    map { _process_queues( $p->[$_], $q[$_], $q[ $_ + 1 ] ) } ( 0 .. $#q - 1 );
     return;
 }
 
 # methods
+sub clone {
+    my $self = shift;
+    return DataFlow->new( procs => $self->procs );
+}
+
 sub input {
     my ( $self, @args ) = @_;
     $self->_firstq->add(@args);
@@ -101,7 +114,8 @@ sub input {
 
 sub process_input {
     my $self = shift;
-    _reduce( $self->procs, $self->_queues );
+	my @q = ( @{ $self->_queues }, $self->_lastq );
+    _reduce( $self->procs, @q );
     return;
 }
 
@@ -117,6 +131,8 @@ sub output {
 sub flush {
     my $self = shift;
     while ( $self->has_queued_data ) {
+
+        #use Data::Dumper; print "FLUSH ".Dumper($self);
         $self->process_input;
     }
     return $self->output;
@@ -124,18 +140,10 @@ sub flush {
 
 sub process {
     my ( $self, @args ) = @_;
-    my $links  = $self->procs;
-    my $queues = _make_queues($links);
-    $queues->[0]->add(@args);
 
-    # while there is data in any queue but the last one
-    my @q = @{$queues};
-    pop @q;
-    while ( _queues_have_data( [@q] ) ) {
-        _reduce( $links, $queues );
-    }
-    my $lastq = $queues->[-1];
-    return wantarray ? $lastq->remove_all : $lastq->remove;
+    my $flow = $self->clone();
+    $flow->input(@args);
+    return $flow->flush;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -150,16 +158,16 @@ no Moose;
 
 use DataFlow;
 
-my $flow = DataFlow->new(
-DataFlow::Proc->new( p => sub { do this thing } ),
-sub { ... do something },
-sub { ... do something else },
-);
+	my $flow = DataFlow->new(
+		DataFlow::Proc->new( p => sub { do this thing } ),
+		sub { ... do something },
+		sub { ... do something else },
+	);
 
-$flow->input( <some input> );
-my $output = $flow->output();
+	$flow->input( <some input> );
+	my $output = $flow->output();
 
-my $output = $flow->output( <some other input> );
+	my $output = $flow->output( <some other input> );
 
 =head1 DESCRIPTION
 
@@ -214,6 +222,10 @@ L<DataFlow::Proc> objects. (REQUIRED)
 
 Returns true if the dataflow contains any queued data within.
 
+=head2 clone
+
+Returns another instance of a C<DataFlow> using the same array of processors.
+
 =head2 input
 
 Accepts input data for the node. It will gladly accept anything passed as
@@ -221,14 +233,14 @@ parameters. However, it must be noticed that it will not be able to make a
 distinction between arrays and hashes. Both forms below will render the exact
 same results:
 
-$flow->input( qw/all the simple things/ );
-$flow->input( all => 'the', simple => 'things' );
+	$flow->input( qw/all the simple things/ );
+	$flow->input( all => 'the', simple => 'things' );
 
 If you do want to handle arrays and hashes differently, we strongly suggest
 that you use references:
 
-$node->input( [ qw/all the simple things/ ] );
-$node->input( { all => the, simple => 'things' } );
+	$node->input( [ qw/all the simple things/ ] );
+	$node->input( { all => the, simple => 'things' } );
 
 Processors with C<process_into> enabled (true by default) will process the
 items inside an array reference, and the values (not the keys) inside a hash
