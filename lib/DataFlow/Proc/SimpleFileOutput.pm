@@ -1,4 +1,4 @@
-package DataFlow::Node::SimpleFileOutput;
+package DataFlow::Proc::SimpleFileOutput;
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 with 'DataFlow::Role::File';
 
 has 'ors' => (
@@ -21,15 +21,17 @@ has 'ors' => (
     'documentation' => 'Output record separator',
 );
 
-has '+process_item' => (
+has '+p' => (
     'default' => sub {
+        my $self = shift;
+
         return sub {
-            my ( $self, $item ) = @_;
-            my $fh = $self->file;
+            my $item = shift;
+            my $fh   = $self->file;
             local $\ = $self->ors if $self->has_ors;
             print $fh $item;
             return $item;
-          }
+        };
     },
 );
 

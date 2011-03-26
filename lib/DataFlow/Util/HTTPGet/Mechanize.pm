@@ -1,4 +1,4 @@
-package DataFlow::Node::URLRetriever::Get::Mechanize;
+package DataFlow::Util::HTTPGet::Mechanize;
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ sub _make_obj {
     my $self = shift;
     return WWW::Mechanize->new(
         agent   => $self->agent,
-        onerror => sub { $self->confess(@_) },
+        onerror => sub { confess(@_) },
         timeout => $self->timeout
     );
 }
