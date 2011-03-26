@@ -3,11 +3,11 @@ use Test::More tests => 3;
 
 use strict;
 
-use_ok('DataFlow::Node::URLRetriever::Get');
+use_ok('DataFlow::Util::HTTPGet');
 
-use DataFlow::Node::URLRetriever::Get;
+use DataFlow::Util::HTTPGet;
 
-my $get = DataFlow::Node::URLRetriever::Get->new;
+my $get = DataFlow::Util::HTTPGet->new;
 ok($get);
 
 my $html = $get->get(q{http://www.kernel.org/});

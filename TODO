@@ -7,25 +7,8 @@ Flow
 * start messing with parallel runs, via fork or threads
 * use some logging facility
   - make a proper error handling/alerting code
-* refactor Node and Chain and the underlying logic:
-  - create a Processor class (or role? gotta think more)
-    - a Processor has only the processing logic
-	- the Node will have the queues
-	- a Processor receives (inputq,outputq) for the processing call
-	  (this will allow to easily modify, dynamically, the input/output queues
-	   being used - useful for Chain and for process() )
-  - Node becomes a 'runner' for a Processor
-  - Chain will have an array of queues, and processing items through the pipe
-    becomes a matter of calling the processors with each pair of queues
 
-Chain
-* in a chain, the output from the previous node should be the same object in
-  memory as the input of the next node
-* the chain's input queue must be the same object as the first link's input
-  queue, and conversely, the last link's output queue must be the same object
-  as the chain's output queue
-
-Nodes
+Proc
 * file reading/writing node
 * char encoding node (there is a first attempt there already, needs to work
   on it and write tests for it)

@@ -4,25 +4,25 @@ use strict;
 use warnings;
 
 use FindBin qw($Bin);
-use lib "$Bin/../lib";
+use lib "$Bin/../../lib";
 
-use aliased 'DataFlow::Node';
-use aliased 'DataFlow::Chain';
-use aliased 'DataFlow::Node::LiteralData';
-use aliased 'DataFlow::Node::NOP';
-use aliased 'DataFlow::Node::HTMLFilter';
-use aliased 'DataFlow::Node::URLRetriever';
-use aliased 'DataFlow::Node::MultiPageURLGenerator';
-use aliased 'DataFlow::Node::CSV';
-use aliased 'DataFlow::Node::SimpleFileOutput';
+use DataFlow;
+use aliased 'DataFlow::Proc::NOP';
+use aliased 'DataFlow::Proc::HTMLFilter';
+use aliased 'DataFlow::Proc::URLRetriever';
+use aliased 'DataFlow::Proc::MultiPageURLGenerator';
+use aliased 'DataFlow::Proc::CSV';
+use aliased 'DataFlow::Proc::SimpleFileOutput';
+
+use Data::Dumper;
 
 my $base = join( '/',
     q{http://www.portaltransparencia.gov.br},
     q{ceis}, q{EmpresasSancionadas.asp?paramEmpresa=0} );
 
-my $chain = Chain->new(
-    links => [
-        LiteralData->new( data => $base, ),
+my $flow = DataFlow->new(
+    procs => [
+#        NOP->new( dump_output => 1 ),
         MultiPageURLGenerator->new(
             name => 'multipage',
 
@@ -31,10 +31,10 @@ my $chain = Chain->new(
             produce_last_page => sub {
                 my $url = shift;
 
-                use DataFlow::Node::URLRetriever::Get;
+                use DataFlow::Util::HTTPGet;
                 use HTML::TreeBuilder::XPath;
 
-                my $get  = DataFlow::Node::URLRetriever::Get->new;
+                my $get  = DataFlow::Util::HTTPGet->new;
                 my $html = $get->get($url);
 
                 my $texto =
@@ -54,28 +54,30 @@ my $chain = Chain->new(
                 return $u->as_string;
             },
         ),
+#        NOP->new( dump_output => 1 ),
         NOP->new( deref => 1, name => 'nop', ),
+#        NOP->new( dump_output => 1 ),
         URLRetriever->new( process_into => 1, ),
+#        NOP->new( dump_output => 1 ),
         HTMLFilter->new(
             process_into => 1,
             search_xpath =>
               '//div[@id="listagemEmpresasSancionadas"]/table/tbody/tr',
         ),
+#        NOP->new( dump_output => 1 ),
         HTMLFilter->new(
             search_xpath => '//td',
             result_type  => 'VALUE',
             ref_result   => 1,
         ),
-        Node->new(
-            process_into => 1,
-            process_item => sub {
-                shift;
-                local $_ = shift;
-                s/^\s*//;
-                s/\s*$//;
-                return $_;
-            }
-        ),
+#        NOP->new( dump_output => 1 ),
+        sub {    # remove leading and trailing spaces
+            local $_ = shift;
+            s/^\s*//;
+            s/\s*$//;
+            return $_;
+        },
+#        NOP->new( dump_output => 1 ),
         CSV->new(
             direction     => 'TO_CSV',
             text_csv_opts => { binary => 1 },
@@ -87,11 +89,17 @@ my $chain = Chain->new(
                 'Data'
             ],
         ),
+#        NOP->new( dump_output => 1 ),
         SimpleFileOutput->new( file => '> /tmp/ceis.csv', ors => "\n" ),
-
-        #NOP->new( dump_output => 1 ),
+#        NOP->new( dump_output => 1 ),
     ],
 );
 
-$chain->flush;
+$flow->input($base);
+#print Dumper($flow);
+
+my @res = $flow->flush;
+
+#print Dumper(\@res);
+#print Dumper($flow);
 

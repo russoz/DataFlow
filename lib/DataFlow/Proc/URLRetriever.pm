@@ -1,4 +1,4 @@
-package DataFlow::Node::URLRetriever;
+package DataFlow::Proc::URLRetriever;
 
 use strict;
 use warnings;
@@ -9,15 +9,15 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 
-use DataFlow::Node::URLRetriever::Get;
+use DataFlow::Util::HTTPGet;
 
 has '_get' => (
-    'is'      => 'rw',
-    'isa'     => 'DataFlow::Node::URLRetriever::Get',
+    'is'      => 'ro',
+    'isa'     => 'DataFlow::Util::HTTPGet',
     'lazy'    => 1,
-    'default' => sub { DataFlow::Node::URLRetriever::Get->new }
+    'default' => sub { DataFlow::Util::HTTPGet->new }
 );
 
 has 'baseurl' => (
@@ -26,12 +26,13 @@ has 'baseurl' => (
     'predicate' => 'has_baseurl',
 );
 
-has '+process_item' => (
+has '+p' => (
     'default' => sub {
-        return sub {
-            my ( $self, $item ) = @_;
+        my $self = shift;
 
-            #warn 'process_item:: item = '.$item;
+        return sub {
+            my $item = shift;
+
             my $url =
               $self->has_baseurl
               ? URI->new_abs( $item, $self->baseurl )->as_string
@@ -39,7 +40,7 @@ has '+process_item' => (
 
             #$self->debug("process_item:: url = $url");
             return $self->_get->get($url);
-          }
+        };
     },
 );
 

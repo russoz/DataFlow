@@ -1,15 +1,15 @@
-package DataFlow::Node::MultiPageURLGenerator;
+package DataFlow::Proc::MultiPageURLGenerator;
 
 use strict;
 use warnings;
 
-# ABSTRACT: A node that generates multi-paged URL lists
+# ABSTRACT: A processor that generates multi-paged URL lists
 # ENCODING: utf8
 
 # VERSION
 
 use Moose;
-extends 'DataFlow::Node';
+extends 'DataFlow::Proc';
 
 use Carp;
 
@@ -28,7 +28,7 @@ has 'last_page' => (
         my $self = shift;
 
         #warn 'last_page';
-        carp q{DataFlow::Node::MultiPageURLGenerator: paged_url not set!}
+        confess(q{DataFlow::Proc::MultiPageURLGenerator: paged_url not set!})
           unless $self->has_paged_url;
         return $self->produce_last_page->( $self->_paged_url );
     },
@@ -41,7 +41,7 @@ has 'produce_last_page' => (
     'is'      => 'ro',
     'isa'     => 'CodeRef',
     'lazy'    => 1,
-    'default' => sub { shift->confess(q{produce_last_page not implemented!}); },
+    'default' => sub { confess(q{produce_last_page not implemented!}); },
 );
 
 # calling convention for the sub:
@@ -61,16 +61,14 @@ has '_paged_url' => (
     'clearer'   => 'clear_paged_url',
 );
 
-has '+process_item' => (
+has '+p' => (
     'default' => sub {
+        my $self = shift;
+
         return sub {
-            my ( $self, $url ) = @_;
+            my $url = shift;
 
-            #warn 'multi page process item, url = '.$url;
             $self->_paged_url($url);
-
-            #use Data::Dumper;
-            #print STDERR Dumper($self);
 
             my $first = $self->first_page;
             my $last  = $self->last_page;
@@ -79,11 +77,9 @@ has '+process_item' => (
             my @result =
               map { $self->make_page_url->( $self, $url, $_ ) } $first .. $last;
 
-            #use Data::Dumper;
-            #warn 'url list = ' . Dumper($result);
             $self->clear_paged_url;
             return [@result];
-          }
+        };
     },
 );
 

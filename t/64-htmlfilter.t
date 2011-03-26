@@ -2,27 +2,25 @@
 use Test::More tests => 9;
 
 BEGIN {
-    use_ok('DataFlow::Node::HTMLFilter');
+    use_ok('DataFlow::Proc::HTMLFilter');
 }
 
-my $fail = eval q{DataFlow::Node::HTMLFilter->new};
+my $fail = eval q{DataFlow::Proc::HTMLFilter->new};
 ok($@);
 
-my $filter1 = DataFlow::Node::HTMLFilter->new( search_xpath => '//td', );
+my $filter1 = DataFlow::Proc::HTMLFilter->new( search_xpath => '//td', );
 ok($filter1);
+ok( !defined( $filter1->process_one() ) );
 
-my $undef = $filter1->process();
-ok( !defined($undef) );
-
-my $html = <<EOH;
+my $html = <<HTML_END;
 <html>
     <body>
         <table>
-            <th>
+            <tr>
                 <th>A</th>
                 <th>B</th>
                 <th>C</th>
-            </th>
+            </tr>
             <tr>
                 <td>a1 yababaga    </td>
                 <td>b1 bugalu</td>
@@ -31,34 +29,27 @@ my $html = <<EOH;
         </table>
     </body>
 </html>
-EOH
+HTML_END
 
-$filter1->input($html);
-my @res = $filter1->output;
-ok( $res[2] eq '<td>c1 potatoes</td>' );
+my @res = $filter1->process_one($html);
+is( $res[2], '<td>c1 potatoes</td>' );
 
-my $filter2 = DataFlow::Node::HTMLFilter->new(
+my $filter2 = DataFlow::Proc::HTMLFilter->new(
     search_xpath => '//td',
     result_type  => 'VALUE',
 );
 ok($filter2);
 
-$filter2->input($html);
-my @res2 = $filter2->output;
+my @res2 = $filter2->process_one($html);
+is( $res2[1], 'b1 bugalu' );
 
-#use Data::Dumper; diag( 'res2 = '. Dumper(@res2) );
-ok( $res2[2] eq 'c1 potatoes' );
-
-my $filter3 = DataFlow::Node::HTMLFilter->new(
-    search_xpath => '//td',
+my $filter3 = DataFlow::Proc::HTMLFilter->new(
+    search_xpath => '//th',
     result_type  => 'VALUE',
     ref_result   => 1,
 );
 ok($filter3);
 
-$filter3->input($html);
-my $res3 = $filter3->output;
-
-#use Data::Dumper; diag( 'res3 = '. Dumper($res3) );
-ok( $res3->[2] eq 'c1 potatoes' );
+my $res3 = $filter3->process_one($html);
+is( $res3->[0], 'A' );
 
