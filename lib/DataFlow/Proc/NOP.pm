@@ -3,7 +3,7 @@ package DataFlow::Proc::NOP;
 use strict;
 use warnings;
 
-# ABSTRACT: A No-Op node, input data is passed unmodified to the output
+# ABSTRACT: A No-Op processor: input data is passed unmodified to the output
 # ENCODING: utf8
 
 # VERSION

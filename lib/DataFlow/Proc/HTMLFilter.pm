@@ -63,6 +63,7 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
+no Moose::Util::TypeConstraints;
 no Moose;
 
 1;
@@ -102,7 +103,7 @@ __END__
 
 =head1 DESCRIPTION
 
-This node type provides a filter for HTML content.
+This processor type provides a filter for HTML content.
 Each item will be considered as a HTML content and will be filtered
 using L<HTML::TreeBuilder::XPath>.
 

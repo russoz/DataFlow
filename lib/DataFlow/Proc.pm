@@ -3,7 +3,7 @@ package DataFlow::Proc;
 use strict;
 use warnings;
 
-# ABSTRACT: A placeholder class for a data processor
+# ABSTRACT: A data processor class
 # ENCODING: utf8
 
 # VERSION
@@ -11,7 +11,14 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::Dumper';
 
+use DataFlow;
+
+use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/blessed reftype/;
+
+subtype 'Processor' => as 'CodeRef';
+coerce 'Processor' => from 'DataFlow::Proc' => via { $_->p };
+coerce 'Processor' => from 'DataFlow' => via { my $f = $_; return sub { $f->process(shift) } };
 
 has 'name' => (
     'is'  => 'ro',
@@ -55,8 +62,9 @@ has 'dump_output' => (
 
 has 'p' => (
     'is'            => 'ro',
-    'isa'           => 'CodeRef',
+    'isa'           => 'Processor',
     'required'      => 1,
+	'coerce'        => 1,
     'documentation' => 'Returns the result of processing one single item',
 );
 
@@ -109,7 +117,7 @@ sub _handle_list {
 #  strings) as keys, and code references (a.k.a. handlers) as values.
 #
 #  For each key, a handler will be defined taking into account whether this
-#  node has process_into == 1 and/or deref == 1.
+#  processor has process_into == 1 and/or deref == 1.
 #
 
 has '_handlers' => (
@@ -172,6 +180,7 @@ sub _handle_code_ref {
 }
 
 __PACKAGE__->meta->make_immutable;
+no Moose::Util::TypeConstraints;
 no Moose;
 
 1;
@@ -182,42 +191,42 @@ __END__
 
 =head1 SYNOPSIS
 
-use DataFlow::Proc;
+	use DataFlow::Proc;
 
-my $uc = DataFlow::Proc->new(
-process_item => sub {
-shift; return uc(shift);
-}
-);
+	my $uc = DataFlow::Proc->new(
+		p => sub {
+			return uc(shift);
+		}
+	);
 
-my @res = $uc->process_one( 'something' );
-# @res == qw/SOMETHING/;
+	my @res = $uc->process_one( 'something' );
+	# @res == qw/SOMETHING/;
 
-my @res = $uc->process_one( [qw/aaa bbb ccc/] );
-# @res == [qw/AAA BBB CCC/];
+	my @res = $uc->process_one( [qw/aaa bbb ccc/] );
+	# @res == [qw/AAA BBB CCC/];
 
 Or
 
-my $uc_deref = DataFlow::Proc->new(
-deref        => 1,
-process_item => sub {
-shift; return uc(shift);
-}
-);
+	my $uc_deref = DataFlow::Proc->new(
+		deref => 1,
+		p     => sub {
+			return uc(shift);
+		}
+	);
 
-my @res = $uc_deref->process_one( [qw/aaa bbb ccc/] );
-# @res == qw/AAA BBB CCC/;
+	my @res = $uc_deref->process_one( [qw/aaa bbb ccc/] );
+	# @res == qw/AAA BBB CCC/;
 
 =head1 DESCRIPTION
 
-This is a L<Moose> based class that provides the idea of a processing step in a
-data-flow.  It attemps to be as generic and unassuming as possible, in order to
-provide flexibility for implementors to make their own nodes as they see fit.
+This is a L<Moose> based class that provides the idea of a processing step in
+a data-flow.  It attemps to be as generic and unassuming as possible, in order
+to provide flexibility for implementors to make their own specialized
+processors as they see fit.
 
-An object of the type C<DataFlow::Proc> does three things:
-accepts some data as input,
-processes that data,
-provides the transformed data as output.
+Apart from atribute accessors, an object of the type C<DataFlow::Proc> will
+provide only a single method, C<process_one()>, which will process a single
+scalar.
 
 =head1 ATTRIBUTES
 
@@ -259,36 +268,36 @@ L<DataFlow::Role::Dumper>. (DEFAULT = false)
 [CodeRef] The actual work horse for this class. It is treated as a function,
 not as a method, as in:
 
-my $proc = DataFlow::Proc->new(
-p => sub {
-my $data = shift;
-return ucfirst($data);
-}
-);
+	my $proc = DataFlow::Proc->new(
+		p => sub {
+			my $data = shift;
+			return ucfirst($data);
+		}
+	);
 
 It only makes sense to access C<$self> when one is sub-classing DataFlow::Proc
 and adding new attibutes or methods, in which case one can do as below:
 
-package MyProc;
+	package MyProc;
 
-use Moose;
-extends 'DataFlow::Proc';
+	use Moose;
+	extends 'DataFlow::Proc';
 
-has 'x_factor' => ( isa => 'Int' );
+	has 'x_factor' => ( isa => 'Int' );
 
-has '+p' => (
-default => sub {        # not the p value, but the sub that returns it
-my $self = shift;
-return sub {
-my $data = shift;
-return $data * int( rand( $self->x_factor ) );
-};
-},
-);
+	has '+p' => (
+		default => sub {        # not the p value, but the sub that returns it
+			my $self = shift;
+			return sub {
+				my $data = shift;
+				return $data * int( rand( $self->x_factor ) );
+			};
+		},
+	);
 
-package main;
+	package main;
 
-my $proc = MyProc->new( x_factor => 5 );
+	my $proc = MyProc->new( x_factor => 5 );
 
 This sub will be called in array context. There is no other restriction on
 what this code reference can or should do. (REQUIRED)
