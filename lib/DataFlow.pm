@@ -89,7 +89,7 @@ sub _process_queues {
 }
 
 sub _make_queues {
-    my $procs  = shift;
+    my $procs = shift;
     my @queues = map { Queue::Base->new() } @{$procs};
     return [@queues];
 }
@@ -114,7 +114,7 @@ sub input {
 
 sub process_input {
     my $self = shift;
-	my @q = ( @{ $self->_queues }, $self->_lastq );
+    my @q = ( @{ $self->_queues }, $self->_lastq );
     _reduce( $self->procs, @q );
     return;
 }

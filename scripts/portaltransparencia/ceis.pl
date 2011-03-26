@@ -22,7 +22,8 @@ my $base = join( '/',
 
 my $flow = DataFlow->new(
     procs => [
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         MultiPageURLGenerator->new(
             name => 'multipage',
 
@@ -54,30 +55,36 @@ my $flow = DataFlow->new(
                 return $u->as_string;
             },
         ),
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         NOP->new( deref => 1, name => 'nop', ),
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         URLRetriever->new( process_into => 1, ),
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         HTMLFilter->new(
             process_into => 1,
             search_xpath =>
               '//div[@id="listagemEmpresasSancionadas"]/table/tbody/tr',
         ),
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         HTMLFilter->new(
             search_xpath => '//td',
             result_type  => 'VALUE',
             ref_result   => 1,
         ),
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         sub {    # remove leading and trailing spaces
             local $_ = shift;
             s/^\s*//;
             s/\s*$//;
             return $_;
         },
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         CSV->new(
             direction     => 'TO_CSV',
             text_csv_opts => { binary => 1 },
@@ -89,13 +96,16 @@ my $flow = DataFlow->new(
                 'Data'
             ],
         ),
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
         SimpleFileOutput->new( file => '> /tmp/ceis.csv', ors => "\n" ),
-#        NOP->new( dump_output => 1 ),
+
+        #        NOP->new( dump_output => 1 ),
     ],
 );
 
 $flow->input($base);
+
 #print Dumper($flow);
 
 my @res = $flow->flush;

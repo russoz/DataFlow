@@ -14,18 +14,20 @@ use Data::Dumper;
 
 my $flow = DataFlow->new(
     procs => [
-		sub {
-			my $num = shift;
-			#print "AAA: ".$num."\n";
-			my @res = map { chr(64+$_) } (1 .. $num);
-			#print "BBB: ".Dumper(\@res);;
-			return [@res];
-		},
-		NOP->new( deref => 1 ),
-		sub {
-			return lc(shift);
-		},
-	],
+        sub {
+            my $num = shift;
+
+            #print "AAA: ".$num."\n";
+            my @res = map { chr( 64 + $_ ) } ( 1 .. $num );
+
+            #print "BBB: ".Dumper(\@res);;
+            return [@res];
+        },
+        NOP->new( deref => 1 ),
+        sub {
+            return lc(shift);
+        },
+    ],
 );
 
 $flow->input(shift);
