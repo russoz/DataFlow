@@ -3,7 +3,7 @@ package DataFlow;
 use strict;
 use warnings;
 
-# ABSTRACT: A framework for dataflow processing
+# ABSTRACT: A component for dataflow processing
 # ENCODING: utf8
 
 # VERSION
@@ -14,18 +14,27 @@ use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/looks_like_number/;
 use Queue::Base 2.1;
 use DataFlow::Proc;
+use Data::Dumper;
 
 # subtypes
 subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
   where { scalar @{$_} > 0 } =>
   message { 'DataFlow must have at least one processor' };
 coerce 'ProcessorChain' => from 'ArrayRef[Ref]' => via {
-    [ map { ref($_) eq 'CODE' ? DataFlow::Proc->new( p => $_ ) : $_ } @{$_} ];
+    my @list = @{$_};
+    return [ map { DataFlow::Proc->new( p => $_ ) } @list ];
 };
+coerce 'ProcessorChain' => from 'CodeRef' =>
+  via { [ DataFlow::Proc->new( p => $_ ) ] };
+coerce 'ProcessorChain' => from 'DataFlow'       => via { $_->procs };
 coerce 'ProcessorChain' => from 'DataFlow::Proc' => via { [$_] };
-coerce 'ProcessorChain' => from 'CodeRef' => via {
-    [ DataFlow::Proc->new( p => $_ ) ];
-};
+
+with 'MooseX::OneArgNew' =>
+  { 'type' => 'ArrayRef[Ref]', 'init_arg' => 'procs', };
+with 'MooseX::OneArgNew' => { 'type' => 'CodeRef',  'init_arg' => 'procs', };
+with 'MooseX::OneArgNew' => { 'type' => 'DataFlow', 'init_arg' => 'procs', };
+with 'MooseX::OneArgNew' =>
+  { 'type' => 'DataFlow::Proc', 'init_arg' => 'procs', };
 
 # attributes
 has 'name' => (
@@ -181,8 +190,8 @@ This is a framework for data flow processing. It started as a spinoff project
 from the L<OpenData-BR|http://www.opendatabr.org/> initiative.
 
 As of now (Mar, 2011) it is still a 'work in progress', and there is a lot of
-progress to make. It is highly recommended that you read the tests, and also
-the documentation for L<DataFlow::Node> and L<DataFlow::Chain>, to start with.
+progress to make. It is highly recommended that you read the tests, and the
+documentation of L<DataFlow::Proc>, to start with.
 
 An article has been recently written in Brazilian Portuguese about this
 framework, per the São Paulo Perl Mongers "Equinócio" (Equinox) virtual event.
@@ -194,7 +203,7 @@ L<http://sao-paulo.pm.org/equinocio/2011/mar/5>
 B<UPDATE:> L<DataFlow> is a fast-evolving project, and this article, as
 it was published there, refers to versions 0.91.x of the framework. There has
 been a big refactor since then and, although the concept remains the same,
-the programming interface has been changed violently.
+since version 0.950000 the programming interface has been changed violently.
 
 Any doubts, feel free to get in touch.
 
@@ -228,7 +237,7 @@ Returns another instance of a C<DataFlow> using the same array of processors.
 
 =head2 input
 
-Accepts input data for the node. It will gladly accept anything passed as
+Accepts input data for the data flow. It will gladly accept anything passed as
 parameters. However, it must be noticed that it will not be able to make a
 distinction between arrays and hashes. Both forms below will render the exact
 same results:
@@ -239,8 +248,8 @@ same results:
 If you do want to handle arrays and hashes differently, we strongly suggest
 that you use references:
 
-	$node->input( [ qw/all the simple things/ ] );
-	$node->input( { all => the, simple => 'things' } );
+	$flow->input( [ qw/all the simple things/ ] );
+	$flow->input( { all => the, simple => 'things' } );
 
 Processors with C<process_into> enabled (true by default) will process the
 items inside an array reference, and the values (not the keys) inside a hash
@@ -254,9 +263,9 @@ data and/or if C<auto_process> has been disabled.
 
 =head2 output
 
-Fetches data from the node. If called in scalar context it will return one
-processed item from the flow. If called in list context it will return all the
-elements in the last queue.
+Fetches data from the data flow. If called in scalar context it will return
+one processed item from the flow. If called in list context it will return all
+the elements in the last queue.
 
 =head2 flush
 

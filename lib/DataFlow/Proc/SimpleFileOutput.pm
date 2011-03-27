@@ -3,7 +3,7 @@ package DataFlow::Proc::SimpleFileOutput;
 use strict;
 use warnings;
 
-# ABSTRACT: A node that writes data to a file
+# ABSTRACT: A processor that writes data to a file
 # ENCODING: utf8
 
 # VERSION

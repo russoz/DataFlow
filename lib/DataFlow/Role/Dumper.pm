@@ -3,7 +3,7 @@ package DataFlow::Role::Dumper;
 use strict;
 use warnings;
 
-# ABSTRACT: A generic processing node in a data flow
+# ABSTRACT: A role that provides a facility for dumping data to STDERR
 # ENCODING: utf8
 
 # VERSION

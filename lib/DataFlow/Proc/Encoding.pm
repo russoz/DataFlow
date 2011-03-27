@@ -3,7 +3,7 @@ package DataFlow::Proc::Encoding;
 use strict;
 use warnings;
 
-# ABSTRACT: A encoding conversion node
+# ABSTRACT: A encoding conversion processor
 # ENCODING: utf8
 
 # VERSION

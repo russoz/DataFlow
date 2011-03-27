@@ -3,7 +3,7 @@ package DataFlow::Proc::Null;
 use strict;
 use warnings;
 
-# ABSTRACT: A null node, will discard any input and return undef in the output
+# ABSTRACT: A 'null' processor, will discard any input and return undef in the output
 # ENCODING: utf8
 
 # VERSION
@@ -11,7 +11,11 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
-has '+process_into' => ( 'default' => 0, );
+has '+process_into' => (
+    'default'  => 0,
+    'init_arg' => undef,
+);
+
 has '+p' => (
     'default' => sub {
         return sub { }
@@ -38,8 +42,8 @@ __END__
 
 =head1 DESCRIPTION
 
-This class represents a null node: it will return undef regardless of any input
-provided to it.
+This class represents a null processor: it will return C<undef> regardless of
+any input provided to it.
 
 =head1 METHODS
 

@@ -12,6 +12,10 @@ use Moose;
 extends 'DataFlow::Proc';
 with 'DataFlow::Role::Dumper';
 
+has '+process_into' => (
+    default  => 0,
+    init_arg => undef,
+);
 has '+p' => (
     'default' => sub {
         my $self = shift;
@@ -43,7 +47,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Dumper node. Every item passed to its input will be printed in the C<STDERR>
+Dumper processor. Every item passed to its input will be printed in the C<STDERR>
 file handle, using the method C<raw_dumper()> defined at the role
 L<DataFlow::Role::Dumper>.
 

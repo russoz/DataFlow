@@ -3,7 +3,7 @@ package DataFlow::Proc::SimpleFileInput;
 use strict;
 use warnings;
 
-# ABSTRACT: A node that reads that from a file
+# ABSTRACT: A processor that reads that from a file
 # ENCODING: utf8
 
 # VERSION

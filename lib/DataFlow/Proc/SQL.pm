@@ -3,7 +3,7 @@ package DataFlow::Proc::SQL;
 use strict;
 use warnings;
 
-# ABSTRACT: A node that generates SQL clauses
+# ABSTRACT: A processor that generates SQL clauses
 # ENCODING: utf8
 
 # VERSION

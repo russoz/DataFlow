@@ -3,7 +3,7 @@ package DataFlow::Proc::URLRetriever;
 use strict;
 use warnings;
 
-# ABSTRACT: An URL-retriever node
+# ABSTRACT: An URL-retriever processor
 # ENCODING: utf8
 
 # VERSION
