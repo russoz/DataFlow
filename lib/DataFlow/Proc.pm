@@ -18,7 +18,10 @@ use Scalar::Util qw/blessed reftype/;
 
 subtype 'Processor' => as 'CodeRef';
 coerce 'Processor' => from 'DataFlow::Proc' => via { $_->p };
-coerce 'Processor' => from 'DataFlow' => via { my $f = $_; return sub { $f->process(shift) } };
+coerce 'Processor' => from 'DataFlow' => via {
+    my $f = $_;
+    return sub { $f->process(shift) }
+};
 
 has 'name' => (
     'is'  => 'ro',
@@ -64,7 +67,7 @@ has 'p' => (
     'is'            => 'ro',
     'isa'           => 'Processor',
     'required'      => 1,
-	'coerce'        => 1,
+    'coerce'        => 1,
     'documentation' => 'Returns the result of processing one single item',
 );
 

@@ -12,8 +12,8 @@ use Moose;
 extends 'DataFlow::Proc';
 
 has '+process_into' => (
-	'default'  => 0,
-	'init_arg' => undef,
+    'default'  => 0,
+    'init_arg' => undef,
 );
 
 has '+p' => (
