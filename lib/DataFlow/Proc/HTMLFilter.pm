@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A HTML filtering processor
-# ENCODING: utf8
 
 # VERSION
 
@@ -27,6 +26,12 @@ has 'result_type' => (
 );
 
 has 'ref_result' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'default' => 0,
+);
+
+has 'nochomp' => (
     'is'      => 'ro',
     'isa'     => 'Bool',
     'default' => 0,
@@ -57,6 +62,10 @@ has '+p' => (
             #warn 'wants HTML';
             return map { $_->as_HTML } @result;
         };
+
+        my $proc2 = $self->nochomp ? $proc : sub { return chomp $proc->(@_) };
+        my $proc3 =
+          $self->ref_result ? sub { return [ $proc2->(@_) ] } : $proc2;
 
         return $self->ref_result ? sub { return [ $proc->(@_) ] } : $proc;
     },

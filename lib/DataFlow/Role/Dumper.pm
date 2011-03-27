@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A role that provides a facility for dumping data to STDERR
-# ENCODING: utf8
 
 # VERSION
 

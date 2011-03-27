@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A HTTP Getter implementation using Curl
-# ENCODING: utf8
 
 # VERSION
 

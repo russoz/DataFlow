@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A encoding conversion processor
-# ENCODING: utf8
 
 # VERSION
 

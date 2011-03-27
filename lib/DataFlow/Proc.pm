@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A data processor class
-# ENCODING: utf8
 
 # VERSION
 
@@ -17,10 +16,13 @@ use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/blessed reftype/;
 
 subtype 'Processor' => as 'CodeRef';
-coerce 'Processor' => from 'DataFlow::Proc' => via { $_->p };
+coerce 'Processor' => from 'DataFlow::Proc' => via {
+    my $p = $_;
+    return sub { $p->process_one(shift) };
+};
 coerce 'Processor' => from 'DataFlow' => via {
     my $f = $_;
-    return sub { $f->process(shift) }
+    return sub { $f->process(shift) };
 };
 
 has 'name' => (
@@ -64,11 +66,12 @@ has 'dump_output' => (
 );
 
 has 'p' => (
-    'is'            => 'ro',
-    'isa'           => 'Processor',
-    'required'      => 1,
-    'coerce'        => 1,
-    'documentation' => 'Returns the result of processing one single item',
+    'is'       => 'ro',
+    'isa'      => 'Processor',
+    'required' => 1,
+    'coerce'   => 1,
+    'documentation' =>
+      'Code reference that returns the result of processing one single item',
 );
 
 sub process_one {
@@ -77,7 +80,7 @@ sub process_one {
     $self->prefix_dumper( '>>', $item ) if $self->dump_input;
     return unless ( $self->allows_undef_input || defined($item) );
 
-    my @result = $self->_handle_list($item);
+    my @result = $self->_handle($item);
     $self->prefix_dumper( '<<', @result ) if $self->dump_output;
 
     return @result if wantarray;
@@ -98,17 +101,13 @@ sub _param_type {
     return $r;
 }
 
-sub _handle_list {
-    my ( $self, @args ) = @_;
-    my @result = ();
+sub _handle {
+    my ( $self, $item ) = @_;
 
-    #use Data::Dumper; warn '_handle_list(params) = '.Dumper(@_);
-    foreach my $item (@args) {
-        my $type = _param_type($item);
-        confess('There is no handler for this parameter type!')
-          unless exists $self->_handlers->{$type};
-        push @result, $self->_handlers->{$type}->( $self->p, $item );
-    }
+    my $type = _param_type($item);
+    confess('There is no handler for this parameter type!')
+      unless exists $self->_handlers->{$type};
+    my @result = $self->_handlers->{$type}->( $self->p, $item );
     return @result;
 }
 
@@ -142,12 +141,12 @@ has '_handlers' => (
         return $type_handler unless $me->deref;
 
         return {
-            'SVALUE' => sub { $type_handler->{'SVALUE'}->(@_) },
-            'OBJECT' => sub { $type_handler->{'OBJECT'}->(@_) },
-            'SCALAR' => sub { ${ $type_handler->{'SCALAR'}->(@_) } },
-            'ARRAY'  => sub { @{ $type_handler->{'ARRAY'}->(@_) } },
-            'HASH'   => sub { %{ $type_handler->{'HASH'}->(@_) } },
-            'CODE'   => sub { $type_handler->{'CODE'}->(@_)->() },
+            'SVALUE' => sub { return $type_handler->{'SVALUE'}->(@_) },
+            'OBJECT' => sub { return $type_handler->{'OBJECT'}->(@_) },
+            'SCALAR' => sub { return ${ $type_handler->{'SCALAR'}->(@_) } },
+            'ARRAY'  => sub { return @{ $type_handler->{'ARRAY'}->(@_) } },
+            'HASH'   => sub { return %{ $type_handler->{'HASH'}->(@_) } },
+            'CODE'   => sub { return $type_handler->{'CODE'}->(@_)->() },
         };
     },
 );
@@ -240,7 +239,7 @@ scalar.
 =head2 allows_undef_input
 
 [Bool] It controls whether C<$self->p->()> will be handed C<undef> as input
-of if DataFlow::Proc will filter those out. (DEFAULT = false)
+or if DataFlow::Proc will filter those out. (DEFAULT = false)
 
 =head2 deref
 

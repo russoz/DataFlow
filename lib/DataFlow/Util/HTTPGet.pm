@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A HTTP Getter
-# ENCODING: utf8
 
 # VERSION
 
