@@ -13,8 +13,8 @@ extends 'DataFlow::Proc';
 with 'DataFlow::Role::Dumper';
 
 has '+process_into' => (
-	default  => 0,
-	init_arg => undef,
+    default  => 0,
+    init_arg => undef,
 );
 has '+p' => (
     'default' => sub {
