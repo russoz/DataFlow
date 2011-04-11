@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A HTTP Getter implementation using WWW::Mechanize
-# ENCODING: utf8
 
 # VERSION
 

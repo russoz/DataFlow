@@ -53,3 +53,5 @@ ok($filter3);
 my $res3 = $filter3->process_one($html);
 is( $res3->[0], 'A' );
 
+# TODO: add tests to check the 'nochomp' option
+

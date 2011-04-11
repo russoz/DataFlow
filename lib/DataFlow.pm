@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A component for dataflow processing
-# ENCODING: utf8
 
 # VERSION
 
@@ -81,10 +80,8 @@ sub _count_queued_items {
     my $q     = shift;
     my $count = 0;
 
-    #use Data::Dumper; print 'COUNT: '.Dumper($q);
     map { $count = $count + $_->size } @{$q};
 
-    #print 'COUNT = ' . $count . "\n";
     return $count;
 }
 
@@ -132,16 +129,12 @@ sub output {
     my $self = shift;
 
     $self->process_input if ( $self->_lastq->empty && $self->auto_process );
-
-    #use Data::Dumper; warn 'output self = ' .Dumper($self);
     return wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
 }
 
 sub flush {
     my $self = shift;
     while ( $self->has_queued_data ) {
-
-        #use Data::Dumper; print "FLUSH ".Dumper($self);
         $self->process_input;
     }
     return $self->output;
@@ -168,9 +161,11 @@ no Moose;
 use DataFlow;
 
 	my $flow = DataFlow->new(
-		DataFlow::Proc->new( p => sub { do this thing } ),
-		sub { ... do something },
-		sub { ... do something else },
+		procs => [
+			DataFlow::Proc->new( p => sub { do this thing } ),
+			sub { ... do something },
+			sub { ... do something else },
+		]
 	);
 
 	$flow->input( <some input> );
@@ -183,29 +178,6 @@ use DataFlow;
 A C<DataFlow> object is able to accept data, feed it into an array of
 processors (L<DataFlow::Proc> objects), and return the result(s) back to the
 caller.
-
-=head1 HISTORY
-
-This is a framework for data flow processing. It started as a spinoff project
-from the L<OpenData-BR|http://www.opendatabr.org/> initiative.
-
-As of now (Mar, 2011) it is still a 'work in progress', and there is a lot of
-progress to make. It is highly recommended that you read the tests, and the
-documentation of L<DataFlow::Proc>, to start with.
-
-An article has been recently written in Brazilian Portuguese about this
-framework, per the São Paulo Perl Mongers "Equinócio" (Equinox) virtual event.
-Although an English version of the article in in the plans, you can figure
-a good deal out of the original one at
-
-L<http://sao-paulo.pm.org/equinocio/2011/mar/5>
-
-B<UPDATE:> L<DataFlow> is a fast-evolving project, and this article, as
-it was published there, refers to versions 0.91.x of the framework. There has
-been a big refactor since then and, although the concept remains the same,
-since version 0.950000 the programming interface has been changed violently.
-
-Any doubts, feel free to get in touch.
 
 =head1 ATTRIBUTES
 
@@ -275,6 +247,29 @@ Flushes all the data through the dataflow, and returns the complete result set.
 
 Immediately processes a bunch of data, without touching the object queues. It
 will process all the provided data and return the complete result set for it.
+
+=head1 HISTORY
+
+This is a framework for data flow processing. It started as a spinoff project
+from the L<OpenData-BR|http://www.opendatabr.org/> initiative.
+
+As of now (Mar, 2011) it is still a 'work in progress', and there is a lot of
+progress to make. It is highly recommended that you read the tests, and the
+documentation of L<DataFlow::Proc>, to start with.
+
+An article has been recently written in Brazilian Portuguese about this
+framework, per the São Paulo Perl Mongers "Equinócio" (Equinox) virtual event.
+Although an English version of the article in in the plans, you can figure
+a good deal out of the original one at
+
+L<http://sao-paulo.pm.org/equinocio/2011/mar/5>
+
+B<UPDATE:> L<DataFlow> is a fast-evolving project, and this article, as
+it was published there, refers to versions 0.91.x of the framework. There has
+been a big refactor since then and, although the concept remains the same,
+since version 0.950000 the programming interface has been changed violently.
+
+Any doubts, feel free to get in touch.
 
 =cut
 

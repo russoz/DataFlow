@@ -4,12 +4,11 @@ use strict;
 use warnings;
 
 # ABSTRACT: A piece of information metadata
-# ENCODING: utf8
 
 # VERSION
 
 use Moose;
-use DateTime;
+use DateTime 0.51;
 
 has 'timestamp'    => ( is => 'rw', isa => 'DateTime', );
 has 'title'        => ( is => 'rw', isa => 'Str', );

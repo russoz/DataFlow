@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A 'null' processor, will discard any input and return undef in the output
-# ENCODING: utf8
 
 # VERSION
 

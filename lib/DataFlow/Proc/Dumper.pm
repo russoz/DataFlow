@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A debugging processor that will dump data to STDERR
-# ENCODING: utf8
 
 # VERSION
 

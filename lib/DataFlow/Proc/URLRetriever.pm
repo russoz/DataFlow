@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: An URL-retriever processor
-# ENCODING: utf8
 
 # VERSION
 

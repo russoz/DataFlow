@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A processor that reads that from a file
-# ENCODING: utf8
 
 # VERSION
 

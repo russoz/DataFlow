@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 # ABSTRACT: A processor that generates multi-paged URL lists
-# ENCODING: utf8
 
 # VERSION
 
