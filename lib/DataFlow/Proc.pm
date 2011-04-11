@@ -52,17 +52,19 @@ has 'process_into' => (
 );
 
 has 'dump_input' => (
-    'is'      => 'ro',
-    'isa'     => 'Bool',
-    'lazy'    => 1,
-    'default' => 0,
+    'is'            => 'ro',
+    'isa'           => 'Bool',
+    'lazy'          => 1,
+    'default'       => 0,
+    'documentation' => 'Prints a dump of the input load to STDERR',
 );
 
 has 'dump_output' => (
-    'is'      => 'ro',
-    'isa'     => 'Bool',
-    'lazy'    => 1,
-    'default' => 0,
+    'is'            => 'ro',
+    'isa'           => 'Bool',
+    'lazy'          => 1,
+    'default'       => 0,
+    'documentation' => 'Prints a dump of the output load to STDERR',
 );
 
 has 'p' => (
