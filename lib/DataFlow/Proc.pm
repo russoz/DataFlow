@@ -56,6 +56,7 @@ has 'dump_input' => (
     'isa'     => 'Bool',
     'lazy'    => 1,
     'default' => 0,
+    'documentation' => 'Prints a dump of the input load to STDERR',
 );
 
 has 'dump_output' => (
@@ -63,6 +64,7 @@ has 'dump_output' => (
     'isa'     => 'Bool',
     'lazy'    => 1,
     'default' => 0,
+    'documentation' => 'Prints a dump of the output load to STDERR',
 );
 
 has 'p' => (
