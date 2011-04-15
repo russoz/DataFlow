@@ -240,7 +240,7 @@ scalar.
 
 =head2 allows_undef_input
 
-[Bool] It controls whether C<$self->p->()> will be handed C<undef> as input
+[Bool] It controls whether C<< $self->p->() >> will accept C<undef> as input
 or if DataFlow::Proc will filter those out. (DEFAULT = false)
 
 =head2 deref
@@ -312,7 +312,7 @@ what this code reference can or should do. (REQUIRED)
 
 Processes one single scalar (or anything else that can be passed in on scalar,
 such as references or globs), and returns the application of the function
-C<$self->p->()> over the item.
+C<< $self->p->() >> over the item.
 
 =head1 DEPENDENCIES
 
