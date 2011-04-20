@@ -10,6 +10,8 @@ use warnings;
 use Moose;
 use DataFlow::Meta;
 
+use namespace::autoclean;
+
 has 'metadata' => (
     'is'  => 'ro',
     'isa' => 'DataFlow::Meta',
@@ -21,7 +23,6 @@ has 'data' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

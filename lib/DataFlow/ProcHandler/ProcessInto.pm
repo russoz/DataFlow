@@ -10,7 +10,10 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::ProcHandler';
 
-has '_handlers' => (
+use namespace::autoclean;
+use MooseX::ClassAttribute;
+
+class_has '_handlers' => (
     'is'      => 'ro',
     'isa'     => 'HashRef[CodeRef]',
     'lazy'    => 1,
@@ -31,12 +34,10 @@ has '_handlers' => (
 sub _handle {
     my ( $p, $item, $type ) = @_;
 
-    return $self->_handlers->{$type}->($p,$item);
+    return __PACKAGE__->_handlers->{$type}->($p,$item);
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose::Util::TypeConstraints;
-no Moose;
 
 1;
 

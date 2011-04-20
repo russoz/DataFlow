@@ -10,13 +10,13 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::ProcHandler';
 
+use namespace::autoclean;
+
 sub _handle {
 	return _handle_svalue(@_);
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose::Util::TypeConstraints;
-no Moose;
 
 1;
 

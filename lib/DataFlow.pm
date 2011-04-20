@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 use Moose::Util::TypeConstraints 1.01;
 
+use namespace::autoclean;
 use Scalar::Util qw/looks_like_number/;
 use Queue::Base 2.1;
 use DataFlow::Proc;
@@ -149,8 +150,6 @@ sub process {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose::Util::TypeConstraints;
-no Moose;
 
 1;
 

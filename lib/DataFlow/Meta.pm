@@ -8,6 +8,8 @@ use warnings;
 # VERSION
 
 use Moose;
+
+use namespace::autoclean;
 use DateTime 0.51;
 
 has 'timestamp'    => ( is => 'rw', isa => 'DateTime', );
@@ -18,7 +20,6 @@ has 'original'     => ( is => 'rw', isa => 'Str', );
 has 'restrictions' => ( is => 'rw', isa => 'Str', );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

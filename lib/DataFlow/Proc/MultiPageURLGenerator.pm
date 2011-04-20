@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+use namespace::autoclean;
 use Carp;
 
 has 'first_page' => (
@@ -83,7 +84,6 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

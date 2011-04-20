@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::Dumper';
 
+use namespace::autoclean;
 use DataFlow;
 
 use Moose::Util::TypeConstraints 1.01;
@@ -184,8 +185,6 @@ sub _handle_code_ref {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose::Util::TypeConstraints;
-no Moose;
 
 1;
 
