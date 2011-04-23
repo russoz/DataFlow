@@ -3,7 +3,7 @@ package DataFlow::TypePolicy::Scalar;
 use strict;
 use warnings;
 
-# ABSTRACT: A ProcHandler that processes only scalar values, no refs
+# ABSTRACT: A TypePolicy that processes only scalar values, no refs
 
 # VERSION
 

@@ -3,7 +3,7 @@ package DataFlow::TypePolicy::ProcessInto;
 use strict;
 use warnings;
 
-# ABSTRACT: A ProcHandler that processes only scalar values, no refs
+# ABSTRACT: A TypePolicy that processes into references' values
 
 # VERSION
 
@@ -14,7 +14,6 @@ use namespace::autoclean;
 
 has '+handlers' => (
     'default' => sub {
-        my $me           = shift;
         my $type_handler = {
             'SCALAR' => \&_handle_scalar_ref,
             'ARRAY'  => \&_handle_array_ref,
