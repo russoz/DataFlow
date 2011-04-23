@@ -127,13 +127,9 @@ sub process_one {
       $self->deref
       ? map { _deref($_) } ( $self->_process($item) )
       : $self->_process($item);
+
     $self->prefix_dumper( '<<', @result ) if $self->dump_output;
-
-    return @result if wantarray;
-
-    $self->confess('Multiple values in result for a scalar context')
-      if $#result > 0;
-    return $result[0];
+    return @result;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -263,7 +259,7 @@ what this code reference can or should do. (REQUIRED)
 
 Processes one single scalar (or anything else that can be passed in on scalar,
 such as references or globs), and returns the application of the function
-C<$self->p->()> over the item.
+C<< $self->p->() >> over the item.
 
 =head1 DEPENDENCIES
 
