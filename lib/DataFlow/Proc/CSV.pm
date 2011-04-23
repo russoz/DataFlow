@@ -14,17 +14,22 @@ use namespace::autoclean;
 use Moose::Util::TypeConstraints 1.01;
 use Text::CSV;
 
-has 'headers' => (
+has 'header' => (
     'is'        => 'rw',
     'isa'       => 'ArrayRef[Str]',
-    'predicate' => 'have_headers',
+    'predicate' => 'has_header',
 );
 
-has '_header_unused' => (
+has 'header_wanted' => (
     'is'      => 'rw',
     'isa'     => 'Bool',
-    'default' => 1,
-    'clearer' => '_use_header',
+    'lazy'    => 1,
+    'default' => sub {
+        my $self = shift;
+        return 0 if $self->direction eq 'FROM_CSV';
+        return 1 if $self->has_header;
+        return 0;
+    },
 );
 
 has 'direction' => (
@@ -42,6 +47,7 @@ has 'text_csv_opts' => (
 has 'csv' => (
     'is'      => 'ro',
     'isa'     => 'Text::CSV',
+    'lazy'    => 1,
     'default' => sub {
         my $self = shift;
 
@@ -53,7 +59,8 @@ has 'csv' => (
 
 sub _combine {
     my ( $self, $e ) = @_;
-    $self->csv->combine( @{$e} );
+    my $status = $self->csv->combine( @{$e} );
+    die $self->csv->error_diag unless $status;
     return $self->csv->string;
 }
 
@@ -74,9 +81,9 @@ has '+p' => (
             'TO_CSV' => sub {
                 my $data = shift;
                 my @res  = ();
-                if ( $self->_header_unused ) {
-                    $self->_header_unused(0);
-                    push @res, $self->_combine( $self->headers );
+                if ( $self->header_wanted ) {
+                    $self->header_wanted(0);
+                    push @res, $self->_combine( $self->header );
                 }
 
                 push @res, $self->_combine($data);
@@ -84,9 +91,9 @@ has '+p' => (
             },
             'FROM_CSV' => sub {
                 my $csv_line = shift;
-                if ( $self->_header_unused ) {
-                    $self->_header_unused(0);
-                    $self->headers( $self->_parse($csv_line) );
+                if ( $self->header_wanted ) {
+                    $self->header_wanted(0);
+                    $self->header( $self->_parse($csv_line) );
                     return;
                 }
                 return $self->_parse($csv_line);
