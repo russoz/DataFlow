@@ -12,6 +12,7 @@ extends 'DataFlow::Proc';
 with 'DataFlow::Role::File';
 
 use autodie;
+use namespace::autoclean;
 use Queue::Base;
 
 has '_slurpy_read' => (
@@ -73,7 +74,6 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

@@ -8,8 +8,10 @@ use warnings;
 # VERSION
 
 use Moose;
-
 with 'MooseX::Traits';
+
+use namespace::autoclean;
+
 has '+_trait_namespace' => ( default => 'DataFlow::Util::HTTPGet' );
 
 has 'referer' => (
@@ -114,8 +116,6 @@ sub post {
     }
     return;
 }
-
-no Moose;
 
 1;
 

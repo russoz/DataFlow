@@ -19,7 +19,7 @@ is( $uc->p->('iop'), 'IOP' );
 # scalars
 diag('scalar params');
 ok( !defined( $uc->process_one() ), 'returns nothing for nothing' );
-is( $uc->process_one('aaa'), 'AAA', 'works as it should' );
-isnt( $uc->process_one('bbb'), 'bbb', 'indeed works as it should' );
-is( $uc->process_one(1), 1, );
+is( ( $uc->process_one('aaa') )[0], 'AAA', 'works as it should' );
+isnt( ( $uc->process_one('bbb') )[0], 'bbb', 'indeed works as it should' );
+is( ( $uc->process_one(1) )[0], 1, );
 

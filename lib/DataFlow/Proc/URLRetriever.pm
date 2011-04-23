@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+use namespace::autoclean;
 use DataFlow::Util::HTTPGet;
 
 has '_get' => (
@@ -44,7 +45,6 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

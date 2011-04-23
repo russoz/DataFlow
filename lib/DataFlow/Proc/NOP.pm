@@ -10,6 +10,8 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+use namespace::autoclean;
+
 has '+process_into' => ( 'default' => 0, );
 has '+p' => (
     'default' => sub {
@@ -18,7 +20,6 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

@@ -10,7 +10,7 @@ use warnings;
 use Moose;
 use Moose::Util::TypeConstraints 1.01;
 
-use Scalar::Util qw/looks_like_number/;
+use namespace::autoclean;
 use Queue::Base 2.1;
 use DataFlow::Proc;
 use Data::Dumper;
@@ -86,10 +86,10 @@ sub _count_queued_items {
 }
 
 sub _process_queues {
-    my ( $p, $inputq, $outputq ) = @_;
+    my ( $proc, $inputq, $outputq ) = @_;
 
     my $item = $inputq->remove;
-    my @res  = $p->process_one($item);
+    my @res  = $proc->process_one($item);
     $outputq->add(@res);
     return;
 }
@@ -149,8 +149,6 @@ sub process {
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose::Util::TypeConstraints;
-no Moose;
 
 1;
 
