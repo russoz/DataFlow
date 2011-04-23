@@ -1,4 +1,4 @@
-package DataFlow::TypePolicies::ProcessInto;
+package DataFlow::TypePolicy::ProcessInto;
 
 use strict;
 use warnings;

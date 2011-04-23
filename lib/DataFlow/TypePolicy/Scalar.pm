@@ -1,4 +1,4 @@
-package DataFlow::TypePolicies::Scalar;
+package DataFlow::TypePolicy::Scalar;
 
 use strict;
 use warnings;
