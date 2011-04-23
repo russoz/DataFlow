@@ -10,7 +10,9 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::Dumper';
 
+use namespace::autoclean;
 use DataFlow;
+use DataFlow::Role::TypePolicy;
 
 use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/blessed reftype/;
@@ -24,6 +26,17 @@ coerce 'Processor' => from 'DataFlow' => via {
     my $f = $_;
     return sub { $f->process(shift) };
 };
+
+subtype '_TypePolicy' => as 'DataFlow::Role::TypePolicy';
+coerce '_TypePolicy' => from 'Str' => via { _make_typepolicy($_) };
+
+sub _make_typepolicy {
+    my $class = 'DataFlow::TypePolicy::' . shift;
+    my $obj;
+    eval 'use ' . $class . '; $obj = ' . $class . '->new()';    ## no critic
+    die $@ if $@;
+    return $obj;
+}
 
 has 'name' => (
     'is'  => 'ro',
@@ -67,6 +80,19 @@ has 'dump_output' => (
     'documentation' => 'Prints a dump of the output load to STDERR',
 );
 
+has 'type_policy' => (
+    'is'       => 'ro',
+    'does'     => '_TypePolicy',
+    'required' => 1,
+    'lazy'     => 1,
+    'default'  => sub {
+        my $self = shift;
+        return $self->process_into
+          ? _make_typepolicy('ProcessInto')
+          : _make_typepolicy('Scalar');
+    },
+);
+
 has 'p' => (
     'is'       => 'ro',
     'isa'      => 'Processor',
@@ -76,116 +102,37 @@ has 'p' => (
       'Code reference that returns the result of processing one single item',
 );
 
+sub _process {
+    my ( $self, $item ) = @_;
+    return $self->type_policy->apply( $self->p, $item );
+}
+
+sub _deref {
+    my $value = shift;
+    my $ref = reftype($value) || '';
+    return ${$value}  if $ref eq 'SCALAR';
+    return @{$value}  if $ref eq 'ARRAY';
+    return %{$value}  if $ref eq 'HASH';
+    return $value->() if $ref eq 'CODE';
+    return $value;
+}
+
 sub process_one {
     my ( $self, $item ) = @_;
 
     $self->prefix_dumper( '>>', $item ) if $self->dump_input;
-    return unless ( $self->allows_undef_input || defined($item) );
+    return () unless ( $self->allows_undef_input || defined($item) );
 
-    my @result = $self->_handle($item);
+    my @result =
+      $self->deref
+      ? map { _deref($_) } ( $self->_process($item) )
+      : $self->_process($item);
+
     $self->prefix_dumper( '<<', @result ) if $self->dump_output;
-
-    return @result if wantarray;
-
-    confess('Multiple values in result for a scalar context') if $#result > 0;
-    return $result[0];
-}
-
-##############################################################################
-# code to handle different types of input
-#   ex: array-refs, hash-refs, code-refs, etc...
-
-sub _param_type {
-    my $p = shift;
-    my $r = reftype($p);
-    return 'SVALUE' unless $r;
-    return 'OBJECT' if blessed($p);
-    return $r;
-}
-
-sub _handle {
-    my ( $self, $item ) = @_;
-
-    my $type = _param_type($item);
-    confess('There is no handler for this parameter type!')
-      unless exists $self->_handlers->{$type};
-    my @result = $self->_handlers->{$type}->( $self->p, $item );
     return @result;
 }
 
-##############################################################################
-#
-#  _handlers
-#
-#  _handlers is a hash reference, with reference types (and some other special
-#  strings) as keys, and code references (a.k.a. handlers) as values.
-#
-#  For each key, a handler will be defined taking into account whether this
-#  processor has process_into == 1 and/or deref == 1.
-#
-
-has '_handlers' => (
-    'is'      => 'ro',
-    'isa'     => 'HashRef[CodeRef]',
-    'lazy'    => 1,
-    'default' => sub {
-        my $me           = shift;
-        my $type_handler = {
-            'SVALUE' => \&_handle_svalue,
-            'OBJECT' => \&_handle_svalue,
-            'SCALAR' => $me->process_into ? \&_handle_scalar_ref
-            : \&_handle_svalue,
-            'ARRAY' => $me->process_into ? \&_handle_array_ref
-            : \&_handle_svalue,
-            'HASH' => $me->process_into ? \&_handle_hash_ref : \&_handle_svalue,
-            'CODE' => $me->process_into ? \&_handle_code_ref : \&_handle_svalue,
-        };
-        return $type_handler unless $me->deref;
-
-        return {
-            'SVALUE' => sub { return $type_handler->{'SVALUE'}->(@_) },
-            'OBJECT' => sub { return $type_handler->{'OBJECT'}->(@_) },
-            'SCALAR' => sub { return ${ $type_handler->{'SCALAR'}->(@_) } },
-            'ARRAY'  => sub { return @{ $type_handler->{'ARRAY'}->(@_) } },
-            'HASH'   => sub { return %{ $type_handler->{'HASH'}->(@_) } },
-            'CODE'   => sub { return $type_handler->{'CODE'}->(@_)->() },
-        };
-    },
-);
-
-sub _handle_svalue {
-    my ( $p, $item ) = @_;
-    return $p->($item);
-}
-
-sub _handle_scalar_ref {
-    my ( $p, $item ) = @_;
-    my $r = $p->($$item);
-    return \$r;
-}
-
-sub _handle_array_ref {
-    my ( $p, $item ) = @_;
-
-    #use Data::Dumper; warn 'handle_array_ref :: item = ' . Dumper($item);
-    my @r = map { $p->($_) } @{$item};
-    return [@r];
-}
-
-sub _handle_hash_ref {
-    my ( $p, $item ) = @_;
-    my %r = map { $_ => $p->( $item->{$_} ) } keys %{$item};
-    return {%r};
-}
-
-sub _handle_code_ref {
-    my ( $p, $item ) = @_;
-    return sub { $p->( $item->() ) };
-}
-
 __PACKAGE__->meta->make_immutable;
-no Moose::Util::TypeConstraints;
-no Moose;
 
 1;
 

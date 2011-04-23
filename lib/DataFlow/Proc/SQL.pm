@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+use namespace::autoclean;
 use SQL::Abstract;
 
 has '_sql' => (
@@ -43,7 +44,6 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

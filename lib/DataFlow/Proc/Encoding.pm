@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+use namespace::autoclean;
 use Encode;
 
 has 'input_encoding' => (
@@ -42,7 +43,6 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 

@@ -11,6 +11,8 @@ use Moose;
 extends 'DataFlow::Proc';
 with 'DataFlow::Role::File';
 
+use namespace::autoclean;
+
 has 'ors' => (
     'is'            => 'ro',
     'isa'           => 'Str',
@@ -35,7 +37,6 @@ has '+p' => (
 );
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
 
 1;
 
