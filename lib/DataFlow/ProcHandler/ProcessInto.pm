@@ -11,17 +11,11 @@ use Moose;
 with 'DataFlow::Role::ProcHandler';
 
 use namespace::autoclean;
-use MooseX::ClassAttribute;
 
-class_has '_handlers' => (
-    'is'      => 'ro',
-    'isa'     => 'HashRef[CodeRef]',
-    'lazy'    => 1,
+has '+handlers' => (
     'default' => sub {
         my $me           = shift;
         my $type_handler = {
-            'SVALUE' => \&_handle_svalue,
-            'OBJECT' => \&_handle_svalue,
             'SCALAR' => \&_handle_scalar_ref,
             'ARRAY'  => \&_handle_array_ref,
             'HASH'   => \&_handle_hash_ref,
@@ -31,11 +25,11 @@ class_has '_handlers' => (
     },
 );
 
-sub _handle {
-    my ( $p, $item, $type ) = @_;
-
-    return __PACKAGE__->_handlers->{$type}->($p,$item);
-}
+has '+default_handler' => (
+    'default' => sub {
+        return \&_handle_svalue;
+    },
+);
 
 __PACKAGE__->meta->make_immutable;
 
