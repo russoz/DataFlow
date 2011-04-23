@@ -15,12 +15,12 @@ is( $n->p->('iop'), 'Iop' );
 # tests: 2
 # scalars
 ok( !defined( $n->process_one() ) );
-ok( ($n->process_one('aaa'))[0] eq 'Aaa' );
+ok( ( $n->process_one('aaa') )[0] eq 'Aaa' );
 
 # tests: 1
 # scalar refs
 my $val = 'babaloo';
-ok( ($n->process_one( \$val ))[0] eq 'Babaloo' );
+ok( ( $n->process_one( \$val ) )[0] eq 'Babaloo' );
 
 # tests: 2
 # array refs

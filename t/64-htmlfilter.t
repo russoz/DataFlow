@@ -50,7 +50,7 @@ my $filter3 = DataFlow::Proc::HTMLFilter->new(
 );
 ok($filter3);
 
-my $res3 = ($filter3->process_one($html))[0];
+my $res3 = ( $filter3->process_one($html) )[0];
 is( $res3->[0], 'A' );
 
 # TODO: add tests to check the 'nochomp' option
