@@ -13,7 +13,7 @@ use Moose::Util::TypeConstraints 1.01;
 use namespace::autoclean;
 use Queue::Base 2.1;
 use DataFlow::Proc;
-use Data::Dumper;
+use Scalar::Util qw/blessed/;
 
 # subtypes
 subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
@@ -21,7 +21,15 @@ subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
   message { 'DataFlow must have at least one processor' };
 coerce 'ProcessorChain' => from 'ArrayRef[Ref]' => via {
     my @list = @{$_};
-    return [ map { DataFlow::Proc->new( p => $_ ) } @list ];
+    my @res  = ();
+    foreach my $proc (@list) {
+        if ( blessed($proc) && $proc->isa('DataFlow::Proc') ) {
+            push @res, $proc;
+            next;
+        }
+        push @res, DataFlow::Proc->new( p => $proc );
+    }
+    return [@res];
 };
 coerce 'ProcessorChain' => from 'CodeRef' =>
   via { [ DataFlow::Proc->new( p => $_ ) ] };
