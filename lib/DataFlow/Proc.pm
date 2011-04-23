@@ -83,13 +83,12 @@ has 'dump_output' => (
 has 'type_policy' => (
     'is'       => 'ro',
     'does'     => '_TypePolicy',
+    'coerce'   => 1,
     'required' => 1,
     'lazy'     => 1,
     'default'  => sub {
         my $self = shift;
-        return $self->process_into
-          ? _make_typepolicy('ProcessInto')
-          : _make_typepolicy('Scalar');
+        return $self->process_into ? 'ProcessInto' : 'Scalar';
     },
 );
 
