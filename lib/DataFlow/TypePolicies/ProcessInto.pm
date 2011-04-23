@@ -1,4 +1,4 @@
-package DataFlow::ProcHandler::ProcessInto;
+package DataFlow::TypePolicies::ProcessInto;
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use warnings;
 # VERSION
 
 use Moose;
-with 'DataFlow::Role::ProcHandler';
+with 'DataFlow::Role::TypePolicy';
 
 use namespace::autoclean;
 

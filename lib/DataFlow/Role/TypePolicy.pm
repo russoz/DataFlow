@@ -1,4 +1,4 @@
-package DataFlow::Role::ProcHandler;
+package DataFlow::Role::TypePolicy;
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ has 'default_handler' => (
     },
 );
 
-sub handle_item {
+sub apply {
     my ( $self, $p, $item ) = @_;
     my $type = _param_type($item);
 
@@ -78,9 +78,9 @@ sub _handle_code_ref {
 
 =pod
 
-=head2 handle_item P ITEM
+=head2 apply P ITEM
 
-Handles one item according to the policy implemented by the consuming class.
+Applies the policy using function P and input data ITEM.
 
 =cut
 

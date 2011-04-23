@@ -1,4 +1,4 @@
-package DataFlow::ProcHandler::Scalar;
+package DataFlow::TypePolicies::Scalar;
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use warnings;
 # VERSION
 
 use Moose;
-with 'DataFlow::Role::ProcHandler';
+with 'DataFlow::Role::TypePolicy';
 
 use namespace::autoclean;
 
