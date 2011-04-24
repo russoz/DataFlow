@@ -13,17 +13,11 @@ my $sub = sub {
     return $_;
 };
 
-my $flow1 =
-  DataFlow->new( procs => [ NOP->new(), $sub, ],
-  );
+my $flow1 = DataFlow->new( procs => [ NOP->new(), $sub, ], );
 ok($flow1);
 
-my $flow2 = DataFlow->new(
-    procs => [
-        NOP->new(),
-        DataFlow::Proc->new( p => $sub ),
-    ],
-);
+my $flow2 =
+  DataFlow->new( procs => [ NOP->new(), DataFlow::Proc->new( p => $sub ), ], );
 ok($flow2);
 
 my @data = (
