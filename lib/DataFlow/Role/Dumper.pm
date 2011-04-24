@@ -15,6 +15,7 @@ has '_dumper' => (
     'lazy'    => 1,
     'default' => sub {
         use Data::Dumper;
+        $Data::Dumper::Terse = 1;
         return sub {
             return Dumper(@_);
         };
@@ -22,12 +23,8 @@ has '_dumper' => (
     'handles' => {
         'prefix_dumper' => sub {
             my ( $self, $prefix, @args ) = @_;
-            print STDERR $prefix;
-            if (@args) {
-                print STDERR ' ' . $self->_dumper->(@args);
-            }
-            else {
-                print STDERR "\n";
+            foreach (@args) {
+                print STDERR $prefix . ' ' . $self->_dumper->($_);
             }
         },
         'raw_dumper' => sub {

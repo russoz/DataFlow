@@ -58,7 +58,6 @@ my $flow = DataFlow->new(
               '//div[@id="listagemEmpresasSancionadas"]/table/tbody/tr',
         ),
         HTMLFilter->new(
-            dump_output  => 1,
             search_xpath => '//td',
             result_type  => 'VALUE',
             ref_result   => 1,
@@ -69,8 +68,9 @@ my $flow = DataFlow->new(
             s/\s*$//;
             return $_;
         },
-        NOP->new( dump_output => 1, ),
+        NOP->new( name => 'nop dumper', dump_output => 1, ),
         CSV->new(
+            name          => 'csv',
             direction     => 'TO_CSV',
             text_csv_opts => { binary => 1 },
             headers       => [
