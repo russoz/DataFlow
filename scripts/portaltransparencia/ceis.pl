@@ -21,7 +21,8 @@ my $flow = DataFlow->new(
         MultiPageURLGenerator->new(
             name => 'multipage',
 
-            #first_page => -2,
+            first_page => -2,
+
             #last_page     => 35,
             produce_last_page => sub {
                 my $url = shift;
@@ -67,8 +68,7 @@ my $flow = DataFlow->new(
             s/\s*$//;
             return $_;
         },
-
-        #NOP->new( name => 'nop dumper', dump_output => 1, ),
+        NOP->new( name => 'nop dumper', dump_output => 1, ),
         CSV->new(
             name          => 'csv',
             direction     => 'TO_CSV',

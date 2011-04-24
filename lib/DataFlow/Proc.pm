@@ -39,8 +39,9 @@ sub _make_typepolicy {
 }
 
 has 'name' => (
-    'is'  => 'ro',
-    'isa' => 'Str',
+    'is'        => 'ro',
+    'isa'       => 'Str',
+    'predicate' => 'has_name',
 );
 
 has 'allows_undef_input' => (
@@ -119,7 +120,8 @@ sub _deref {
 sub process_one {
     my ( $self, $item ) = @_;
 
-    $self->prefix_dumper( '>>', $item ) if $self->dump_input;
+    $self->prefix_dumper( $self->has_name ? $self->name . ' <<' : '<<', $item )
+      if $self->dump_input;
     return () unless ( $self->allows_undef_input || defined($item) );
 
     my @result =
@@ -127,7 +129,9 @@ sub process_one {
       ? map { _deref($_) } ( $self->_process($item) )
       : $self->_process($item);
 
-    $self->prefix_dumper( '<<', @result ) if $self->dump_output;
+    $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>',
+        @result )
+      if $self->dump_output;
     return @result;
 }
 
