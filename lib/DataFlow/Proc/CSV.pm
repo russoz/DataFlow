@@ -70,7 +70,11 @@ sub _parse {
     return [ $self->csv->fields ];
 }
 
-has '+process_into' => ( 'default' => 0, );
+has '+type_policy' => (
+    'default' => sub {
+        return shift->direction eq 'TO_CSV' ? 'ArrayRef' : 'Scalar';
+    },
+);
 
 has '+p' => (
     'lazy'    => 1,
