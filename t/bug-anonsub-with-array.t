@@ -14,7 +14,7 @@ my $sub = sub {
 };
 
 my $flow1 =
-  DataFlow->new( procs => [ NOP->new(), $sub, NOP->new( dump_output => 1 ), ],
+  DataFlow->new( procs => [ NOP->new(), $sub, ],
   );
 ok($flow1);
 
@@ -22,7 +22,6 @@ my $flow2 = DataFlow->new(
     procs => [
         NOP->new(),
         DataFlow::Proc->new( p => $sub ),
-        NOP->new( dump_output => 1 ),
     ],
 );
 ok($flow2);
