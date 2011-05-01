@@ -74,7 +74,8 @@ has '_queues' => (
     'handles' => {
         '_firstq'         => sub { return shift->_queues->[0] },
         'has_queued_data' => sub {
-            return _count_queued_items( shift->_queues );
+			my $self = shift;
+            return _count_queued_items( $self->_queues ) + $self->_lastq->size;
         },
         '_make_queues' => sub {
             return [ map { Queue::Base->new() } @{ shift->procs } ];
