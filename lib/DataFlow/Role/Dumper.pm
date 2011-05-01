@@ -15,9 +15,9 @@ has '_dumper' => (
     'lazy'    => 1,
     'default' => sub {
         use Data::Dumper;
-        $Data::Dumper::Terse = 1;
         return sub {
-            return Dumper(@_);
+            $Data::Dumper::Terse = 1;
+            return join qq{\n}, map { Dumper($_) } @_;
         };
     },
     'handles' => {

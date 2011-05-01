@@ -72,11 +72,9 @@ has '_queues' => (
     'lazy'    => 1,
     'default' => sub { return shift->_make_queues(); },
     'handles' => {
-        '_firstq'         => sub { return shift->_queues->[0] },
-        'has_queued_data' => sub {
-			my $self = shift;
-            return _count_queued_items( $self->_queues ) + $self->_lastq->size;
-        },
+        '_firstq' => sub { return shift->_queues->[0] },
+        'has_queued_data' =>
+          sub { return _count_queued_items( shift->_queues ) },
         '_make_queues' => sub {
             return [ map { Queue::Base->new() } @{ shift->procs } ];
         },
