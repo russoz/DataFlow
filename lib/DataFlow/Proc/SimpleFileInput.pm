@@ -40,7 +40,12 @@ has '_fileq' => (
     'default' => sub { return Queue::Base->new },
 );
 
-has '+allows_undef_input' => ( 'default' => 1 );
+has '+allows_undef_input' => (
+    'default' => sub {
+        my $self = shift;
+        return $self->do_slurp ? 0 : 1;
+    }
+);
 
 has '+p' => (
     'default' => sub {
