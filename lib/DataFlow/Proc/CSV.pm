@@ -13,10 +13,11 @@ extends 'DataFlow::Proc';
 use namespace::autoclean;
 use Moose::Util::TypeConstraints 1.01;
 use Text::CSV;
+use Text::CSV::Encoded;
 
 has 'header' => (
     'is'        => 'rw',
-    'isa'       => 'ArrayRef[Str]',
+    'isa'       => 'ArrayRef[Maybe[Str]]',
     'predicate' => 'has_header',
 );
 
@@ -51,9 +52,19 @@ has 'csv' => (
     'default' => sub {
         my $self = shift;
 
-        return $self->has_text_csv_opts
-          ? Text::CSV->new( $self->text_csv_opts )
-          : Text::CSV->new();
+        return Text::CSV->new unless $self->has_text_csv_opts;
+
+        my %opts = %{ $self->text_csv_opts };
+        my $has_encode =
+          scalar grep { exists $opts{$_} }
+          qw/encoding encoding_in encoding_out encoding_io_in encoding_to_parse encoding_io_out encoding_to_combine/;
+
+        if ($has_encode) {
+            return Text::CSV::Encoded->new( $self->text_csv_opts );
+        }
+        else {
+            return Text::CSV->new( $self->text_csv_opts );
+        }
     },
 );
 
@@ -66,7 +77,8 @@ sub _combine {
 
 sub _parse {
     my ( $self, $line ) = @_;
-    $self->csv->parse($line);
+    my $ok = $self->csv->parse($line);
+    die $self->csv->error_diag unless $ok;
     return [ $self->csv->fields ];
 }
 
