@@ -8,6 +8,8 @@ use warnings;
 # VERSION
 
 use Moose;
+with 'DataFlow::Role::Dumper';
+
 use Moose::Util::TypeConstraints 1.01;
 
 use namespace::autoclean;
@@ -23,11 +25,11 @@ coerce 'ProcessorChain' => from 'ArrayRef[Ref]' => via {
     my @list = @{$_};
     my @res  = ();
     foreach my $proc (@list) {
-        if ( blessed($proc) && $proc->isa('DataFlow::Proc') ) {
-            push @res, $proc;
-            next;
-        }
-        push @res, DataFlow::Proc->new( p => $proc );
+        my $v =
+          ( blessed($proc) && $proc->isa('DataFlow::Proc') )
+          ? $proc
+          : DataFlow::Proc->new( p => $proc );
+        push @res, $v;
     }
     return [@res];
 };
@@ -45,8 +47,9 @@ with 'MooseX::OneArgNew' =>
 
 # attributes
 has 'name' => (
-    'is'  => 'ro',
-    'isa' => 'Str',
+    'is'        => 'ro',
+    'isa'       => 'Str',
+    'predicate' => 'has_name',
 );
 
 has 'auto_process' => (
@@ -67,11 +70,13 @@ has '_queues' => (
     'is'      => 'ro',
     'isa'     => 'ArrayRef[Queue::Base]',
     'lazy'    => 1,
-    'default' => sub { return _make_queues( shift->procs ); },
+    'default' => sub { return shift->_make_queues(); },
     'handles' => {
-        '_firstq'         => sub { return shift->_queues->[0] },
-        'has_queued_data' => sub {
-            return _count_queued_items( shift->_queues );
+        '_firstq' => sub { return shift->_queues->[0] },
+        'has_queued_data' =>
+          sub { return _count_queued_items( shift->_queues ) },
+        '_make_queues' => sub {
+            return [ map { Queue::Base->new() } @{ shift->procs } ];
         },
     },
 );
@@ -81,6 +86,22 @@ has '_lastq' => (
     'isa'     => 'Queue::Base',
     'lazy'    => 1,
     'default' => sub { return Queue::Base->new },
+);
+
+has 'dump_input' => (
+    'is'            => 'ro',
+    'isa'           => 'Bool',
+    'lazy'          => 1,
+    'default'       => 0,
+    'documentation' => 'Prints a dump of the input load to STDERR',
+);
+
+has 'dump_output' => (
+    'is'            => 'ro',
+    'isa'           => 'Bool',
+    'lazy'          => 1,
+    'default'       => 0,
+    'documentation' => 'Prints a dump of the output load to STDERR',
 );
 
 # functions
@@ -102,12 +123,6 @@ sub _process_queues {
     return;
 }
 
-sub _make_queues {
-    my $procs = shift;
-    my @queues = map { Queue::Base->new() } @{$procs};
-    return [@queues];
-}
-
 sub _reduce {
     my ( $p, @q ) = @_;
     map { _process_queues( $p->[$_], $q[$_], $q[ $_ + 1 ] ) } ( 0 .. $#q - 1 );
@@ -122,6 +137,9 @@ sub clone {
 
 sub input {
     my ( $self, @args ) = @_;
+    $self->prefix_dumper( $self->has_name ? $self->name . ' <<' : '<<', @args )
+      if $self->dump_input;
+
     $self->_firstq->add(@args);
     return;
 }
@@ -137,7 +155,10 @@ sub output {
     my $self = shift;
 
     $self->process_input if ( $self->_lastq->empty && $self->auto_process );
-    return wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
+    my @res = wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
+    $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>', @res )
+      if $self->dump_output;
+    return wantarray ? @res : $res[0];
 }
 
 sub flush {
