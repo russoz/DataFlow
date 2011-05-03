@@ -30,14 +30,14 @@ has '+p' => (
         my $self = shift;
         return sub {
             my $item = shift;
-            return $item unless ref($item) ne '';
-            my $data =
+            return $item unless ref($item) eq '';
+            my $internal =
               $self->has_input_encoding
               ? decode( $self->input_encoding, $item )
               : $item;
             return $self->has_output_encoding
-              ? encode( $self->output_encoding, $data )
-              : $data;
+              ? encode( $self->output_encoding, $internal )
+              : $internal;
         };
     },
 );
