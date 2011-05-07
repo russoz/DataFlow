@@ -6,54 +6,68 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/../../lib";
 
+package CeisPages;
+
+use Moose;
+extends 'DataFlow::Proc::MultiPageURLGenerator';
+
+use DataFlow::Util::HTTPGet;
+use HTML::TreeBuilder::XPath;
+use URI;
+
+has '+produce_last_page' => (
+    default => sub {
+        return sub {
+            my $url = shift;
+
+            my $get  = DataFlow::Util::HTTPGet->new;
+            my $html = $get->get($url);
+
+            my $texto =
+              HTML::TreeBuilder::XPath->new_from_content($html)
+              ->findvalue('//p[@class="paginaAtual"]');
+            die q{Não conseguiu determinar a última página}
+              unless $texto;
+            return $1 if $texto =~ /\d\/(\d+)/;
+          }
+    },
+);
+has '+make_page_url' => (
+    default => sub {
+        return sub {
+            my ( $self, $url, $page ) = @_;
+
+            my $u = URI->new($url);
+            $u->query_form( $u->query_form, Pagina => $page );
+            return $u->as_string;
+          }
+    },
+);
+
+package main;
+
 use DataFlow;
 use aliased 'DataFlow::Proc::NOP';
 use aliased 'DataFlow::Proc::HTMLFilter';
 use aliased 'DataFlow::Proc::URLRetriever';
 use aliased 'DataFlow::Proc::MultiPageURLGenerator';
 use aliased 'DataFlow::Proc::CSV';
+use aliased 'DataFlow::Proc::Encoding';
 use aliased 'DataFlow::Proc::SimpleFileOutput';
 
+use Encode;
 use Data::Dumper;
 
 my $flow = DataFlow->new(
     procs => [
-        MultiPageURLGenerator->new(
-            name => 'multipage',
-
-            first_page => -2,
+        CeisPages->new(
+            first_page => -5,
 
             #last_page     => 35,
-            produce_last_page => sub {
-                my $url = shift;
-
-                use DataFlow::Util::HTTPGet;
-                use HTML::TreeBuilder::XPath;
-
-                my $get  = DataFlow::Util::HTTPGet->new;
-                my $html = $get->get($url);
-
-                my $texto =
-                  HTML::TreeBuilder::XPath->new_from_content($html)
-                  ->findvalue('//p[@class="paginaAtual"]');
-                die q{Não conseguiu determinar a última página}
-                  unless $texto;
-                return $1 if $texto =~ /\d\/(\d+)/;
-            },
-            make_page_url => sub {
-                my ( $self, $url, $page ) = @_;
-
-                use URI;
-
-                my $u = URI->new($url);
-                $u->query_form( $u->query_form, Pagina => $page );
-                return $u->as_string;
-            },
         ),
         NOP->new( deref => 1, name => 'nop', ),
-        URLRetriever->new( process_into => 1, ),
+        URLRetriever->new,
         HTMLFilter->new(
-            process_into => 1,
             search_xpath =>
               '//div[@id="listagemEmpresasSancionadas"]/table/tbody/tr',
         ),
@@ -66,9 +80,15 @@ my $flow = DataFlow->new(
             local $_ = shift;
             s/^\s*//;
             s/\s*$//;
+            s/[\r\n\t]+/ /g;
+            s/\s\s+/ /g;
             return $_;
         },
-        NOP->new( name => 'nop dumper', dump_output => 1, ),
+        sub {
+            my $internal = decode( "iso-8859-1", shift );
+            return encode( "utf8", $internal );
+        },
+        NOP->new( name => 'espiando', dump_output => 1, ),
         CSV->new(
             name          => 'csv',
             direction     => 'TO_CSV',
@@ -87,9 +107,8 @@ my $flow = DataFlow->new(
 
 ##############################################################################
 
-my $base = join( '/',
-    q{http://www.portaltransparencia.gov.br},
-    q{ceis}, q{EmpresasSancionadas.asp?paramEmpresa=0} );
+my $base = q{http://www.portaltransparencia.gov.br} . '/'
+  . q{ceis/EmpresasSancionadas.asp?paramEmpresa=0};
 
 $flow->input($base);
 
