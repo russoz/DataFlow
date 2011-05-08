@@ -9,10 +9,13 @@ use warnings;
 
 use Moose;
 extends 'DataFlow::Proc';
+with 'DataFlow::Role::Converter' => {
+	type_attr => 'text_csv',
+	type_class => 'Text::CSV::Encoded',
+	type_short => 'csv',
+};
 
 use namespace::autoclean;
-use Moose::Util::TypeConstraints 1.01;
-use Text::CSV;
 use Text::CSV::Encoded;
 
 has 'header' => (
@@ -33,53 +36,18 @@ has 'header_wanted' => (
     },
 );
 
-has 'direction' => (
-    'is'       => 'ro',
-    'isa'      => enum( [qw/FROM_CSV TO_CSV/] ),
-    'required' => 1,
-);
-
-has 'text_csv_opts' => (
-    'is'        => 'ro',
-    'isa'       => 'HashRef',
-    'predicate' => 'has_text_csv_opts',
-);
-
-has 'csv' => (
-    'is'      => 'ro',
-    'isa'     => 'Text::CSV',
-    'lazy'    => 1,
-    'default' => sub {
-        my $self = shift;
-
-        return Text::CSV->new unless $self->has_text_csv_opts;
-
-        my %opts = %{ $self->text_csv_opts };
-        my $has_encode =
-          scalar grep { exists $opts{$_} }
-          qw/encoding encoding_in encoding_out encoding_io_in encoding_to_parse encoding_io_out encoding_to_combine/;
-
-        if ($has_encode) {
-            return Text::CSV::Encoded->new( $self->text_csv_opts );
-        }
-        else {
-            return Text::CSV->new( $self->text_csv_opts );
-        }
-    },
-);
-
 sub _combine {
     my ( $self, $e ) = @_;
-    my $status = $self->csv->combine( @{$e} );
-    die $self->csv->error_diag unless $status;
-    return $self->csv->string;
+    my $status = $self->text_csv->combine( @{$e} );
+    die $self->text_csv->error_diag unless $status;
+    return $self->text_csv->string;
 }
 
 sub _parse {
     my ( $self, $line ) = @_;
-    my $ok = $self->csv->parse($line);
-    die $self->csv->error_diag unless $ok;
-    return [ $self->csv->fields ];
+    my $ok = $self->text_csv->parse($line);
+    die $self->text_csv->error_diag unless $ok;
+    return [ $self->text_csv->fields ];
 }
 
 has '+type_policy' => (

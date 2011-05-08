@@ -15,7 +15,7 @@ use DataFlow;
 use DataFlow::Role::TypePolicy;
 
 use Moose::Util::TypeConstraints 1.01;
-use Scalar::Util qw/blessed reftype/;
+use Scalar::Util qw/reftype/;
 
 subtype 'Processor' => as 'CodeRef';
 coerce 'Processor' => from 'DataFlow::Proc' => via {
