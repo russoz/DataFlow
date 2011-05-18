@@ -20,6 +20,11 @@ parameter 'type_class' => (
     'required' => 1,
 );
 
+parameter 'type_class_imports' => (
+    'isa'       => 'ArrayRef',
+    'predicate' => 'has_imports',
+);
+
 parameter 'type_short' => (
     'isa'      => 'Str',
     'required' => 1,
@@ -63,9 +68,12 @@ role {
         my $self = shift;
         my $options = $self->$opts || +{};
 
-        eval "use $class";    ## no critic
+        my $use_clause = "use $class";
+        $use_clause .= " (@{ $p->type_class_imports })" if $p->has_imports;
+
+        eval $use_clause;    ## no critic
         my $o = $class->new($options);
-        eval "no $class";     ## no critic
+        eval "no $class";    ## no critic
 
         return $o;
     };
