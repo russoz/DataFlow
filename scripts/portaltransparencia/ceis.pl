@@ -100,6 +100,7 @@ my $flow = DataFlow->new(
                 'UF',         'Fonte',
                 'Data'
             ],
+            dump_output => 1,
         ),
         SimpleFileOutput->new( file => '> /tmp/ceis.csv', ors => "\n" ),
     ],
