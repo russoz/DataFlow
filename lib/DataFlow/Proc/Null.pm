@@ -33,7 +33,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    use DataFlow::Null;
+    use DataFlow::Proc::Null;
 
     my $null = DataFlow::Proc::Null->new;
 

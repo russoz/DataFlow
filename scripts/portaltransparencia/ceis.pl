@@ -52,6 +52,7 @@ use aliased 'DataFlow::Proc::HTMLFilter';
 use aliased 'DataFlow::Proc::URLRetriever';
 use aliased 'DataFlow::Proc::MultiPageURLGenerator';
 use aliased 'DataFlow::Proc::CSV';
+use aliased 'DataFlow::Proc::JSON';
 use aliased 'DataFlow::Proc::Encoding';
 use aliased 'DataFlow::Proc::SimpleFileOutput';
 
@@ -89,19 +90,27 @@ my $flow = DataFlow->new(
             return encode( "utf8", $internal );
         },
         NOP->new( name => 'espiando', dump_output => 1, ),
-        CSV->new(
-            name          => 'csv',
-            direction     => 'TO_CSV',
-            text_csv_opts => { binary => 1 },
-            headers       => [
-                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
-                'Tipo',       'Data Inicial',
-                'Data Final', 'Nome do Órgão/Entidade',
-                'UF',         'Fonte',
-                'Data'
-            ],
+        JSON->new(
+            name        => 'json',
+            direction   => 'TO_JSON',
+            json_opts   => { utf8 => 1, pretty => 1, },
+            dump_output => 1,
         ),
-        SimpleFileOutput->new( file => '> /tmp/ceis.csv', ors => "\n" ),
+
+       #        CSV->new(
+       #            name          => 'csv',
+       #            direction     => 'TO_CSV',
+       #            text_csv_opts => { binary => 1 },
+       #            headers       => [
+       #                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
+       #                'Tipo',       'Data Inicial',
+       #                'Data Final', 'Nome do Órgão/Entidade',
+       #                'UF',         'Fonte',
+       #                'Data'
+       #            ],
+       #            dump_output => 1,
+       #        ),
+       #        SimpleFileOutput->new( file => '> /tmp/ceis.csv', ors => "\n" ),
     ],
 );
 

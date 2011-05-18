@@ -8,7 +8,7 @@ use warnings;
 # VERSION
 
 use Moose::Role;
-use LWP::Curl;
+use LWP::Curl 0.08;
 
 sub _make_obj {
     return LWP::Curl->new;
