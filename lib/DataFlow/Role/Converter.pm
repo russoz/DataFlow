@@ -63,9 +63,9 @@ role {
         my $self = shift;
         my $options = $self->$opts || +{};
 
-		eval "use $class"; ## no critic
-		my $o = $class->new( $options );
-		eval "no $class";  ## no critic
+        eval "use $class";    ## no critic
+        my $o = $class->new($options);
+        eval "no $class";     ## no critic
 
         return $o;
     };

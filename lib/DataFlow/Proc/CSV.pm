@@ -10,9 +10,9 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 with 'DataFlow::Role::Converter' => {
-	type_attr => 'text_csv',
-	type_class => 'Text::CSV::Encoded',
-	type_short => 'csv',
+    type_attr  => 'text_csv',
+    type_class => 'Text::CSV::Encoded',
+    type_short => 'csv',
 };
 
 use namespace::autoclean;
