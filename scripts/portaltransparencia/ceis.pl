@@ -47,36 +47,28 @@ has '+make_page_url' => (
 package main;
 
 use DataFlow;
-use aliased 'DataFlow::Proc::NOP';
-use aliased 'DataFlow::Proc::HTMLFilter';
-use aliased 'DataFlow::Proc::URLRetriever';
-use aliased 'DataFlow::Proc::MultiPageURLGenerator';
-use aliased 'DataFlow::Proc::CSV';
-use aliased 'DataFlow::Proc::JSON';
-use aliased 'DataFlow::Proc::Encoding';
-use aliased 'DataFlow::Proc::SimpleFileOutput';
 
 use Encode;
 use Data::Dumper;
 
 my $flow = DataFlow->new(
-    procs => [
+    [
         CeisPages->new(
             first_page => -5,
 
             #last_page     => 35,
         ),
-        NOP->new( deref => 1, name => 'nop', ),
-        URLRetriever->new,
-        HTMLFilter->new(
+        NOP => { deref => 1, name => 'nop', },
+        'URLRetriever',
+        HTMLFilter => {
             search_xpath =>
               '//div[@id="listagemEmpresasSancionadas"]/table/tbody/tr',
-        ),
-        HTMLFilter->new(
+        },
+        HTMLFilter => {
             search_xpath => '//td',
             result_type  => 'VALUE',
             ref_result   => 1,
-        ),
+        },
         sub {    # remove leading and trailing spaces
             local $_ = shift;
             s/^\s*//;
@@ -89,28 +81,28 @@ my $flow = DataFlow->new(
             my $internal = decode( "iso-8859-1", shift );
             return encode( "utf8", $internal );
         },
-        NOP->new( name => 'espiando', dump_output => 1, ),
-        JSON->new(
+        NOP  => { name => 'espiando', dump_output => 1, },
+        JSON => {
             name        => 'json',
             direction   => 'TO_JSON',
             json_opts   => { utf8 => 1, pretty => 1, },
             dump_output => 1,
-        ),
+        },
 
-       #        CSV->new(
-       #            name          => 'csv',
-       #            direction     => 'TO_CSV',
-       #            text_csv_opts => { binary => 1 },
-       #            headers       => [
-       #                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
-       #                'Tipo',       'Data Inicial',
-       #                'Data Final', 'Nome do Órgão/Entidade',
-       #                'UF',         'Fonte',
-       #                'Data'
-       #            ],
-       #            dump_output => 1,
-       #        ),
-       #        SimpleFileOutput->new( file => '> /tmp/ceis.csv', ors => "\n" ),
+#        CSV => {
+#            name          => 'csv',
+#            direction     => 'TO_CSV',
+#            text_csv_opts => { binary => 1 },
+#            headers       => [
+#                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
+#                'Tipo',       'Data Inicial',
+#                'Data Final', 'Nome do Órgão/Entidade',
+#                'UF',         'Fonte',
+#                'Data'
+#            ],
+#            dump_output => 1,
+#        },
+#        SimpleFileOutput => { file => '> /tmp/ceis.csv', ors => "\n" },
     ],
 );
 

@@ -17,29 +17,68 @@ use Queue::Base 2.1;
 use DataFlow::Proc;
 use Scalar::Util qw/blessed/;
 
+sub _str_to_proc {
+    my ( $str, $params ) = @_;
+    my $class = ( $str =~ m/::/ ) ? $str : q{DataFlow::Proc::} . $str;
+    eval "use $class";    ## no critic
+    my $obj = eval {
+        ( defined($params) and ( ref($params) eq 'HASH' ) )
+          ? $class->new($params)
+          : $class->new;
+    };
+    die "$@" if "$@";
+    return $obj;
+}
+
 # subtypes
 subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
   where { scalar @{$_} > 0 } =>
   message { 'DataFlow must have at least one processor' };
-coerce 'ProcessorChain' => from 'ArrayRef[Ref]' => via {
+coerce 'ProcessorChain' => from 'ArrayRef' => via {
     my @list = @{$_};
     my @res  = ();
-    foreach my $proc (@list) {
-        my $v =
-          ( blessed($proc) && $proc->isa('DataFlow::Proc') )
-          ? $proc
-          : DataFlow::Proc->new( p => $proc );
-        push @res, $v;
+    while ( my $proc = shift @list ) {
+        my $ref = ref($proc);
+        if ( $ref eq '' ) {    # String?
+            push @res,
+              ref( $list[0] ) eq 'HASH'
+              ? _str_to_proc( $proc, shift @list )
+              : _str_to_proc($proc);
+        }
+        elsif ( $ref eq 'CODE' ) {
+            push @res, DataFlow::Proc->new( p => $proc );
+        }
+        elsif ( blessed($proc) ) {
+            if ( $proc->isa('DataFlow::Proc') ) {
+                push @res, $proc;
+            }
+            elsif ( $proc->isa('DataFlow') ) {
+                push @res,
+                  DataFlow::Proc->new( p => sub { $proc->process(@_) } );
+            }
+            else {
+                die q{Invalid object (} . $ref
+                  . q{) passed instead of a processor};
+            }
+        }
+        else {
+            die q{Invalid element (}
+              . join( q{,}, $ref, $proc )
+              . q{) passed instead of a processor};
+        }
     }
     return [@res];
-};
-coerce 'ProcessorChain' => from 'CodeRef' =>
-  via { [ DataFlow::Proc->new( p => $_ ) ] };
-coerce 'ProcessorChain' => from 'DataFlow'       => via { $_->procs };
-coerce 'ProcessorChain' => from 'DataFlow::Proc' => via { [$_] };
+},
+  from
+  'Str' => via { [ _str_to_proc($_) ] },
+  from
+  'CodeRef' => via { [ DataFlow::Proc->new( p => $_ ) ] },
+  from
+  'DataFlow'            => via { $_->procs },
+  from 'DataFlow::Proc' => via { [$_] };
 
-with 'MooseX::OneArgNew' =>
-  { 'type' => 'ArrayRef[Ref]', 'init_arg' => 'procs', };
+with 'MooseX::OneArgNew' => { 'type' => 'Str',      'init_arg' => 'procs', };
+with 'MooseX::OneArgNew' => { 'type' => 'ArrayRef', 'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' => { 'type' => 'CodeRef',  'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' => { 'type' => 'DataFlow', 'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' =>
