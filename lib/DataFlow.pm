@@ -206,35 +206,31 @@ A C<DataFlow> object is able to accept data, feed it into an array of
 processors (L<DataFlow::Proc> objects), and return the result(s) back to the
 caller.
 
-=head1 ATTRIBUTES
-
-=head2 name
+=attr name
 
 [Str] A descriptive name for the dataflow. (OPTIONAL)
 
-=head2 auto_process
+=attr auto_process
 
 [Bool] If there is data available in the output queue, and one calls the
 C<output()> method, this attribute will flag whether the dataflow should
 attempt to automatically process queued data. (DEFAULT: true)
 
-=head2 procs
+=attr procs
 
 [ArrayRef[DataFlow::Proc]] The list of processors that make this DataFlow.
 Optionally, you may pass CodeRefs that will be automatically converted to
 L<DataFlow::Proc> objects. (REQUIRED)
 
-=head1 METHODS
-
-=head2 has_queued_data
+=method has_queued_data
 
 Returns true if the dataflow contains any queued data within.
 
-=head2 clone
+=method clone
 
 Returns another instance of a C<DataFlow> using the same array of processors.
 
-=head2 input
+=method input
 
 Accepts input data for the data flow. It will gladly accept anything passed as
 parameters. However, it must be noticed that it will not be able to make a
@@ -254,23 +250,23 @@ Processors with C<process_into> enabled (true by default) will process the
 items inside an array reference, and the values (not the keys) inside a hash
 reference.
 
-=head2 process_input
+=method process_input
 
 Processes items in the array of queues and place at least one item in the
 output (last) queue. One will typically call this to flush out some unwanted
 data and/or if C<auto_process> has been disabled.
 
-=head2 output
+=method output
 
 Fetches data from the data flow. If called in scalar context it will return
 one processed item from the flow. If called in list context it will return all
 the elements in the last queue.
 
-=head2 flush
+=method flush
 
 Flushes all the data through the dataflow, and returns the complete result set.
 
-=head2 process
+=method process
 
 Immediately processes a bunch of data, without touching the object queues. It
 will process all the provided data and return the complete result set for it.

@@ -182,24 +182,22 @@ Apart from atribute accessors, an object of the type C<DataFlow::Proc> will
 provide only a single method, C<process_one()>, which will process a single
 scalar.
 
-=head1 ATTRIBUTES
-
-=head2 name
+=attr name
 
 [Str] A descriptive name for the dataflow. (OPTIONAL)
 
-=head2 allows_undef_input
+=attr allows_undef_input
 
 [Bool] It controls whether C<< $self->p->() >> will accept C<undef> as input
 or if DataFlow::Proc will filter those out. (DEFAULT = false)
 
-=head2 deref
+=attr deref
 
 [Bool] Signals whether the result of the processing will be de-referenced
 upon output or if DataFlow::Proc will preserve the original reference.
 (DEFAULT = false)
 
-=head2 process_into
+=attr process_into
 
 [Bool] It signals whether this processor will attempt to process data within
 references or not. If process_into is true, then C<process_item> will be
@@ -207,17 +205,17 @@ applied into the values referenced by any scalar, array or hash reference and
 onto the result of running any code reference.
 (DEFAULT = true)
 
-=head2 dump_input
+=attr dump_input
 
 [Bool] Dumps the input parameter to STDERR before processing. See
 L<DataFlow::Role::Dumper>. (DEFAULT = false)
 
-=head2 dump_output
+=attr dump_output
 
 [Bool] Dumps the results to STDERR after processing. See
 L<DataFlow::Role::Dumper>. (DEFAULT = false)
 
-=head2 p
+=attr p
 
 [CodeRef] The actual work horse for this class. It is treated as a function,
 not as a method, as in:
@@ -256,17 +254,11 @@ and adding new attibutes or methods, in which case one can do as below:
 This sub will be called in array context. There is no other restriction on
 what this code reference can or should do. (REQUIRED)
 
-=head1 METHODS
-
-=head2 process_one
+=method process_one
 
 Processes one single scalar (or anything else that can be passed in on scalar,
 such as references or globs), and returns the application of the function
 C<< $self->p->() >> over the item.
-
-=head1 DEPENDENCIES
-
-L<Scalar::Util>
 
 =cut
 

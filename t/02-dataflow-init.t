@@ -8,7 +8,7 @@ use DataFlow::Proc;
 # each call = 2 tests
 sub test_uc_with {
     my $flow = DataFlow->new(@_);
-    ok($flow);
+    ok($flow, q{test_uc_wth(}.join(q{,},@_).q{)});
     my @res = $flow->process('abcdef');
     is( $res[0], 'ABCDEF' );
 }
@@ -38,7 +38,7 @@ test_uc_with($flow);
 # each call = 2 tests
 sub test_ucf_with {
     my $flow = DataFlow->new(@_);
-    ok($flow);
+    ok($flow, q{test_ucf_wth(}.join(q{,},@_).q{)});
     my @res = $flow->process('abcdef');
     is( $res[0], 'Abcdef' );
 }
