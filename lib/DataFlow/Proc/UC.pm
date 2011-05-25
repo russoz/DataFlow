@@ -14,7 +14,7 @@ use namespace::autoclean;
 
 has '+p' => (
     'default' => sub {
-        return sub { uc($_[0]) }
+        return sub { uc( $_[0] ) }
     },
 );
 
