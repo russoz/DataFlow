@@ -115,36 +115,38 @@ This processor type provides a filter for HTML content.
 Each item will be considered as a HTML content and will be filtered
 using L<HTML::TreeBuilder::XPath>.
 
-=head1 ATTRIBUTES
-
-=head2 search_xpath
+=attr search_xpath
 
 This attribute is a XPath string used to filter down the HTML content.
 The C<search_xpath> attribute is mandatory.
 
-=head2 result_type
+=attr result_type
 
 This attribute is a string, but its value B<must> be one of:
 C<HTML>, C<VALUE>, C<NODE>. The default is C<HTML>.
 
-=head3 HTML
+=over
+
+=item HTML
 
 The result will be the HTML content specified by C<search_xpath>.
 
-=head3 VALUE
+=item VALUE
 
 The result will be the literal value enclosed by the tag and/or attribute
 specified by C<search_xpath>.
 
-=head3 NODE
+=item NODE
 
 The result will be a list of L<HTML::Element> objects, as returned by the
 C<findnodes> method of L<HTML::TreeBuilder::XPath> class.
 
+=back
+
 Most people will probably use C<HTML> or C<VALUE>, but this option is also
 provided in case someone wants to manipulate the HTML elements directly.
 
-=head2 ref_result
+=attr ref_result
 
 This attribute is a boolean, and it signals whether the result list should be
 added as a list of items to the output queue, or as a reference to an array
@@ -156,12 +158,6 @@ i.e. it is a one-to-one mapping.
 On the other hand, by keeping C<ref_result> as 0 (false), one HTML item
 may produce any number of items as result,
 i.e. it is a one-to-many mapping.
-
-=head1 DEPENDENCIES
-
-L<HTML::TreeBuilder::XPath>
-
-L<HTML::Element>
 
 =cut
 

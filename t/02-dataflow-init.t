@@ -1,4 +1,4 @@
-use Test::More tests => 28;
+use Test::More tests => 40;
 
 use strict;
 
@@ -8,9 +8,9 @@ use DataFlow::Proc;
 # each call = 2 tests
 sub test_uc_with {
     my $flow = DataFlow->new(@_);
-    ok($flow);
+    ok( $flow, q{test_uc_wth(} . join( q{,}, @_ ) . q{)} );
     my @res = $flow->process('abcdef');
-    is( $res[0], 'ABCDEF' );
+    is( $res[0], 'ABCDEF', '...and returns the right value' );
 }
 
 my $uc = sub { uc(shift) };
@@ -35,10 +35,16 @@ test_uc_with( procs => $flow );
 test_uc_with( [$flow] );
 test_uc_with($flow);
 
+# string
+test_uc_with( procs => ['UC'] );
+test_uc_with( procs => 'UC' );
+test_uc_with( ['UC'] );
+test_uc_with('UC');
+
 # each call = 2 tests
 sub test_ucf_with {
     my $flow = DataFlow->new(@_);
-    ok($flow);
+    ok( $flow, q{test_ucf_wth(} . join( q{,}, @_ ) . q{)} );
     my @res = $flow->process('abcdef');
     is( $res[0], 'Abcdef' );
 }
@@ -49,4 +55,5 @@ my @mix = ( $flow, $proc, sub { lc(shift) }, $ucfirst );
 # mix
 test_ucf_with( procs => [@mix] );
 test_ucf_with( [@mix] );
-
+test_ucf_with( procs => [ $flow, $proc, 'UC', sub { lc(shift) }, $ucfirst ] );
+test_ucf_with( [ $flow, $proc, 'UC', sub { lc(shift) }, $ucfirst ] );

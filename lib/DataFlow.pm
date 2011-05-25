@@ -17,29 +17,68 @@ use Queue::Base 2.1;
 use DataFlow::Proc;
 use Scalar::Util qw/blessed/;
 
+sub _str_to_proc {
+    my ( $str, $params ) = @_;
+    my $class = ( $str =~ m/::/ ) ? $str : q{DataFlow::Proc::} . $str;
+    eval "use $class";    ## no critic
+    my $obj = eval {
+        ( defined($params) and ( ref($params) eq 'HASH' ) )
+          ? $class->new($params)
+          : $class->new;
+    };
+    die "$@" if "$@";
+    return $obj;
+}
+
 # subtypes
 subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
   where { scalar @{$_} > 0 } =>
   message { 'DataFlow must have at least one processor' };
-coerce 'ProcessorChain' => from 'ArrayRef[Ref]' => via {
+coerce 'ProcessorChain' => from 'ArrayRef' => via {
     my @list = @{$_};
     my @res  = ();
-    foreach my $proc (@list) {
-        my $v =
-          ( blessed($proc) && $proc->isa('DataFlow::Proc') )
-          ? $proc
-          : DataFlow::Proc->new( p => $proc );
-        push @res, $v;
+    while ( my $proc = shift @list ) {
+        my $ref = ref($proc);
+        if ( $ref eq '' ) {    # String?
+            push @res,
+              ref( $list[0] ) eq 'HASH'
+              ? _str_to_proc( $proc, shift @list )
+              : _str_to_proc($proc);
+        }
+        elsif ( $ref eq 'CODE' ) {
+            push @res, DataFlow::Proc->new( p => $proc );
+        }
+        elsif ( blessed($proc) ) {
+            if ( $proc->isa('DataFlow::Proc') ) {
+                push @res, $proc;
+            }
+            elsif ( $proc->isa('DataFlow') ) {
+                push @res,
+                  DataFlow::Proc->new( p => sub { $proc->process(@_) } );
+            }
+            else {
+                die q{Invalid object (} . $ref
+                  . q{) passed instead of a processor};
+            }
+        }
+        else {
+            die q{Invalid element (}
+              . join( q{,}, $ref, $proc )
+              . q{) passed instead of a processor};
+        }
     }
     return [@res];
-};
-coerce 'ProcessorChain' => from 'CodeRef' =>
-  via { [ DataFlow::Proc->new( p => $_ ) ] };
-coerce 'ProcessorChain' => from 'DataFlow'       => via { $_->procs };
-coerce 'ProcessorChain' => from 'DataFlow::Proc' => via { [$_] };
+},
+  from
+  'Str' => via { [ _str_to_proc($_) ] },
+  from
+  'CodeRef' => via { [ DataFlow::Proc->new( p => $_ ) ] },
+  from
+  'DataFlow'            => via { $_->procs },
+  from 'DataFlow::Proc' => via { [$_] };
 
-with 'MooseX::OneArgNew' =>
-  { 'type' => 'ArrayRef[Ref]', 'init_arg' => 'procs', };
+with 'MooseX::OneArgNew' => { 'type' => 'Str',      'init_arg' => 'procs', };
+with 'MooseX::OneArgNew' => { 'type' => 'ArrayRef', 'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' => { 'type' => 'CodeRef',  'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' => { 'type' => 'DataFlow', 'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' =>
@@ -206,35 +245,31 @@ A C<DataFlow> object is able to accept data, feed it into an array of
 processors (L<DataFlow::Proc> objects), and return the result(s) back to the
 caller.
 
-=head1 ATTRIBUTES
-
-=head2 name
+=attr name
 
 [Str] A descriptive name for the dataflow. (OPTIONAL)
 
-=head2 auto_process
+=attr auto_process
 
 [Bool] If there is data available in the output queue, and one calls the
 C<output()> method, this attribute will flag whether the dataflow should
 attempt to automatically process queued data. (DEFAULT: true)
 
-=head2 procs
+=attr procs
 
 [ArrayRef[DataFlow::Proc]] The list of processors that make this DataFlow.
 Optionally, you may pass CodeRefs that will be automatically converted to
 L<DataFlow::Proc> objects. (REQUIRED)
 
-=head1 METHODS
-
-=head2 has_queued_data
+=method has_queued_data
 
 Returns true if the dataflow contains any queued data within.
 
-=head2 clone
+=method clone
 
 Returns another instance of a C<DataFlow> using the same array of processors.
 
-=head2 input
+=method input
 
 Accepts input data for the data flow. It will gladly accept anything passed as
 parameters. However, it must be noticed that it will not be able to make a
@@ -254,23 +289,23 @@ Processors with C<process_into> enabled (true by default) will process the
 items inside an array reference, and the values (not the keys) inside a hash
 reference.
 
-=head2 process_input
+=method process_input
 
 Processes items in the array of queues and place at least one item in the
 output (last) queue. One will typically call this to flush out some unwanted
 data and/or if C<auto_process> has been disabled.
 
-=head2 output
+=method output
 
 Fetches data from the data flow. If called in scalar context it will return
 one processed item from the flow. If called in list context it will return all
 the elements in the last queue.
 
-=head2 flush
+=method flush
 
 Flushes all the data through the dataflow, and returns the complete result set.
 
-=head2 process
+=method process
 
 Immediately processes a bunch of data, without touching the object queues. It
 will process all the provided data and return the complete result set for it.
