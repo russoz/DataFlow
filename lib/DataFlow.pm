@@ -17,11 +17,24 @@ use Queue::Base 2.1;
 use DataFlow::Proc;
 use Scalar::Util qw/blessed/;
 
+sub _load_class {
+    my $str = shift;
+    if ( $str =~ m/::/ ) {
+        eval "use $str";    ## no critic
+        return $str unless $@;
+    }
+    my $class = "DataFlow::Proc::$str";
+    eval "use $class";      ## no critic
+    return $class unless $@;
+    eval "use $str";        ## no critic
+    return $str unless $@;
+    die qq{Cannot load class from '$str'};
+}
+
 sub _str_to_proc {
     my ( $str, $params ) = @_;
-    my $class = ( $str =~ m/::/ ) ? $str : q{DataFlow::Proc::} . $str;
-    eval "use $class";    ## no critic
-    my $obj = eval {
+    my $class = _load_class($str);
+    my $obj   = eval {
         ( defined($params) and ( ref($params) eq 'HASH' ) )
           ? $class->new($params)
           : $class->new;
@@ -231,6 +244,10 @@ use DataFlow;
 			DataFlow::Proc->new( p => sub { do this thing } ),
 			sub { ... do something },
 			sub { ... do something else },
+			CSV => {
+				direction     => 'TO_CSV',
+				text_csv_opts => { binary => 1 },
+			},
 		]
 	);
 
@@ -260,6 +277,20 @@ attempt to automatically process queued data. (DEFAULT: true)
 [ArrayRef[DataFlow::Proc]] The list of processors that make this DataFlow.
 Optionally, you may pass CodeRefs that will be automatically converted to
 L<DataFlow::Proc> objects. (REQUIRED)
+
+The C<procs> parameter will accept some variations in its value. Any
+C<ArrayRef> passed will be parsed, and additionaly to plain
+C<DataFlow::Proc> objects, it will accept: C<DataFlow> objects (so one can
+nest flows), code references (C<sub{}> blocks) and plain text strings.
+
+The text string form is treatedi, for a given "TEXT", in the following order:
+if it contains '::' then DataFlow will try to use a class named "TEXT";
+it that doesn't work (or if it doesn't contain '::'), DataFlow will try to load
+a class named 'DataFlow::Proc::TEXT'; if that fails, it tries one last time to
+load a class named 'TEXT'. If that last try doesn't work, it dies.
+
+Additionally, one may pass any of these forms as a single argument to the
+constructor C<new>, plus a single C<DataFlow>, or C<DataFlow:Proc> or string.
 
 =method has_queued_data
 
