@@ -8,7 +8,6 @@ use warnings;
 # VERSION
 
 use MooseX::Role::Parameterized;
-use Moose::Util::TypeConstraints 1.01;
 
 parameter 'type_attr' => (
     'isa'      => 'Str',
@@ -32,6 +31,8 @@ parameter 'type_short' => (
 
 role {
     my $p = shift;
+
+    use Moose::Util::TypeConstraints 1.01;
 
     my $attr     = $p->type_attr;
     my $class    = $p->type_class;
@@ -77,6 +78,8 @@ role {
 
         return $o;
     };
+
+    no Moose::Util::TypeConstraints;
 };
 
 1;

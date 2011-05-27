@@ -1,5 +1,7 @@
 use Test::More tests => 6;
 
+use DataFlow::Proc;
+
 my $uc = sub { uc(shift) };
 
 sub test_uc_with {

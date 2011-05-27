@@ -10,33 +10,10 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::Dumper';
 
+use DataFlow::Types qw(Processor _TypePolicy);
+
 use namespace::autoclean;
-use DataFlow;
-use DataFlow::Role::TypePolicy;
-
-use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/reftype/;
-
-subtype 'Processor' => as 'CodeRef';
-coerce 'Processor' => from 'DataFlow::Proc' => via {
-    my $p = $_;
-    return sub { $p->process_one(shift) };
-};
-coerce 'Processor' => from 'DataFlow' => via {
-    my $f = $_;
-    return sub { $f->process(shift) };
-};
-
-subtype '_TypePolicy' => as 'DataFlow::Role::TypePolicy';
-coerce '_TypePolicy' => from 'Str' => via { _make_typepolicy($_) };
-
-sub _make_typepolicy {
-    my $class = 'DataFlow::TypePolicy::' . shift;
-    my $obj;
-    eval 'use ' . $class . '; $obj = ' . $class . '->new()';    ## no critic
-    die $@ if $@;
-    return $obj;
-}
 
 has 'name' => (
     'is'        => 'ro',
