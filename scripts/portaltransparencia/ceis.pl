@@ -53,12 +53,7 @@ use Data::Dumper;
 
 my $flow = DataFlow->new(
     [
-        CeisPages->new(
-            first_page => -5,
-
-            #last_page     => 35,
-        ),
-        NOP => { deref => 1, name => 'nop', },
+        CeisPages->new( first_page => -5, deref => 1 ),
         'URLRetriever',
         HTMLFilter => {
             search_xpath =>
@@ -81,28 +76,21 @@ my $flow = DataFlow->new(
             my $internal = decode( "iso-8859-1", shift );
             return encode( "utf8", $internal );
         },
-        NOP  => { name => 'espiando', dump_output => 1, },
-        JSON => {
-            name        => 'json',
-            direction   => 'TO_JSON',
-            json_opts   => { utf8 => 1, pretty => 1, },
+        NOP => { name => 'espiando', dump_output => 1, },
+        CSV => {
+            name          => 'csv',
+            direction     => 'TO_CSV',
+            text_csv_opts => { binary => 1 },
+            headers       => [
+                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
+                'Tipo',       'Data Inicial',
+                'Data Final', 'Nome do Órgão/Entidade',
+                'UF',         'Fonte',
+                'Data'
+            ],
             dump_output => 1,
         },
-
-#        CSV => {
-#            name          => 'csv',
-#            direction     => 'TO_CSV',
-#            text_csv_opts => { binary => 1 },
-#            headers       => [
-#                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
-#                'Tipo',       'Data Inicial',
-#                'Data Final', 'Nome do Órgão/Entidade',
-#                'UF',         'Fonte',
-#                'Data'
-#            ],
-#            dump_output => 1,
-#        },
-#        SimpleFileOutput => { file => '> /tmp/ceis.csv', ors => "\n" },
+        SimpleFileOutput => { file => '> /tmp/ceis.csv', ors => "\n" },
     ],
 );
 
