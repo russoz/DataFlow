@@ -79,8 +79,8 @@ my $flow = DataFlow->new(
         NOP => { name => 'espiando', dump_output => 1, },
         CSV => {
             name          => 'csv',
-            direction     => 'TO_CSV',
-            text_csv_opts => { binary => 1 },
+            direction     => 'CONVERT_TO',
+            converter_opts => { binary => 1 },
             headers       => [
                 'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
                 'Tipo',       'Data Inicial',

@@ -7,12 +7,14 @@ use warnings;
 
 # VERSION
 
-use MooseX::Types -declare =>
-  [qw( ProcessorChain Processor _TypePolicy Encoder Decoder HTMLFilterTypes)];
+use MooseX::Types -declare => [
+    qw(ProcessorChain Processor _TypePolicy Encoder Decoder HTMLFilterTypes),
+    qw(ConversionSubs ConversionDirection)
+];
 
 use namespace::autoclean;
 
-use MooseX::Types::Moose qw/Str CodeRef ArrayRef/;
+use MooseX::Types::Moose qw/Str CodeRef ArrayRef HashRef/;
 class_type 'DataFlow';
 class_type 'DataFlow::Proc';
 role_type 'DataFlow::Role::TypePolicy';
@@ -118,6 +120,16 @@ sub _make_typepolicy {
     die $@ if $@;
     return $obj;
 }
+
+#################### DataFlow::Proc::Converter ######################
+
+enum 'ConversionDirection' => [ 'CONVERT_TO', 'CONVERT_FROM' ];
+
+subtype 'ConversionSubs' => as 'HashRef[CodeRef]' => where {
+    scalar( keys %{$_} ) == 2
+      && exists $_->{CONVERT_TO}
+      && exists $_->{CONVERT_FROM};
+} => message { q(Invalid 'ConversionSubs' hash) };
 
 #################### DataFlow::Proc::Encoding ######################
 
