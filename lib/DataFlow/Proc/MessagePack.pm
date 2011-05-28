@@ -8,23 +8,28 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Proc';
-with 'DataFlow::Role::Converter' => {
-    type_attr  => 'msgpack',
-    type_short => 'msgpack',
-    type_class => 'Data::MessagePack',
-};
+extends 'DataFlow::Proc::Converter';
 
 use namespace::autoclean;
 use Data::MessagePack;
 
 has '+type_policy' => (
     'default' => sub {
-        return shift->direction eq 'TO_MSGPACK' ? 'ArrayRef' : 'Scalar';
+        return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
     },
 );
 
-has '+p' => (
+has '+converter' => (
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->has_converter_opts
+          ? Data::MessagePack->new( $self->converter_opts )
+          : Data::MessagePack->new;
+    },
+);
+
+has '+converter_subs' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
@@ -40,8 +45,9 @@ has '+p' => (
             },
         };
 
-        return $subs->{ $self->direction };
+        return $subs;
     },
+    'init_arg' => undef,
 );
 
 __PACKAGE__->meta->make_immutable;

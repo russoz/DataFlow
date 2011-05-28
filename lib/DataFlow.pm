@@ -10,72 +10,10 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::Dumper';
 
-use Moose::Util::TypeConstraints 1.01;
+use DataFlow::Types qw(ProcessorChain);
 
 use namespace::autoclean;
 use Queue::Base 2.1;
-use DataFlow::Proc;
-use Scalar::Util qw/blessed/;
-
-sub _str_to_proc {
-    my ( $str, $params ) = @_;
-    my $class = ( $str =~ m/::/ ) ? $str : q{DataFlow::Proc::} . $str;
-    eval "use $class";    ## no critic
-    my $obj = eval {
-        ( defined($params) and ( ref($params) eq 'HASH' ) )
-          ? $class->new($params)
-          : $class->new;
-    };
-    die "$@" if "$@";
-    return $obj;
-}
-
-# subtypes
-subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
-  where { scalar @{$_} > 0 } =>
-  message { 'DataFlow must have at least one processor' };
-coerce 'ProcessorChain' => from 'ArrayRef' => via {
-    my @list = @{$_};
-    my @res  = ();
-    while ( my $proc = shift @list ) {
-        my $ref = ref($proc);
-        if ( $ref eq '' ) {    # String?
-            push @res,
-              ref( $list[0] ) eq 'HASH'
-              ? _str_to_proc( $proc, shift @list )
-              : _str_to_proc($proc);
-        }
-        elsif ( $ref eq 'CODE' ) {
-            push @res, DataFlow::Proc->new( p => $proc );
-        }
-        elsif ( blessed($proc) ) {
-            if ( $proc->isa('DataFlow::Proc') ) {
-                push @res, $proc;
-            }
-            elsif ( $proc->isa('DataFlow') ) {
-                push @res,
-                  DataFlow::Proc->new( p => sub { $proc->process(@_) } );
-            }
-            else {
-                die q{Invalid object (} . $ref
-                  . q{) passed instead of a processor};
-            }
-        }
-        else {
-            die q{Invalid element (}
-              . join( q{,}, $ref, $proc )
-              . q{) passed instead of a processor};
-        }
-    }
-    return [@res];
-},
-  from
-  'Str' => via { [ _str_to_proc($_) ] },
-  from
-  'CodeRef' => via { [ DataFlow::Proc->new( p => $_ ) ] },
-  from
-  'DataFlow'            => via { $_->procs },
-  from 'DataFlow::Proc' => via { [$_] };
 
 with 'MooseX::OneArgNew' => { 'type' => 'Str',      'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' => { 'type' => 'ArrayRef', 'init_arg' => 'procs', };
@@ -231,6 +169,10 @@ use DataFlow;
 			DataFlow::Proc->new( p => sub { do this thing } ),
 			sub { ... do something },
 			sub { ... do something else },
+			CSV => {
+				direction     => 'TO_CSV',
+				text_csv_opts => { binary => 1 },
+			},
 		]
 	);
 
@@ -260,6 +202,20 @@ attempt to automatically process queued data. (DEFAULT: true)
 [ArrayRef[DataFlow::Proc]] The list of processors that make this DataFlow.
 Optionally, you may pass CodeRefs that will be automatically converted to
 L<DataFlow::Proc> objects. (REQUIRED)
+
+The C<procs> parameter will accept some variations in its value. Any
+C<ArrayRef> passed will be parsed, and additionaly to plain
+C<DataFlow::Proc> objects, it will accept: C<DataFlow> objects (so one can
+nest flows), code references (C<sub{}> blocks) and plain text strings.
+
+The text string form is treatedi, for a given "TEXT", in the following order:
+if it contains '::' then DataFlow will try to use a class named "TEXT";
+it that doesn't work (or if it doesn't contain '::'), DataFlow will try to load
+a class named 'DataFlow::Proc::TEXT'; if that fails, it tries one last time to
+load a class named 'TEXT'. If that last try doesn't work, it dies.
+
+Additionally, one may pass any of these forms as a single argument to the
+constructor C<new>, plus a single C<DataFlow>, or C<DataFlow:Proc> or string.
 
 =method has_queued_data
 

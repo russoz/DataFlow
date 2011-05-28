@@ -8,40 +8,45 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Proc';
-with 'DataFlow::Role::Converter' => {
-    type_attr  => 'json',
-    type_short => 'json',
-    type_class => 'JSON::Any',
-};
+extends 'DataFlow::Proc::Converter';
 
 use namespace::autoclean;
 use JSON::Any;
 
 has '+type_policy' => (
     'default' => sub {
-        return shift->direction eq 'TO_JSON' ? 'ArrayRef' : 'Scalar';
+        return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
     },
 );
 
-has '+p' => (
+has '+converter' => (
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return $self->has_converter_opts
+          ? JSON::Any->new( $self->converter_opts )
+          : JSON::Any->new;
+    },
+);
+
+has '+converter_subs' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
 
         my $subs = {
-            'TO_JSON' => sub {
+            'CONVERT_TO' => sub {
                 my $data = shift;
-                return $self->json->to_json($data);
+                return $self->converter->to_json($data);
             },
             'FROM_JSON' => sub {
                 my $json = shift;
-                return $self->json->from_json($json);
+                return $self->converter->from_json($json);
             },
         };
-
-        return $subs->{ $self->direction };
+        return $subs;
     },
+    'init_arg' => undef,
 );
 
 __PACKAGE__->meta->make_immutable;

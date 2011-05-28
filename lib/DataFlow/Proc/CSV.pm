@@ -8,12 +8,7 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Proc';
-with 'DataFlow::Role::Converter' => {
-    type_attr  => 'text_csv',
-    type_class => 'Text::CSV::Encoded',
-    type_short => 'csv',
-};
+extends 'DataFlow::Proc::Converter';
 
 use namespace::autoclean;
 use Text::CSV::Encoded;
@@ -30,39 +25,49 @@ has 'header_wanted' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
-        return 0 if $self->direction eq 'FROM_CSV';
+        return 0 if $self->direction eq 'CONVERT_FROM';
         return 1 if $self->has_header;
         return 0;
     },
 );
 
+has '+converter' => (
+    'lazy'    => 1,
+    'default' => sub {
+        my $self = shift;
+        return $self->has_converter_opts
+          ? Text::CSV::Encoded->new( $self->converter_opts )
+          : Text::CSV::Encoded->new;
+    },
+);
+
 sub _combine {
     my ( $self, $e ) = @_;
-    my $status = $self->text_csv->combine( @{$e} );
-    die $self->text_csv->error_diag unless $status;
-    return $self->text_csv->string;
+    my $status = $self->converter->combine( @{$e} );
+    die $self->converter->error_diag unless $status;
+    return $self->converter->string;
 }
 
 sub _parse {
     my ( $self, $line ) = @_;
-    my $ok = $self->text_csv->parse($line);
-    die $self->text_csv->error_diag unless $ok;
-    return [ $self->text_csv->fields ];
+    my $ok = $self->converter->parse($line);
+    die $self->converter->error_diag unless $ok;
+    return [ $self->converter->fields ];
 }
 
 has '+type_policy' => (
     'default' => sub {
-        return shift->direction eq 'TO_CSV' ? 'ArrayRef' : 'Scalar';
+        return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
     },
 );
 
-has '+p' => (
+has '+converter_subs' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
 
         my $subs = {
-            'TO_CSV' => sub {
+            'CONVERT_TO' => sub {
                 my $data = shift;
                 my @res  = ();
                 if ( $self->header_wanted ) {
@@ -73,7 +78,7 @@ has '+p' => (
                 push @res, $self->_combine($data);
                 return @res;
             },
-            'FROM_CSV' => sub {
+            'CONVERT_FROM' => sub {
                 my $csv_line = shift;
                 if ( $self->header_wanted ) {
                     $self->header_wanted(0);
@@ -84,8 +89,9 @@ has '+p' => (
             },
         };
 
-        return $subs->{ $self->direction };
+        return $subs;
     },
+    'init_arg' => undef,
 );
 
 __PACKAGE__->meta->make_immutable;

@@ -10,23 +10,10 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
-use Moose::Util::TypeConstraints 1.01;
+use DataFlow::Types qw(Encoder Decoder);
 
 use namespace::autoclean;
-use Encode;
 use MooseX::Aliases;
-
-subtype 'Decoder' => as 'CodeRef';
-coerce 'Decoder' => from 'Str' => via {
-    my $encoding = $_;
-    return sub { return decode( $encoding, shift ) };
-};
-
-subtype 'Encoder' => as 'CodeRef';
-coerce 'Encoder' => from 'Str' => via {
-    my $encoding = $_;
-    return sub { return encode( $encoding, shift ) };
-};
 
 has 'input_decoder' => (
     'is'      => 'ro',

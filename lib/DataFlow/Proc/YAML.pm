@@ -8,12 +8,7 @@ use warnings;
 # VERSION
 
 use Moose;
-extends 'DataFlow::Proc';
-with 'DataFlow::Role::Converter' => {
-    type_attr  => 'yaml',
-    type_short => 'yaml',
-    type_class => 'YAML::Any',
-};
+extends 'DataFlow::Proc::Converter';
 
 use namespace::autoclean;
 use YAML::Any;

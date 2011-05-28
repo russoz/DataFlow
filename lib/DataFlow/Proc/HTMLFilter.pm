@@ -11,7 +11,7 @@ use Moose;
 extends 'DataFlow::Proc';
 
 use namespace::autoclean;
-use Moose::Util::TypeConstraints 1.01;
+use DataFlow::Types qw(HTMLFilterTypes);
 use HTML::TreeBuilder::XPath;
 
 has 'search_xpath' => (
@@ -22,7 +22,7 @@ has 'search_xpath' => (
 
 has 'result_type' => (
     'is'      => 'ro',
-    'isa'     => enum( [qw(NODE HTML VALUE)] ),
+    'isa'     => 'HTMLFilterTypes',
     'default' => 'HTML',
 );
 
