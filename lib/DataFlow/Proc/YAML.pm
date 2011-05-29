@@ -15,28 +15,26 @@ use YAML::Any;
 
 has '+type_policy' => (
     'default' => sub {
-        return shift->direction eq 'TO_YAML' ? 'ArrayRef' : 'Scalar';
+        return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
     },
 );
 
-has '+p' => (
+has '+converter_subs' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
-
-        my $subs = {
-            'TO_YAML' => sub {
+        return {
+            'CONVERT_TO' => sub {
                 my $data = shift;
                 return Dump($data);
             },
-            'FROM_YAML' => sub {
+            'CONVERT_FROM' => sub {
                 my $yaml = shift;
                 return Load($yaml);
             },
         };
-
-        return $subs->{ $self->direction };
     },
+    'init_arg' => undef,
 );
 
 __PACKAGE__->meta->make_immutable;

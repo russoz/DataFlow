@@ -27,7 +27,15 @@ has '+converter' => (
           ? Data::MessagePack->new( $self->converter_opts )
           : Data::MessagePack->new;
     },
+    'handles' => {
+        'msgpack'          => sub { shift->converter(@_) },
+        'msgpack_opts'     => sub { shift->converter_opts(@_) },
+        'has_msgpack_opts' => sub { shift->has_converter_opts },
+    },
+    'init_arg' => 'msgpack',
 );
+
+has '+converter_opts' => ( 'init_arg' => 'msgpack_opts', );
 
 has '+converter_subs' => (
     'lazy'    => 1,

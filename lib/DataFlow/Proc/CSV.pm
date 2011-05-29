@@ -39,7 +39,15 @@ has '+converter' => (
           ? Text::CSV::Encoded->new( $self->converter_opts )
           : Text::CSV::Encoded->new;
     },
+    'handles' => {
+        'text_csv'          => sub { shift->converter(@_) },
+        'text_csv_opts'     => sub { shift->converter_opts(@_) },
+        'has_text_csv_opts' => sub { shift->has_converter_opts },
+    },
+    'init_arg' => 'text_csv',
 );
+
+has '+converter_opts' => ( 'init_arg' => 'text_csv_opts', );
 
 sub _combine {
     my ( $self, $e ) = @_;
@@ -65,8 +73,7 @@ has '+converter_subs' => (
     'lazy'    => 1,
     'default' => sub {
         my $self = shift;
-
-        my $subs = {
+        return {
             'CONVERT_TO' => sub {
                 my $data = shift;
                 my @res  = ();
@@ -88,8 +95,6 @@ has '+converter_subs' => (
                 return $self->_parse($csv_line);
             },
         };
-
-        return $subs;
     },
     'init_arg' => undef,
 );
