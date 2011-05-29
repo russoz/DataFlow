@@ -13,7 +13,7 @@ extends 'DataFlow::Proc::Converter';
 use namespace::autoclean;
 use YAML::Any;
 
-has '+type_policy' => (
+has '+policy' => (
     'default' => sub {
         return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
     },

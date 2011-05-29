@@ -33,7 +33,7 @@ __END__
 
     my $nop = DataFlow::Proc::NOP->new;
 
-    my $result = $nop->process_one( 'abc' );
+    my $result = $nop->process( 'abc' );
     # $result == 'abc'
 
 =head1 DESCRIPTION

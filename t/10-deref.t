@@ -14,24 +14,24 @@ is( $n->p->('iop'), 'Iop' );
 
 # tests: 2
 # scalars
-ok( !defined( $n->process_one() ) );
-ok( ( $n->process_one('aaa') )[0] eq 'Aaa' );
+ok( !defined( $n->process() ) );
+ok( ( $n->process('aaa') )[0] eq 'Aaa' );
 
 # tests: 1
 # scalar refs
 my $val = 'babaloo';
-ok( ( $n->process_one( \$val ) )[0] eq 'Babaloo' );
+ok( ( $n->process( \$val ) )[0] eq 'Babaloo' );
 
 # tests: 2
 # array refs
-my @res_aref = $n->process_one( [qw/aa bb cc dd ee ff gg hh ii jj/] );
+my @res_aref = $n->process( [qw/aa bb cc dd ee ff gg hh ii jj/] );
 is( $res_aref[0], 'Aa' );
 is( $res_aref[9], 'Jj' );
 
 # tests: 4
 # hash refs
 my %res_href =
-  $n->process_one( { ii => 'jj', kk => 'll', mm => 'nn', oo => 'pp' } );
+  $n->process( { ii => 'jj', kk => 'll', mm => 'nn', oo => 'pp' } );
 is( $res_href{'ii'}, 'Jj' );
 is( $res_href{'kk'}, 'Ll' );
 is( $res_href{'mm'}, 'Nn' );

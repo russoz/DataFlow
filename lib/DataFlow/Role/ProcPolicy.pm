@@ -1,9 +1,9 @@
-package DataFlow::Role::TypePolicy;
+package DataFlow::Role::ProcPolicy;
 
 use strict;
 use warnings;
 
-# ABSTRACT: A role that defines a proc-handler
+# ABSTRACT: A role that defines how to use proc-handlers
 
 # VERSION
 
@@ -44,6 +44,10 @@ sub _param_type {
     return $r ? $r : 'SVALUE';
 }
 
+sub _nop_handle {    ## no critic
+    return $_[1];
+}
+
 sub _handle_svalue {
     my ( $p, $item ) = @_;
     return $p->($item);
@@ -72,6 +76,11 @@ sub _handle_hash_ref {
 sub _handle_code_ref {
     my ( $p, $item ) = @_;
     return sub { $p->( $item->() ) };
+}
+
+sub _make_apply_ref {
+    my ( $self, $p ) = @_;
+    return sub { $self->apply( $p, $_[0] ) };
 }
 
 1;

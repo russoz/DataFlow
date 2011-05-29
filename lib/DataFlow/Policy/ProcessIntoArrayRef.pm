@@ -1,20 +1,20 @@
-package DataFlow::TypePolicy::ArrayRef;
+package DataFlow::Policy::ProcessIntoArrayRef;
 
 use strict;
 use warnings;
 
-# ABSTRACT: A TypePolicy that accepts only array-references
+# ABSTRACT: A Policy that processes into array references only
 
 # VERSION
 
 use Moose;
-with 'DataFlow::Role::TypePolicy';
+with 'DataFlow::Role::ProcPolicy';
 
 use namespace::autoclean;
 
 has '+handlers' => (
     'default' => sub {
-        return { 'ARRAY' => \&_handle_svalue, };
+        return { 'ARRAY' => \&_handle_array_ref, };
     },
 );
 

@@ -1,20 +1,20 @@
-package DataFlow::TypePolicy::Scalar;
+package DataFlow::Policy::Null;
 
 use strict;
 use warnings;
 
-# ABSTRACT: A TypePolicy that treats all items as scalars
+# ABSTRACT: A ProcPolicy that returns undef to any type
 
 # VERSION
 
 use Moose;
-with 'DataFlow::Role::TypePolicy';
+with 'DataFlow::Role::ProcPolicy';
 
 use namespace::autoclean;
 
 has '+default_handler' => (
     'default' => sub {
-        return \&_handle_svalue;
+        sub { }
     },
 );
 

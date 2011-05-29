@@ -8,7 +8,7 @@ use warnings;
 # VERSION
 
 use MooseX::Types -declare => [
-    qw(ProcessorChain Processor _TypePolicy Encoder Decoder HTMLFilterTypes),
+    qw(ProcessorChain Encoder Decoder HTMLFilterTypes),
     qw(ConversionSubs ConversionDirection)
 ];
 
@@ -17,7 +17,6 @@ use namespace::autoclean;
 use MooseX::Types::Moose qw/Str CodeRef ArrayRef HashRef/;
 class_type 'DataFlow';
 class_type 'DataFlow::Proc';
-role_type 'DataFlow::Role::TypePolicy';
 
 use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/blessed/;
@@ -67,6 +66,7 @@ coerce 'ProcessorChain' => from 'ArrayRef' => via {
               : _str_to_proc($proc);
         }
         elsif ( $ref eq 'CODE' ) {
+            use DataFlow::Proc;
             push @res, DataFlow::Proc->new( p => $proc );
         }
         elsif ( blessed($proc) ) {
@@ -97,29 +97,6 @@ coerce 'ProcessorChain' => from 'ArrayRef' => via {
   from
   'DataFlow'            => via { $_->procs },
   from 'DataFlow::Proc' => via { [$_] };
-
-#################### DataFlow::Proc ######################
-
-subtype 'Processor' => as 'CodeRef';
-coerce 'Processor' => from 'DataFlow::Proc' => via {
-    my $p = $_;
-    return sub { $p->process_one(shift) };
-};
-coerce 'Processor' => from 'DataFlow' => via {
-    my $f = $_;
-    return sub { $f->process(shift) };
-};
-
-subtype '_TypePolicy' => as 'DataFlow::Role::TypePolicy';
-coerce '_TypePolicy' => from 'Str' => via { _make_typepolicy($_) };
-
-sub _make_typepolicy {
-    my $class = 'DataFlow::TypePolicy::' . shift;
-    my $obj;
-    eval 'use ' . $class . '; $obj = ' . $class . '->new()';    ## no critic
-    die $@ if $@;
-    return $obj;
-}
 
 #################### DataFlow::Proc::Converter ######################
 

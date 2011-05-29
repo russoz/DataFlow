@@ -3,11 +3,12 @@ package DataFlow;
 use strict;
 use warnings;
 
-# ABSTRACT: A component for dataflow processing
+# ABSTRACT: A framework for dataflow processing
 
 # VERSION
 
 use Moose;
+with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
 use DataFlow::Types qw(ProcessorChain);
@@ -95,7 +96,7 @@ sub _process_queues {
     my ( $proc, $inputq, $outputq ) = @_;
 
     my $item = $inputq->remove;
-    my @res  = $proc->process_one($item);
+    my @res  = $proc->process($item);
     $outputq->add(@res);
     return;
 }

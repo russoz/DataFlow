@@ -10,7 +10,7 @@ ok($@);
 
 my $filter1 = DataFlow::Proc::HTMLFilter->new( search_xpath => '//td', );
 ok($filter1);
-ok( !defined( $filter1->process_one() ) );
+ok( !defined( $filter1->process() ) );
 
 my $html = <<HTML_END;
 <html>
@@ -31,7 +31,7 @@ my $html = <<HTML_END;
 </html>
 HTML_END
 
-my @res = $filter1->process_one($html);
+my @res = $filter1->process($html);
 is( $res[2], '<td>c1 potatoes</td>' );
 
 my $filter2 = DataFlow::Proc::HTMLFilter->new(
@@ -40,7 +40,7 @@ my $filter2 = DataFlow::Proc::HTMLFilter->new(
 );
 ok($filter2);
 
-my @res2 = $filter2->process_one($html);
+my @res2 = $filter2->process($html);
 is( $res2[1], 'b1 bugalu' );
 
 my $filter3 = DataFlow::Proc::HTMLFilter->new(
@@ -50,7 +50,7 @@ my $filter3 = DataFlow::Proc::HTMLFilter->new(
 );
 ok($filter3);
 
-my $res3 = ( $filter3->process_one($html) )[0];
+my $res3 = ( $filter3->process($html) )[0];
 is( $res3->[0], 'A' );
 
 # TODO: add tests to check the 'nochomp' option

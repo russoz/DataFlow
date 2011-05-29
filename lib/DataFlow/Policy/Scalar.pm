@@ -1,24 +1,25 @@
-package DataFlow::TypePolicy::ProcessInto;
+package DataFlow::Policy::Scalar;
 
 use strict;
 use warnings;
 
-# ABSTRACT: A TypePolicy that processes into references' values
+# ABSTRACT: A ProcPolicy that treats scalars items and pass other types as-is.
 
 # VERSION
 
 use Moose;
-with 'DataFlow::Role::TypePolicy';
+with 'DataFlow::Role::ProcPolicy';
 
 use namespace::autoclean;
 
 has '+handlers' => (
     'default' => sub {
+        my $self         = shift;
         my $type_handler = {
-            'SCALAR' => \&_handle_scalar_ref,
-            'ARRAY'  => \&_handle_array_ref,
-            'HASH'   => \&_handle_hash_ref,
-            'CODE'   => \&_handle_code_ref,
+            'SCALAR' => \&_nop_handle,
+            'ARRAY'  => \&_nop_handle,
+            'HASH'   => \&_nop_handle,
+            'CODE'   => \&_nop_handle,
         };
         return $type_handler;
     },

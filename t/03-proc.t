@@ -11,15 +11,15 @@ my $uc = DataFlow::Proc->new(
 );
 ok($uc);
 isa_ok( $uc, 'DataFlow::Proc' );
-can_ok( $uc, qw(name deref process_into dump_input dump_output p process_one) );
+can_ok( $uc, qw(name deref process_into dump_input dump_output p process) );
 
 is( $uc->p->('iop'), 'IOP' );
 
 # tests: 4
 # scalars
 diag('scalar params');
-ok( !defined( $uc->process_one() ), 'returns nothing for nothing' );
-is( ( $uc->process_one('aaa') )[0], 'AAA', 'works as it should' );
-isnt( ( $uc->process_one('bbb') )[0], 'bbb', 'indeed works as it should' );
-is( ( $uc->process_one(1) )[0], 1, );
+ok( !defined( $uc->process() ), 'returns nothing for nothing' );
+is( ( $uc->process('aaa') )[0], 'AAA', 'works as it should' );
+isnt( ( $uc->process('bbb') )[0], 'bbb', 'indeed works as it should' );
+is( ( $uc->process(1) )[0], 1, );
 

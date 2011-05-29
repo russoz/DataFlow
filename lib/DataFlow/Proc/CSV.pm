@@ -63,7 +63,7 @@ sub _parse {
     return [ $self->converter->fields ];
 }
 
-has '+type_policy' => (
+has '+policy' => (
     'default' => sub {
         return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
     },
