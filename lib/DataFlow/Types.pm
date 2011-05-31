@@ -26,7 +26,11 @@ use Encode;
 
 sub _load_class {
     my $str = shift;
-    if ( $str =~ m/::/ ) {
+    if ( $str eq 'Proc' ) {
+        eval "use $str";    ## no critic
+        return $str unless $@;
+    }
+    elsif ( $str =~ m/::/ ) {
         eval "use $str";    ## no critic
         return $str unless $@;
     }
