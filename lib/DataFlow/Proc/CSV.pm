@@ -18,10 +18,8 @@ has 'header' => (
     'is'        => 'rw',
     'isa'       => 'ArrayRef[Maybe[Str]]',
     'predicate' => 'has_header',
-	'alias'     => 'headers',
-	'handles'   => {
-		'has_headers' => sub { shift->has_header },
-	},
+    'alias'     => 'headers',
+    'handles'   => { 'has_headers' => sub { shift->has_header }, },
 );
 
 has 'header_wanted' => (
