@@ -4,9 +4,7 @@ BEGIN { use_ok('DataFlow::Proc'); }
 
 # tests: 2
 diag('constructor and basic tests');
-my $uc = DataFlow::Proc->new(
-    p => sub { uc }
-);
+my $uc = DataFlow::Proc->new( p => sub { uc } );
 ok($uc);
 isa_ok( $uc, 'DataFlow::Proc' );
 can_ok( $uc, qw(name deref process_into dump_input dump_output p process) );

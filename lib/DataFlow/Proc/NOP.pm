@@ -14,7 +14,9 @@ use namespace::autoclean;
 
 has '+process_into' => ( 'default' => 0, );
 has '+p' => (
-    'default' => sub { return sub { $_ } },
+    'default' => sub {
+        return sub { $_ }
+    },
 );
 
 __PACKAGE__->meta->make_immutable;

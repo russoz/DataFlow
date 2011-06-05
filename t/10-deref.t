@@ -10,7 +10,7 @@ my $n = DataFlow::Proc->new(
     p     => sub { ucfirst },
 );
 ok($n);
-is( ($n->process('iop'))[0], 'Iop' );
+is( ( $n->process('iop') )[0], 'Iop' );
 
 # tests: 2
 # scalars

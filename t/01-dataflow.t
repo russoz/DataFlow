@@ -12,7 +12,7 @@ use DataFlow::Proc;
 diag('constructor and basic tests');
 my $proc_uc = DataFlow::Proc->new( p => sub { uc } );
 ok($proc_uc);
-is( ($proc_uc->process('iop'))[0], 'IOP' );
+is( ( $proc_uc->process('iop') )[0], 'IOP' );
 my $f = DataFlow->new( procs => [$proc_uc] );
 ok($f);
 
