@@ -78,7 +78,7 @@ has '+converter_subs' => (
         my $self = shift;
         return {
             'CONVERT_TO' => sub {
-                my @res  = ();
+                my @res = ();
                 if ( $self->header_wanted ) {
                     $self->header_wanted(0);
                     push @res, $self->_combine( $self->header );

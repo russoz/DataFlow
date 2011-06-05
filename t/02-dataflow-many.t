@@ -51,12 +51,7 @@ my $rp5 = Repeat->new( times => 5 );
 ok($rp5);
 my $cc = DataFlow::Proc->new( p => sub { length } );
 ok($cc);
-my $flow2 = DataFlow->new(
-    procs => [
-        $rp5,
-        sub { length },
-    ]
-);
+my $flow2 = DataFlow->new( procs => [ $rp5, sub { length }, ] );
 ok($flow2);
 
 # tests: 2

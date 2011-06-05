@@ -27,7 +27,7 @@ has '+p' => (
         my $self = shift;
 
         return sub {
-            my $fh   = $self->file;
+            my $fh = $self->file;
             local $\ = $self->ors if $self->has_ors;
             print $fh $_;
             return $_;
