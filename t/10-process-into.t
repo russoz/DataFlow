@@ -3,7 +3,7 @@ use Test::More tests => 10;
 use DataFlow::Proc;
 
 # tests: 1
-my $uc = DataFlow::Proc->new( p => sub { return uc(shift) }, );
+my $uc = DataFlow::Proc->new( p => sub { uc }, );
 ok($uc);
 
 # tests: 2
@@ -41,7 +41,7 @@ is( ( $uc->process($cref) )[0]->(), 'GGG' );
 #
 
 my $not_into = DataFlow::Proc->new(
-    p            => sub { return ucfirst(shift) },
+    p            => sub { ucfirst },
     process_into => 0,
 );
 ok($not_into);

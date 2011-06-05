@@ -47,9 +47,7 @@ has '+p' => (
         my $self = shift;
 
         my $proc = sub {
-            my $item = shift;
-
-            my $html = HTML::TreeBuilder::XPath->new_from_content($item);
+            my $html = HTML::TreeBuilder::XPath->new_from_content($_);
 
             #warn 'xpath is built';
             #warn 'values if VALUES';

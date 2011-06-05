@@ -20,7 +20,7 @@ use Moose::Util::TypeConstraints 1.01;
 subtype 'Processor' => as 'CodeRef';
 coerce 'Processor' => from 'DataFlow::Role::Processor' => via {
     my $f = $_;
-    return sub { $f->process(shift) };
+    return sub { $f->process($_) };
 };
 
 use DataFlow::Role::ProcPolicy;

@@ -5,7 +5,7 @@ use DataFlow::Proc;
 # tests: 1
 my $uc = DataFlow::Proc->new(
     policy => 'ProcessInto',
-    p      => sub { return uc(shift) },
+    p      => sub { uc },
 );
 ok($uc);
 is( ( $uc->process('aaa') )[0], 'AAA', 'works for a simple processing' );

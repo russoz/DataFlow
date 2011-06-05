@@ -78,24 +78,22 @@ has '+converter_subs' => (
         my $self = shift;
         return {
             'CONVERT_TO' => sub {
-                my $data = shift;
                 my @res  = ();
                 if ( $self->header_wanted ) {
                     $self->header_wanted(0);
                     push @res, $self->_combine( $self->header );
                 }
 
-                push @res, $self->_combine($data);
+                push @res, $self->_combine($_);
                 return @res;
             },
             'CONVERT_FROM' => sub {
-                my $csv_line = shift;
                 if ( $self->header_wanted ) {
                     $self->header_wanted(0);
-                    $self->header( $self->_parse($csv_line) );
+                    $self->header( $self->_parse($_) );
                     return;
                 }
-                return $self->_parse($csv_line);
+                return $self->_parse($_);
             },
         };
     },

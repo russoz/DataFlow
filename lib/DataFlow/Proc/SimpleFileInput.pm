@@ -22,7 +22,7 @@ has '_slurpy_read' => (
     'default' => sub {
         my $self = shift;
         return sub {
-            my $filename = shift;
+            my $filename = $_;
             open( my $fh, '<', $filename );
             my @slurp = <$fh>;
             close $fh;
@@ -54,7 +54,7 @@ has '+p' => (
         return $self->_slurpy_read if $self->do_slurp;
 
         return sub {
-            my $filename = shift;
+            my $filename = $_;
 
             # if filename is provided, add it to the queue
             $self->_fileq->add($filename) if defined $filename;

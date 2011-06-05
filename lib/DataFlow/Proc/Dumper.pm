@@ -21,9 +21,8 @@ has '+p' => (
     'default' => sub {
         my $self = shift;
         return sub {
-            my $item = shift;
-            $self->raw_dumper($item);
-            return $item;
+            $self->raw_dumper($_);
+            return $_;
         };
     },
 );

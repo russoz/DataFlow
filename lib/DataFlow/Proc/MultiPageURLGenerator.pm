@@ -66,7 +66,7 @@ has '+p' => (
         my $self = shift;
 
         return sub {
-            my $url = shift;
+            my $url = $_;
 
             $self->_paged_url($url);
 

@@ -8,8 +8,7 @@ has '+p' => (
     default => sub {
         my $self = shift;
         return sub {
-            my $item = shift;
-            return "$item" x $self->times;
+            return $_ x $self->times;
         };
     }
 );
@@ -23,12 +22,12 @@ use DataFlow::Proc;
 # tests: 3
 my $uc = DataFlow::Proc->new(
     name => 'UpperCase',
-    p    => sub { return uc(shift) }
+    p    => sub { uc }
 );
 ok($uc);
 my $rv = DataFlow::Proc->new(
     name => 'Reverse',
-    p    => sub { return scalar reverse $_[0]; }
+    p    => sub { scalar reverse }
 );
 ok($rv);
 my $flow = DataFlow->new( procs => [ $uc, $rv ] );
@@ -50,14 +49,12 @@ ok( $abc eq 'CBA' );
 # tests: 3
 my $rp5 = Repeat->new( times => 5 );
 ok($rp5);
-my $cc = DataFlow::Proc->new( p => sub { return length(shift) } );
+my $cc = DataFlow::Proc->new( p => sub { length } );
 ok($cc);
 my $flow2 = DataFlow->new(
     procs => [
         $rp5,
-        sub {
-            return length(shift);
-          }
+        sub { length },
     ]
 );
 ok($flow2);

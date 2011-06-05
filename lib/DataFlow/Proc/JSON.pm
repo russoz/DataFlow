@@ -43,12 +43,10 @@ has '+converter_subs' => (
         my $self = shift;
         return {
             'CONVERT_TO' => sub {
-                my $data = shift;
-                return $self->converter->to_json($data);
+                return $self->converter->to_json($_);
             },
             'FROM_JSON' => sub {
-                my $json = shift;
-                return $self->converter->from_json($json);
+                return $self->converter->from_json($_);
             },
         };
     },

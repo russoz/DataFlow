@@ -27,11 +27,10 @@ has '+p' => (
         my $self = shift;
 
         return sub {
-            my $item = shift;
             my $fh   = $self->file;
             local $\ = $self->ors if $self->has_ors;
-            print $fh $item;
-            return $item;
+            print $fh $_;
+            return $_;
         };
     },
 );

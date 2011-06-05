@@ -25,12 +25,10 @@ has '+converter_subs' => (
         my $self = shift;
         return {
             'CONVERT_TO' => sub {
-                my $data = shift;
-                return Dump($data);
+                return Dump($_);
             },
             'CONVERT_FROM' => sub {
-                my $yaml = shift;
-                return Load($yaml);
+                return Load($_);
             },
         };
     },
