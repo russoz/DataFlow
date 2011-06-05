@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -7,15 +8,11 @@ use DataFlow;
 
 my $flow = DataFlow->new(
     'procs' => [
-        sub {
-            return uc(shift);
-        },
-        sub {
-            return scalar reverse(shift);
-        },
+        sub { uc },
+        sub { scalar reverse },
     ],
 );
 
 $flow->input('batatas');
-print $flow->output . "\n";
+say $flow->output;
 

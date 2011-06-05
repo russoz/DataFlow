@@ -51,14 +51,14 @@ sub _make_apply_ref {
     return sub { $self->apply( $p, $_ ) };
 }
 
-sub _nop_handle {    ## no critic
-    return $_[1];
-}
-
 sub _run_p {
     my ( $p, $item ) = @_;
     local $_ = $item;
     return $p->();
+}
+
+sub _nop_handle {    ## no critic
+    return $_;
 }
 
 sub _handle_svalue {
