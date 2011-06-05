@@ -44,12 +44,10 @@ has '+converter_subs' => (
 
         my $subs = {
             'TO_MSGPACK' => sub {
-                my $data = shift;
-                return $self->msgpack->pack($data);
+                return $self->msgpack->pack($_);
             },
             'FROM_MSGPACK' => sub {
-                my $msgpack = shift;
-                return $self->msgpack->unpack($msgpack);
+                return $self->msgpack->unpack($_);
             },
         };
 

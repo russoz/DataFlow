@@ -7,10 +7,10 @@ use DataFlow::Proc;
 # tests: 2
 my $n = DataFlow::Proc->new(
     deref => 1,
-    p     => sub { return ucfirst(shift); },
+    p     => sub { ucfirst },
 );
 ok($n);
-is( $n->p->('iop'), 'Iop' );
+is( ( $n->process('iop') )[0], 'Iop' );
 
 # tests: 2
 # scalars

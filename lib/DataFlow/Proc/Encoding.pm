@@ -41,7 +41,7 @@ has '+p' => (
     'default' => sub {
         my $self = shift;
         return sub {
-            my $internal = $self->input_decoder->(shift);
+            my $internal = $self->input_decoder->($_);
             return $self->output_encoder->($internal);
         };
     },

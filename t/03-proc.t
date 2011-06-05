@@ -1,19 +1,13 @@
-use Test::More tests => 9;
+use Test::More tests => 8;
 
 BEGIN { use_ok('DataFlow::Proc'); }
 
 # tests: 2
 diag('constructor and basic tests');
-my $uc = DataFlow::Proc->new(
-    p => sub {
-        return eval { uc(shift) };
-    }
-);
+my $uc = DataFlow::Proc->new( p => sub { uc } );
 ok($uc);
 isa_ok( $uc, 'DataFlow::Proc' );
 can_ok( $uc, qw(name deref process_into dump_input dump_output p process) );
-
-is( $uc->p->('iop'), 'IOP' );
 
 # tests: 4
 # scalars

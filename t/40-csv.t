@@ -5,7 +5,7 @@ new_ok( 'DataFlow::Proc::CSV' => [ direction => 'CONVERT_FROM' ] );
 new_ok( 'DataFlow::Proc::CSV' => [ direction => 'CONVERT_TO' ] );
 
 my $to_csv = DataFlow::Proc::CSV->new( direction => 'CONVERT_TO', );
-is( ( $to_csv->p->( [qw/a b c 1 2 3/] ) )[0],
+is( ( $to_csv->process( [qw/a b c 1 2 3/] ) )[0],
     'a,b,c,1,2,3', 'produces a CSV output' );
 my @res = $to_csv->process( [qw/a b c 1 2 3/] );
 is( $res[0], 'a,b,c,1,2,3', 'produces a CSV output' );

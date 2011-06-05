@@ -31,12 +31,10 @@ has '+p' => (
         my $self = shift;
 
         return sub {
-            my $item = shift;
-
             my $url =
               $self->has_baseurl
-              ? URI->new_abs( $item, $self->baseurl )->as_string
-              : $item;
+              ? URI->new_abs( $_, $self->baseurl )->as_string
+              : $_;
 
             #$self->debug("process_item:: url = $url");
             return $self->_get->get($url);

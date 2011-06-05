@@ -32,7 +32,7 @@ has '+p' => (
         my $sql  = $self->_sql;
 
         return sub {
-            my $data = shift;
+            my $data = $_;
 
             my ( $insert, @bind ) = $sql->insert( $self->table, $data );
 

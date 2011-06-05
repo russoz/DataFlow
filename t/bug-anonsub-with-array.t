@@ -7,7 +7,6 @@ use DataFlow::Proc;
 use aliased 'DataFlow::Proc::NOP';
 
 my $sub = sub {
-    local $_ = shift;
     s/^\s*//;
     s/\s*$//;
     return $_;

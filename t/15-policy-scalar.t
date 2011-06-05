@@ -5,7 +5,7 @@ use DataFlow::Proc;
 # tests: 1
 my $uc = DataFlow::Proc->new(
     policy => 'Scalar',
-    p      => sub { return uc(shift) },
+    p      => sub { uc },
 );
 ok($uc);
 

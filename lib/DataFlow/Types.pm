@@ -79,7 +79,7 @@ coerce 'ProcessorChain' => from 'ArrayRef' => via {
             }
             elsif ( $proc->isa('DataFlow') ) {
                 push @res,
-                  DataFlow::Proc->new( p => sub { $proc->process(@_) } );
+                  DataFlow::Proc->new( p => sub { $proc->process($_) } );
             }
             else {
                 die q{Invalid object (} . $ref
