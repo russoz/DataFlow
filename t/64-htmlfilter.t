@@ -1,5 +1,5 @@
 
-use Test::More tests => 9;
+use Test::More tests => 12;
 
 BEGIN {
     use_ok('DataFlow::Proc::HTMLFilter');
@@ -32,6 +32,7 @@ my $html = <<HTML_END;
 HTML_END
 
 my @res = $filter1->process($html);
+is( scalar @res, 3, 'result has the right size' );
 is( $res[2], '<td>c1 potatoes</td>' );
 
 my $filter2 = DataFlow::Proc::HTMLFilter->new(
@@ -41,6 +42,7 @@ my $filter2 = DataFlow::Proc::HTMLFilter->new(
 ok($filter2);
 
 my @res2 = $filter2->process($html);
+is( scalar @res2, 3, 'result has the right size' );
 is( $res2[1], 'b1 bugalu' );
 
 my $filter3 = DataFlow::Proc::HTMLFilter->new(
@@ -50,8 +52,9 @@ my $filter3 = DataFlow::Proc::HTMLFilter->new(
 );
 ok($filter3);
 
-my $res3 = ( $filter3->process($html) )[0];
-is( $res3->[0], 'A' );
+my @res3 = $filter3->process($html);
+is( scalar @{ $res3[0] }, 3, 'result has the right size' );
+is_deeply( $res3[0], [qw/A B C/], 'produces the expected result' );
 
 # TODO: add tests to check the 'nochomp' option
 

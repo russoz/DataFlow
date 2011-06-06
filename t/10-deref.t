@@ -1,4 +1,4 @@
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use strict;
 
@@ -12,23 +12,20 @@ my $n = DataFlow::Proc->new(
 ok($n);
 is( ( $n->process('iop') )[0], 'Iop' );
 
-# tests: 2
 # scalars
 ok( !defined( $n->process() ) );
 ok( ( $n->process('aaa') )[0] eq 'Aaa' );
 
-# tests: 1
 # scalar refs
 my $val = 'babaloo';
 ok( ( $n->process( \$val ) )[0] eq 'Babaloo' );
 
-# tests: 2
 # array refs
 my @res_aref = $n->process( [qw/aa bb cc dd ee ff gg hh ii jj/] );
-is( $res_aref[0], 'Aa' );
-is( $res_aref[9], 'Jj' );
+is( scalar @res_aref, 10, 'result has the right size' );
+is( $res_aref[0],     'Aa' );
+is( $res_aref[9],     'Jj' );
 
-# tests: 4
 # hash refs
 my %res_href =
   $n->process( { ii => 'jj', kk => 'll', mm => 'nn', oo => 'pp' } );

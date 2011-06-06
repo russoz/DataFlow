@@ -57,8 +57,9 @@ sub _run_p {
     return $p->();
 }
 
-sub _nop_handle {    ## no critic
-    return $_;
+sub _nop_handle {
+    my @param = @_;      # ( p, item )
+    return $param[1];    # nop handle: ignores p, returns item itself
 }
 
 sub _handle_svalue {
