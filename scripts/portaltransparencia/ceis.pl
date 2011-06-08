@@ -65,7 +65,6 @@ my $flow = DataFlow->new(
             ref_result   => 1,
         },
         sub {    # remove leading and trailing spaces
-            local $_ = shift;
             s/^\s*//;
             s/\s*$//;
             s/[\r\n\t]+/ /g;
@@ -73,7 +72,7 @@ my $flow = DataFlow->new(
             return $_;
         },
         sub {
-            my $internal = decode( "iso-8859-1", shift );
+            my $internal = decode( "iso-8859-1", $_ );
             return encode( "utf8", $internal );
         },
         NOP => { name => 'espiando', dump_output => 1, },

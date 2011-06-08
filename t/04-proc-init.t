@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 use DataFlow::Proc;
 
@@ -15,6 +15,6 @@ sub test_uc_with {
 test_uc_with( p => $uc );
 test_uc_with( p => DataFlow::Proc->new( p => $uc ) );
 use DataFlow;
-my $d = DataFlow->new( procs => [ DataFlow::Proc->new( p => $uc ) ] );
-test_uc_with( p => $d );
+test_uc_with( p => DataFlow->new( [ DataFlow::Proc->new( p => $uc ) ] ) );
+test_uc_with( p => DataFlow->new( [$uc] ) );
 

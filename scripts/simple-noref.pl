@@ -14,7 +14,7 @@ use Data::Dumper;
 my $flow = DataFlow->new(
     procs => [
         sub {
-            my $num = shift;
+            my $num = $_;
 
             #print "AAA: ".$num."\n";
             my @res = map { chr( 64 + $_ ) } ( 1 .. $num );
@@ -23,10 +23,10 @@ my $flow = DataFlow->new(
             return [@res];
         },
         DataFlow::Proc->new(
-            dump_input   => 1,
-            dump_output  => 1,
-            process_into => 0,
-            p            => sub { return lc(shift); },
+            dump_input  => 1,
+            dump_output => 1,
+            policy      => 'Scalar',
+            p           => sub { lc },
         ),
     ],
 );

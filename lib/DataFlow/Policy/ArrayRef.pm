@@ -20,7 +20,9 @@ has '+handlers' => (
 
 has '+default_handler' => (
     'default' => sub {
-        die q{Must be an array reference!};
+        return sub {
+            die q{Must be an array reference!};
+          }
     },
 );
 

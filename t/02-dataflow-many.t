@@ -7,9 +7,7 @@ has times => ( is => 'ro', isa => 'Int', required => 1 );
 has '+p' => (
     default => sub {
         my $self = shift;
-        return sub {
-            return $_ x $self->times;
-        };
+        return sub { $_ x $self->times; };
     }
 );
 no Moose;

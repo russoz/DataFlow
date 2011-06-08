@@ -20,12 +20,9 @@ has 'handlers' => (
 );
 
 has 'default_handler' => (
-    'is'      => 'ro',
-    'isa'     => 'CodeRef',
-    'lazy'    => 1,
-    'default' => sub {
-        shift->confess(q{Must provide a default handler!});
-    },
+    'is'       => 'ro',
+    'isa'      => 'CodeRef',
+    'required' => 1,
 );
 
 sub apply {
@@ -51,14 +48,15 @@ sub _make_apply_ref {
     return sub { $self->apply( $p, $_ ) };
 }
 
-sub _nop_handle {    ## no critic
-    return $_[1];
-}
-
 sub _run_p {
     my ( $p, $item ) = @_;
     local $_ = $item;
     return $p->();
+}
+
+sub _nop_handle {
+    my @param = @_;      # ( p, item )
+    return $param[1];    # nop handle: ignores p, returns item itself
 }
 
 sub _handle_svalue {

@@ -15,7 +15,7 @@ use Data::Dumper;
 my $flow = DataFlow->new(
     procs => [
         sub {
-            my $num = shift;
+            my $num = $_;
 
             #print "AAA: ".$num."\n";
             my @res = map { chr( 64 + $_ ) } ( 1 .. $num );
@@ -24,9 +24,7 @@ my $flow = DataFlow->new(
             return [@res];
         },
         NOP->new( deref => 1 ),
-        sub {
-            return lc(shift);
-        },
+        sub { lc },
     ],
 );
 
