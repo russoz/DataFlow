@@ -12,11 +12,11 @@ extends 'DataFlow::Proc';
 
 use namespace::autoclean;
 
-has '+process_into' => ( 'default' => 0, );
+has '+policy' => ( 'default' => 'NOP', );
 has '+p' => (
     'default' => sub {
-        return sub { $_ }
-    },
+        return sub { }
+    }
 );
 
 __PACKAGE__->meta->make_immutable;
