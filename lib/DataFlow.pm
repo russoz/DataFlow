@@ -171,7 +171,7 @@ use DataFlow;
 			sub { ... do something },
 			sub { ... do something else },
 			CSV => {
-				direction     => 'TO_CSV',
+				direction     => 'CONVERT_TO',
 				text_csv_opts => { binary => 1 },
 			},
 		]
