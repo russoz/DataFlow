@@ -25,12 +25,14 @@ coerce 'Processor' => from 'DataFlow::Role::Processor' => via {
 
 use DataFlow::Role::ProcPolicy;
 subtype 'ProcPolicy' => as 'DataFlow::Role::ProcPolicy';
-coerce 'ProcPolicy' => from 'Str' => via { _make_policy($_) };
+coerce 'ProcPolicy' => from 'Str' => via { _make_policy($_) } => from
+  'ArrayRef' => via { _make_policy( @{$_} ) };
 
 sub _make_policy {
-    my $class = 'DataFlow::Policy::' . shift;
+    my ( $policy, @args ) = @_;
+    my $class = 'DataFlow::Policy::' . $policy;
     my $obj;
-    eval 'use ' . $class . '; $obj = ' . $class . '->new()';    ## no critic
+    eval 'use ' . $class . '; $obj = ' . $class . '->new(@args)';   ## no critic
     die $@ if $@;
     return $obj;
 }
