@@ -11,31 +11,11 @@ use Moose;
 with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
+use DataFlow::Types qw(Processor ProcPolicy);
+
 use namespace::autoclean;
 use Scalar::Util qw/reftype/;
 use Moose::Util::TypeConstraints 1.01;
-
-################################################################################
-
-subtype 'Processor' => as 'CodeRef';
-coerce 'Processor' => from 'DataFlow::Role::Processor' => via {
-    my $f = $_;
-    return sub { $f->process($_) };
-};
-
-use DataFlow::Role::ProcPolicy;
-subtype 'ProcPolicy' => as 'DataFlow::Role::ProcPolicy';
-coerce 'ProcPolicy' => from 'Str' => via { _make_policy($_) } => from
-  'ArrayRef' => via { _make_policy( @{$_} ) };
-
-sub _make_policy {
-    my ( $policy, @args ) = @_;
-    my $class = 'DataFlow::Policy::' . $policy;
-    my $obj;
-    eval 'use ' . $class . '; $obj = ' . $class . '->new(@args)';   ## no critic
-    die $@ if $@;
-    return $obj;
-}
 
 ################################################################################
 
