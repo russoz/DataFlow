@@ -23,7 +23,7 @@ my $flow = DataFlow->new(
             #print "BBB: ".Dumper(\@res);;
             return [@res];
         },
-        NOP->new( deref => 1 ),
+        [ NOP => ( deref => 1 ) ],
         sub { lc },
     ],
 );

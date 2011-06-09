@@ -6,13 +6,12 @@ use warnings;
 
 use DataFlow;
 
-my $flow = DataFlow->new(
-    'procs' => [
-        sub { uc },
-        sub { scalar reverse },
-    ],
-);
+my $flow = DataFlow->new( [ sub { uc }, sub { scalar reverse }, ] );
 
 $flow->input('batatas');
-say $flow->output;
+$flow->input('potatoes');
+$flow->input('kartoshky');
+$flow->input(@ARGV) if @ARGV;
+$, = "\n";
+say $flow->flush;
 

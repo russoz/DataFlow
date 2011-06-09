@@ -22,12 +22,14 @@ my $flow = DataFlow->new(
             #print "BBB: ".Dumper(\@res);;
             return [@res];
         },
-        DataFlow::Proc->new(
-            dump_input  => 1,
-            dump_output => 1,
-            policy      => 'Scalar',
-            p           => sub { lc },
-        ),
+        [
+            Proc => (
+                dump_input  => 1,
+                dump_output => 1,
+                policy      => 'Scalar',
+                p           => sub { lc },
+            )
+        ],
     ],
 );
 
