@@ -171,7 +171,7 @@ use DataFlow;
 			sub { ... do something },
 			sub { ... do something else },
 			CSV => {
-				direction     => 'TO_CSV',
+				direction     => 'CONVERT_TO',
 				text_csv_opts => { binary => 1 },
 			},
 		]
@@ -242,9 +242,9 @@ that you use references:
 	$flow->input( [ qw/all the simple things/ ] );
 	$flow->input( { all => the, simple => 'things' } );
 
-Processors with C<process_into> enabled (true by default) will process the
-items inside an array reference, and the values (not the keys) inside a hash
-reference.
+Processors using the L<DataFlow::Policy::ProcessInto> policy (default) will
+process the items inside an array reference, and the values (not the keys)
+inside a hash reference.
 
 =method process_input
 

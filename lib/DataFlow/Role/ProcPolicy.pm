@@ -20,12 +20,9 @@ has 'handlers' => (
 );
 
 has 'default_handler' => (
-    'is'      => 'ro',
-    'isa'     => 'CodeRef',
-    'lazy'    => 1,
-    'default' => sub {
-        shift->confess(q{Must provide a default handler!});
-    },
+    'is'       => 'ro',
+    'isa'      => 'CodeRef',
+    'required' => 1,
 );
 
 sub apply {

@@ -57,13 +57,6 @@ has 'deref' => (
     'default' => 0,
 );
 
-has 'process_into' => (
-    'is'      => 'ro',
-    'isa'     => 'Bool',
-    'lazy'    => 1,
-    'default' => 1,
-);
-
 has 'dump_input' => (
     'is'            => 'ro',
     'isa'           => 'Bool',
@@ -85,10 +78,7 @@ has 'policy' => (
     'isa'     => 'ProcPolicy',
     'coerce'  => 1,
     'lazy'    => 1,
-    'default' => sub {
-        my $self = shift;
-        return $self->process_into ? 'ProcessInto' : 'Scalar';
-    },
+    'default' => 'ProcessInto',
 );
 
 has 'p' => (
@@ -194,14 +184,6 @@ or if DataFlow::Proc will filter those out. (DEFAULT = false)
 [Bool] Signals whether the result of the processing will be de-referenced
 upon output or if DataFlow::Proc will preserve the original reference.
 (DEFAULT = false)
-
-=attr process_into
-
-[Bool] It signals whether this processor will attempt to process data within
-references or not. If process_into is true, then C<process_item> will be
-applied into the values referenced by any scalar, array or hash reference and
-onto the result of running any code reference.
-(DEFAULT = true)
 
 =attr dump_input
 

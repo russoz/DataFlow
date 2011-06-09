@@ -23,10 +23,10 @@ my $flow = DataFlow->new(
             return [@res];
         },
         DataFlow::Proc->new(
-            dump_input   => 1,
-            dump_output  => 1,
-            process_into => 0,
-            p            => sub { lc },
+            dump_input  => 1,
+            dump_output => 1,
+            policy      => 'Scalar',
+            p           => sub { lc },
         ),
     ],
 );
