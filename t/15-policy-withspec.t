@@ -5,8 +5,8 @@ use DataFlow::Policy::WithSpec;
 
 # tests: 1
 my $uc = DataFlow::Proc->new(
-    policy => DataFlow::Policy::WithSpec->new( spec => '->[2]', ),
     p      => sub                                   { uc },
+    policy => DataFlow::Policy::WithSpec->new( spec => '->[2]', ),
 );
 ok($uc);
 

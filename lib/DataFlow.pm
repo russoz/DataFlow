@@ -167,13 +167,15 @@ use DataFlow;
 
 	my $flow = DataFlow->new(
 		procs => [
-			DataFlow::Proc->new( p => sub { do this thing } ),
+			[ Proc => { p => sub { do this thing } } ],
 			sub { ... do something },
 			sub { ... do something else },
-			CSV => {
+			[
+			  CSV => {
 				direction     => 'CONVERT_TO',
 				text_csv_opts => { binary => 1 },
-			},
+			  }
+			],
 		]
 	);
 
@@ -190,30 +192,26 @@ caller.
 
 =attr name
 
-[Str] A descriptive name for the dataflow. (OPTIONAL)
+(Str) A descriptive name for the dataflow. (OPTIONAL)
 
 =attr auto_process
 
-[Bool] If there is data available in the output queue, and one calls the
+(Bool) If there is data available in the output queue, and one calls the
 C<output()> method, this attribute will flag whether the dataflow should
 attempt to automatically process queued data. (DEFAULT: true)
 
 =attr procs
 
-[ArrayRef[DataFlow::Proc]] The list of processors that make this DataFlow.
+(ArrayRef[DataFlow::Proc]) The list of processors that make this DataFlow.
 Optionally, you may pass CodeRefs that will be automatically converted to
 L<DataFlow::Proc> objects. (REQUIRED)
 
 The C<procs> parameter will accept some variations in its value. Any
 C<ArrayRef> passed will be parsed, and additionaly to plain
 C<DataFlow::Proc> objects, it will accept: C<DataFlow> objects (so one can
-nest flows), code references (C<sub{}> blocks) and plain text strings.
-
-The text string form is treatedi, for a given "TEXT", in the following order:
-if it contains '::' then DataFlow will try to use a class named "TEXT";
-it that doesn't work (or if it doesn't contain '::'), DataFlow will try to load
-a class named 'DataFlow::Proc::TEXT'; if that fails, it tries one last time to
-load a class named 'TEXT'. If that last try doesn't work, it dies.
+nest flows), code references (C<sub{}> blocks), array references and plain
+text strings. Refer to L<DataFlow::Types> for more information on these
+different forms of passing the C<procs> parameter.
 
 Additionally, one may pass any of these forms as a single argument to the
 constructor C<new>, plus a single C<DataFlow>, or C<DataFlow:Proc> or string.

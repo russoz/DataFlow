@@ -14,6 +14,8 @@ use MooseX::Types -declare => [
 
 use namespace::autoclean;
 
+use DataFlow::Proc;
+
 use MooseX::Types::Moose qw/Str CodeRef ArrayRef HashRef/;
 class_type 'DataFlow';
 class_type 'DataFlow::Proc';
@@ -26,11 +28,9 @@ use Encode;
 
 sub _load_class {
     my $str = shift;
-    if ( $str eq 'Proc' ) {
-        eval "use $str";    ## no critic
-        return $str unless $@;
-    }
-    elsif ( $str =~ m/::/ ) {
+    return q{DataFlow::Proc} if $str eq 'Proc';
+
+    if ( $str =~ m/::/ ) {
         eval "use $str";    ## no critic
         return $str unless $@;
     }
@@ -43,15 +43,19 @@ sub _load_class {
 }
 
 sub _str_to_proc {
-    my ( $str, $params ) = @_;
-    my $class = _load_class($str);
-    my $obj   = eval {
-        ( defined($params) and ( ref($params) eq 'HASH' ) )
-          ? $class->new($params)
-          : $class->new;
-    };
+    my ( $procname, @args ) = @_;
+    my $class = _load_class($procname);
+    my $obj = eval { $class->new(@args) };
     die "$@" if "$@";
     return $obj;
+}
+
+sub _is_processor {
+    my $obj = shift;
+    return
+         blessed($obj)
+      && $obj->can('does')
+      && $obj->does('DataFlow::Role::Processor');
 }
 
 # subtypes
@@ -60,38 +64,27 @@ subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
   message { 'DataFlow must have at least one processor' };
 coerce 'ProcessorChain' => from 'ArrayRef' => via {
     my @list = @{$_};
-    my @res  = ();
-    while ( my $proc = shift @list ) {
-        my $ref = ref($proc);
+    my @res  = map {
+        my $elem = $_;
+        my $ref  = ref($elem);
         if ( $ref eq '' ) {    # String?
-            push @res,
-              ref( $list[0] ) eq 'HASH'
-              ? _str_to_proc( $proc, shift @list )
-              : _str_to_proc($proc);
+            _str_to_proc($elem);
+        }
+        elsif ( $ref eq 'ARRAY' ) {
+            _str_to_proc( @{$elem} );
         }
         elsif ( $ref eq 'CODE' ) {
-            use DataFlow::Proc;
-            push @res, DataFlow::Proc->new( p => $proc );
+            DataFlow::Proc->new( p => $elem );
         }
-        elsif ( blessed($proc) ) {
-            if ( $proc->isa('DataFlow::Proc') ) {
-                push @res, $proc;
-            }
-            elsif ( $proc->isa('DataFlow') ) {
-                push @res,
-                  DataFlow::Proc->new( p => sub { $proc->process($_) } );
-            }
-            else {
-                die q{Invalid object (} . $ref
-                  . q{) passed instead of a processor};
-            }
+        elsif ( _is_processor($elem) ) {
+            DataFlow::Proc->new( p => sub { $elem->process($_) } );
         }
         else {
             die q{Invalid element (}
-              . join( q{,}, $ref, $proc )
+              . join( q{,}, $ref, $elem )
               . q{) passed instead of a processor};
         }
-    }
+    } @list;
     return [@res];
 },
   from
@@ -171,9 +164,11 @@ Currently it works for:
 Named processors. If it contains the substring '::', DataFlow will try to
 create an object of that type. If it does not, then DataFlow will attempt to
 create an object of the type C<< DataFlow::Proc::<STRING> >>. The string 'Proc'
-is reserved for creating an object of the type <DataFlow::Proc>. If the next
-element in the ArrayRef is a HashRef, it will be used as argument for the
-object constructor.
+is reserved for creating an object of the type <DataFlow::Proc>.
+* ArrayRef 
+Named processor with parameters. The first element of the array must be a
+text string, subject to the rules used in the previous item. The rest of the
+array is passed as parameters for constructing the object.
 * CodeRef
 Code reference, a.k.a. a C<sub>. A processor object will be created:
 

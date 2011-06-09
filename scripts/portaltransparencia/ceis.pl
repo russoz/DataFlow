@@ -55,15 +55,19 @@ my $flow = DataFlow->new(
     [
         CeisPages->new( first_page => -5, deref => 1 ),
         'URLRetriever',
-        HTMLFilter => {
-            search_xpath =>
-              '//div[@id="listagemEmpresasSancionadas"]/table/tbody/tr',
-        },
-        HTMLFilter => {
-            search_xpath => '//td',
-            result_type  => 'VALUE',
-            ref_result   => 1,
-        },
+        [
+            HTMLFilter => {
+                search_xpath =>
+                  '//div[@id="listagemEmpresasSancionadas"]/table/tbody/tr',
+            }
+        ],
+        [
+            HTMLFilter => {
+                search_xpath => '//td',
+                result_type  => 'VALUE',
+                ref_result   => 1,
+            }
+        ],
         sub {    # remove leading and trailing spaces
             s/^\s*//;
             s/\s*$//;
@@ -75,21 +79,23 @@ my $flow = DataFlow->new(
             my $internal = decode( "iso-8859-1", $_ );
             return encode( "utf8", $internal );
         },
-        NOP => { name => 'espiando', dump_output => 1, },
-        CSV => {
-            name           => 'csv',
-            direction      => 'CONVERT_TO',
-            converter_opts => { binary => 1 },
-            headers        => [
-                'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
-                'Tipo',       'Data Inicial',
-                'Data Final', 'Nome do Órgão/Entidade',
-                'UF',         'Fonte',
-                'Data'
-            ],
-            dump_output => 1,
-        },
-        SimpleFileOutput => { file => '> /tmp/ceis.csv', ors => "\n" },
+        [ NOP => { name => 'espiando', dump_output => 1, } ],
+        [
+            CSV => {
+                name           => 'csv',
+                direction      => 'CONVERT_TO',
+                converter_opts => { binary => 1, },
+                headers        => [
+                    'CNPJ/CPF',   'Nome/Razão Social/Nome Fantasia',
+                    'Tipo',       'Data Inicial',
+                    'Data Final', 'Nome do Órgão/Entidade',
+                    'UF',         'Fonte',
+                    'Data'
+                ],
+                dump_output => 1,
+            }
+        ],
+        [ SimpleFileOutput => { file => '> /tmp/ceis.csv', ors => "\n" } ],
     ],
 );
 

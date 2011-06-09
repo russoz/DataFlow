@@ -12,6 +12,6 @@ $flow->input('batatas');
 $flow->input('potatoes');
 $flow->input('kartoshky');
 $flow->input(@ARGV) if @ARGV;
-$,="\n";
+$, = "\n";
 say $flow->flush;
 
