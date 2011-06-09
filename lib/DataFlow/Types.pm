@@ -8,7 +8,7 @@ use warnings;
 # VERSION
 
 use MooseX::Types -declare => [
-    qw(ProcessorChain Encoder Decoder HTMLFilterTypes),
+    qw(ProcessorChain Processor ProcPolicy Encoder Decoder HTMLFilterTypes),
     qw(ConversionSubs ConversionDirection)
 ];
 
@@ -17,6 +17,7 @@ use namespace::autoclean;
 use MooseX::Types::Moose qw/Str CodeRef ArrayRef HashRef/;
 class_type 'DataFlow';
 class_type 'DataFlow::Proc';
+role_type 'DataFlow::Role::Processor';
 
 use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/blessed/;
@@ -25,33 +26,37 @@ use Encode;
 #################### DataFlow ######################
 
 sub _load_class {
-    my $str = shift;
-    if ( $str eq 'Proc' ) {
-        eval "use $str";    ## no critic
-        return $str unless $@;
+    my $name = shift;
+    return q{DataFlow::Proc} if $name eq 'Proc';
+
+    if ( $name =~ m/::/ ) {
+        eval "use $name";    ## no critic
+        return $name unless $@;
     }
-    elsif ( $str =~ m/::/ ) {
-        eval "use $str";    ## no critic
-        return $str unless $@;
-    }
-    my $class = "DataFlow::Proc::$str";
+
+    my $class = "DataFlow::Proc::$name";
     eval "use $class";      ## no critic
     return $class unless $@;
-    eval "use $str";        ## no critic
-    return $str unless $@;
-    die qq{Cannot load class from '$str'};
+
+    eval "use $name";        ## no critic
+    return $name unless $@;
+    die qq{Cannot load class from '$name'};
 }
 
 sub _str_to_proc {
-    my ( $str, $params ) = @_;
-    my $class = _load_class($str);
-    my $obj   = eval {
-        ( defined($params) and ( ref($params) eq 'HASH' ) )
-          ? $class->new($params)
-          : $class->new;
-    };
+    my ( $procname, @args ) = @_;
+    my $class = _load_class($procname);
+    my $obj = eval { $class->new(@args) };
     die "$@" if "$@";
     return $obj;
+}
+
+sub _is_processor {
+    my $obj = shift;
+    return
+         blessed($obj)
+      && $obj->can('does')
+      && $obj->does('DataFlow::Role::Processor');
 }
 
 # subtypes
@@ -60,47 +65,65 @@ subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
   message { 'DataFlow must have at least one processor' };
 coerce 'ProcessorChain' => from 'ArrayRef' => via {
     my @list = @{$_};
-    my @res  = ();
-    while ( my $proc = shift @list ) {
-        my $ref = ref($proc);
+    my @res  = map {
+        my $elem = $_;
+        my $ref  = ref($elem);
         if ( $ref eq '' ) {    # String?
-            push @res,
-              ref( $list[0] ) eq 'HASH'
-              ? _str_to_proc( $proc, shift @list )
-              : _str_to_proc($proc);
+            _str_to_proc($elem);
+        }
+        elsif ( $ref eq 'ARRAY' ) {
+            _str_to_proc( @{$elem} );
         }
         elsif ( $ref eq 'CODE' ) {
-            use DataFlow::Proc;
-            push @res, DataFlow::Proc->new( p => $proc );
+            require DataFlow::Proc;
+            DataFlow::Proc->new( p => $elem );
         }
-        elsif ( blessed($proc) ) {
-            if ( $proc->isa('DataFlow::Proc') ) {
-                push @res, $proc;
-            }
-            elsif ( $proc->isa('DataFlow') ) {
-                push @res,
-                  DataFlow::Proc->new( p => sub { $proc->process($_) } );
-            }
-            else {
-                die q{Invalid object (} . $ref
-                  . q{) passed instead of a processor};
-            }
+        elsif ( _is_processor($elem) ) {
+            require DataFlow::Proc;
+            DataFlow::Proc->new( p => sub { $elem->process($_) } );
         }
         else {
             die q{Invalid element (}
-              . join( q{,}, $ref, $proc )
+              . join( q{,}, $ref, $elem )
               . q{) passed instead of a processor};
         }
-    }
+    } @list;
     return [@res];
 },
   from
-  'Str' => via { [ _str_to_proc($_) ] },
-  from
-  'CodeRef' => via { [ DataFlow::Proc->new( p => $_ ) ] },
-  from
-  'DataFlow'            => via { $_->procs },
+  'Str'          => via { [ _str_to_proc($_) ] },
+  from 'CodeRef' => via {
+    require DataFlow::Proc;
+    [ DataFlow::Proc->new( p => $_ ) ];
+  },
+  from 'DataFlow' => via {
+    my $proc = $_;
+    require DataFlow::Proc;
+    [ DataFlow::Proc->new( p => sub { $proc->process($_) } ) ];
+  },
   from 'DataFlow::Proc' => via { [$_] };
+
+#################### DataFlow::Proc ######################
+
+subtype 'Processor' => as 'CodeRef';
+coerce 'Processor' => from 'DataFlow::Role::Processor' => via {
+    my $f = $_;
+    return sub { $f->process($_) };
+};
+
+use DataFlow::Role::ProcPolicy;
+subtype 'ProcPolicy' => as 'DataFlow::Role::ProcPolicy';
+coerce 'ProcPolicy' => from 'Str' => via { _make_policy($_) } => from
+  'ArrayRef' => via { _make_policy( @{$_} ) };
+
+sub _make_policy {
+    my ( $policy, @args ) = @_;
+    my $class = 'DataFlow::Policy::' . $policy;
+    my $obj;
+    eval 'use ' . $class . '; $obj = ' . $class . '->new(@args)';   ## no critic
+    die $@ if $@;
+    return $obj;
+}
 
 #################### DataFlow::Proc::Converter ######################
 
@@ -171,9 +194,11 @@ Currently it works for:
 Named processors. If it contains the substring '::', DataFlow will try to
 create an object of that type. If it does not, then DataFlow will attempt to
 create an object of the type C<< DataFlow::Proc::<STRING> >>. The string 'Proc'
-is reserved for creating an object of the type <DataFlow::Proc>. If the next
-element in the ArrayRef is a HashRef, it will be used as argument for the
-object constructor.
+is reserved for creating an object of the type <DataFlow::Proc>.
+* ArrayRef
+Named processor with parameters. The first element of the array must be a
+text string, subject to the rules used in the previous item. The rest of the
+array is passed as parameters for constructing the object.
 * CodeRef
 Code reference, a.k.a. a C<sub>. A processor object will be created:
 
