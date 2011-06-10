@@ -139,6 +139,11 @@ sub output {
     return wantarray ? @res : $res[0];
 }
 
+sub reset {
+	my $self = shift;
+	map { $_->clear } @{$self->_queues};
+}
+
 sub flush {
     my $self = shift;
     while ( $self->has_queued_data ) {
@@ -255,6 +260,10 @@ data and/or if C<auto_process> has been disabled.
 Fetches data from the data flow. If called in scalar context it will return
 one processed item from the flow. If called in list context it will return all
 the elements in the last queue.
+
+=method reset
+
+Clears all data in the dataflow and makes it ready for a new run.
 
 =method flush
 
