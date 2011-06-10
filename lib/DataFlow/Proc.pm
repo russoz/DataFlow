@@ -117,11 +117,7 @@ __END__
 
 	use DataFlow::Proc;
 
-	my $uc = DataFlow::Proc->new(
-		p => sub {
-			return uc(shift);
-		}
-	);
+	my $uc = DataFlow::Proc->new( p => sub { uc } );
 
 	my @res = $uc->process( 'something' );
 	# @res == qw/SOMETHING/;
@@ -133,9 +129,7 @@ Or
 
 	my $uc_deref = DataFlow::Proc->new(
 		deref => 1,
-		p     => sub {
-			return uc(shift);
-		}
+		p     => sub { uc }
 	);
 
 	my @res = $uc_deref->process( [qw/aaa bbb ccc/] );
@@ -182,12 +176,10 @@ L<DataFlow::Role::Dumper>. (DEFAULT = false)
 [CodeRef] The actual work horse for this class. It is treated as a function,
 not as a method, as in:
 
-	my $proc = DataFlow::Proc->new(
-		p => sub {
-			my $data = shift;
-			return ucfirst($data);
-		}
-	);
+	my $proc = DataFlow::Proc->new( p => sub { ucfirst } );
+
+The sub referenced by C<p> is run with a localized version the special
+variable C<< $_ >>, containing the value of the data to be processed.
 
 It only makes sense to access C<$self> when one is sub-classing DataFlow::Proc
 and adding new attibutes or methods, in which case one can do as below:
@@ -202,10 +194,7 @@ and adding new attibutes or methods, in which case one can do as below:
 	has '+p' => (
 		default => sub {        # not the p value, but the sub that returns it
 			my $self = shift;
-			return sub {
-				my $data = shift;
-				return $data * int( rand( $self->x_factor ) );
-			};
+			return sub { $_ * int( rand( $self->x_factor ) ) };
 		},
 	);
 
