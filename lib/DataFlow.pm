@@ -139,9 +139,8 @@ sub output {
     return wantarray ? @res : $res[0];
 }
 
-sub reset {
-	my $self = shift;
-	map { $_->clear } @{$self->_queues};
+sub reset {    ## no critic
+    return map { $_->clear } @{ shift->_queues };
 }
 
 sub flush {

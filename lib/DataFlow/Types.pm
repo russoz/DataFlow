@@ -35,7 +35,7 @@ sub _load_class {
     }
 
     my $class = "DataFlow::Proc::$name";
-    eval "use $class";      ## no critic
+    eval "use $class";       ## no critic
     return $class unless $@;
 
     eval "use $name";        ## no critic
