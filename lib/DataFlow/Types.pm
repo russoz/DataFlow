@@ -60,7 +60,7 @@ sub _is_processor {
 }
 
 # subtypes
-subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Proc]' =>
+subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Role::Processor]' =>
   where { scalar @{$_} > 0 } =>
   message { 'DataFlow must have at least one processor' };
 coerce 'ProcessorChain' => from 'ArrayRef' => via {
@@ -96,12 +96,7 @@ coerce 'ProcessorChain' => from 'ArrayRef' => via {
     require DataFlow::Proc;
     [ DataFlow::Proc->new( p => $_ ) ];
   },
-  from 'DataFlow' => via {
-    my $proc = $_;
-    require DataFlow::Proc;
-    [ DataFlow::Proc->new( p => sub { $proc->process($_) } ) ];
-  },
-  from 'DataFlow::Proc' => via { [$_] };
+  from 'DataFlow::Role::Processor' => via { [$_] };
 
 #################### DataFlow::Proc ######################
 
