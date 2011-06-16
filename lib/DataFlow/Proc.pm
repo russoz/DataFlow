@@ -11,7 +11,7 @@ use Moose;
 with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
-use DataFlow::Types qw(Processor ProcPolicy);
+use DataFlow::Types qw(ProcessorSub ProcPolicy);
 
 use namespace::autoclean;
 use Scalar::Util qw/reftype/;
@@ -65,7 +65,7 @@ has 'policy' => (
 
 has 'p' => (
     'is'       => 'ro',
-    'isa'      => 'Processor',
+    'isa'      => 'ProcessorSub',
     'required' => 1,
     'coerce'   => 1,
     'documentation' =>

@@ -8,8 +8,10 @@ use warnings;
 # VERSION
 
 use MooseX::Types -declare => [
-    qw(ProcessorChain Processor ProcPolicy Encoder Decoder HTMLFilterTypes),
-    qw(ConversionSubs ConversionDirection)
+    qw(Processor ProcessorList ProcessorSub ProcPolicy),
+    qw(ConversionSubs ConversionDirection),
+    qw(Encoder Decoder),
+    qw(HTMLFilterTypes),
 ];
 
 use namespace::autoclean;
@@ -18,12 +20,11 @@ use MooseX::Types::Moose qw/Str CodeRef ArrayRef HashRef/;
 class_type 'DataFlow';
 class_type 'DataFlow::Proc';
 role_type 'DataFlow::Role::Processor';
+role_type 'DataFlow::Role::ProcPolicy';
 
 use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/blessed/;
 use Encode;
-
-#################### DataFlow ######################
 
 sub _load_class {
     my $name = shift;
@@ -59,57 +60,55 @@ sub _is_processor {
       && $obj->does('DataFlow::Role::Processor');
 }
 
-# subtypes
-subtype 'ProcessorChain' => as 'ArrayRef[DataFlow::Role::Processor]' =>
+# where any can be of types:
+# - Str
+# - [ Str, <options> ]
+# - CodeRef
+# - DataFlow::Role::Processor
+sub _any_to_proc {
+    my $elem = shift;
+    my $ref  = ref($elem);
+    if ( $ref eq '' ) {    # String?
+        return _str_to_proc($elem);
+    }
+    elsif ( $ref eq 'ARRAY' ) {
+        return _str_to_proc( @{$elem} );
+    }
+    elsif ( $ref eq 'CODE' ) {
+        require DataFlow::Proc;
+        return DataFlow::Proc->new( p => $elem );
+    }
+    return $elem;
+}
+
+# subtypes CORE
+
+subtype 'Processor' => as 'DataFlow::Role::Processor';
+coerce 'Processor' => from 'Any' => via { _any_to_proc($_) };
+
+subtype 'ProcessorList' => as 'ArrayRef[DataFlow::Role::Processor]' =>
   where { scalar @{$_} > 0 } =>
   message { 'DataFlow must have at least one processor' };
-coerce 'ProcessorChain' => from 'ArrayRef' => via {
+coerce 'ProcessorList' => from 'ArrayRef' => via {
     my @list = @{$_};
-    my @res  = map {
-        my $elem = $_;
-        my $ref  = ref($elem);
-        if ( $ref eq '' ) {    # String?
-            _str_to_proc($elem);
-        }
-        elsif ( $ref eq 'ARRAY' ) {
-            _str_to_proc( @{$elem} );
-        }
-        elsif ( $ref eq 'CODE' ) {
-            require DataFlow::Proc;
-            DataFlow::Proc->new( p => $elem );
-        }
-        elsif ( _is_processor($elem) ) {
-            require DataFlow::Proc;
-            DataFlow::Proc->new( p => sub { $elem->process($_) } );
-        }
-        else {
-            die q{Invalid element (}
-              . join( q{,}, $ref, $elem )
-              . q{) passed instead of a processor};
-        }
-    } @list;
+    my @res = map { _any_to_proc($_) } @list;
     return [@res];
 },
   from
-  'Str'          => via { [ _str_to_proc($_) ] },
-  from 'CodeRef' => via {
-    require DataFlow::Proc;
-    [ DataFlow::Proc->new( p => $_ ) ];
-  },
+  'Str' => via { [ _str_to_proc($_) ] },
+  from
+  'CodeRef'                        => via { [ _any_to_proc($_) ] },
   from 'DataFlow::Role::Processor' => via { [$_] };
 
-#################### DataFlow::Proc ######################
-
-subtype 'Processor' => as 'CodeRef';
-coerce 'Processor' => from 'DataFlow::Role::Processor' => via {
+subtype 'ProcessorSub' => as 'CodeRef';
+coerce 'ProcessorSub' => from 'DataFlow::Role::Processor' => via {
     my $f = $_;
     return sub { $f->process($_) };
 };
 
-use DataFlow::Role::ProcPolicy;
 subtype 'ProcPolicy' => as 'DataFlow::Role::ProcPolicy';
-coerce 'ProcPolicy' => from 'Str' => via { _make_policy($_) } => from
-  'ArrayRef' => via { _make_policy( @{$_} ) };
+coerce 'ProcPolicy'  => from 'Str' => via { _make_policy($_) };
+coerce 'ProcPolicy'  => from 'ArrayRef' => via { _make_policy( @{$_} ) };
 
 sub _make_policy {
     my ( $policy, @args ) = @_;
@@ -120,7 +119,7 @@ sub _make_policy {
     return $obj;
 }
 
-#################### DataFlow::Proc::Converter ######################
+# subtypes for DataFlow::Proc::Converter ######################
 
 enum 'ConversionDirection' => [ 'CONVERT_TO', 'CONVERT_FROM' ];
 
@@ -128,9 +127,9 @@ subtype 'ConversionSubs' => as 'HashRef[CodeRef]' => where {
     scalar( keys %{$_} ) == 2
       && exists $_->{CONVERT_TO}
       && exists $_->{CONVERT_FROM};
-} => message { q(Invalid 'ConversionSubs' hash) };
+} => message { q(Invalid hash of type 'ConversionSubs') };
 
-#################### DataFlow::Proc::Encoding ######################
+# subtypes for DataFlow::Proc::Encoding ######################
 
 subtype 'Decoder' => as 'CodeRef';
 coerce 'Decoder' => from 'Str' => via {
@@ -144,13 +143,11 @@ coerce 'Encoder' => from 'Str' => via {
     return sub { return encode( $encoding, shift ) };
 };
 
-#################### DataFlow::Proc::HTMLFilter ######################
+# subtype for DataFlow::Proc::HTMLFilter ######################
 
 enum 'HTMLFilterTypes', [qw(NODE HTML VALUE)];
 
 1;
-
-__END__
 
 =pod
 
@@ -172,7 +169,41 @@ adjustment to an existing one.
 
 =head1 SUBTYPES
 
-=head2 ProcessorChain
+=head2 Processor
+
+A L<DataFlow::Proc> object, with coercions.
+
+=head3 Coercions
+
+=head4 from Str
+
+Named processors. If it contains the substring '::', DataFlow will try to
+create an object of that type. If it does not, then DataFlow will attempt to
+create an object of the type C<< DataFlow::Proc::<STRING> >>. The string 'Proc'
+is reserved for creating an object of the type <DataFlow::Proc>.
+
+=head4 from ArrayRef
+
+Named processor with parameters. The first element of the array must be a
+text string, subject to the rules used in the previous item. The rest of the
+array is passed as-is for the constructor of the object.
+
+=head4 from CodeRef
+
+Code reference, a.k.a. a C<sub>. A processor object will be created:
+
+    DataFlow::Proc->new( p => CODE )
+
+=head4 from DataFlow::Role::Processor
+
+An object that can B<process> something. Objects from both L<DataFlow> and
+L<DataFlow::Proc> classes will consume that role, so will all its descendants.
+If the element is blessed and C<< ->does('DataFlow::Role::Processor') >>, a
+processor object will be created wrapping it:
+
+    DataFlow::Proc->new( p => sub { PROCESSOR->process($_) } )
+
+=head2 ProcessorList
 
 An ArrayRef of L<DataFlow::Proc> objects, with at least one element.
 
@@ -180,57 +211,47 @@ An ArrayRef of L<DataFlow::Proc> objects, with at least one element.
 
 =head4 from ArrayRef
 
-Attempts to make DataFlow::Proc objects out of different things in an ArrayRef.
-Currently it works for:
+Attempts to make DataFlow::Proc objects out of different things provided in
+an ArrayRef. It currently works for:
 
 =begin :list
 
 * Str
-Named processors. If it contains the substring '::', DataFlow will try to
-create an object of that type. If it does not, then DataFlow will attempt to
-create an object of the type C<< DataFlow::Proc::<STRING> >>. The string 'Proc'
-is reserved for creating an object of the type <DataFlow::Proc>.
 * ArrayRef
-Named processor with parameters. The first element of the array must be a
-text string, subject to the rules used in the previous item. The rest of the
-array is passed as parameters for constructing the object.
 * CodeRef
-Code reference, a.k.a. a C<sub>. A processor object will be created:
-
-    DataFlow::Proc->new( p => CODE )
-
-* DataFlow::Proc
-A processor. If the element is blessed and C<< ->isa('DataFlow::Proc') >>, it
-will be used as-is in the resulting ArrayRef.
-* DataFlow
-A dataflow. If the element is blessed and C<< ->isa('DataFlow') >>, a processor
-object will be created wrapping it:
-
-    DataFlow::Proc->new( p => sub { DATAFLOW->process($_) } )
+* DataFlow::Role::Processor
 
 =end :list
 
+using the same rules as in the subtype C<Processor> described above.
 Anything else will trigger an error.
 
 =head4 from Str
 
-An ArrayRef will be created wrapping a named processor.
-The rules used above for Str elements in the ArrayRef apply.
+An ArrayRef will be created wrapping a named processor, as described in the
+coercion section of the C<Processor> subtype above.
 
 =head4 from CodeRef
 
-An ArrayRef will be created wrapping a processor.
-The rules used above for CodeRef elements in the ArrayRef apply.
+An ArrayRef will be created wrapping a processor, as described in the
+coercion section of the C<Processor> subtype above.
 
-=head4 from DataFlow::Proc
+=head4 from DataFlow::Role::Processor
+
+An ArrayRef will be created wrapping the processor, as described in the
+coercion section of the C<Processor> subtype above.
+
+=head2 ProcessorSub
+
+A CodeRef, with coercions.
+
+=head3 Coercions
+
+=head4 from DataFlow::Role::Processor
 
 An ArrayRef will be created wrapping the processor.
-The rules used above for DataFlow::Proc elements in the ArrayRef apply.
-
-=head4 from DataFlow
-
-An ArrayRef will be created wrapping a processor.
-The rules used above for DataFlow elements in the ArrayRef apply.
+The rules used above for DataFlow::Role::Processor elements in the ArrayRef
+apply.
 
 =head2 ConversionDirection
 
