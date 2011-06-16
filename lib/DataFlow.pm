@@ -11,7 +11,7 @@ use Moose;
 with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
-use DataFlow::Types qw(ProcessorChain);
+use DataFlow::Types qw(ProcessorList);
 
 use namespace::autoclean;
 use Queue::Base 2.1;
@@ -39,7 +39,7 @@ has 'auto_process' => (
 
 has 'procs' => (
     'is'       => 'ro',
-    'isa'      => 'ProcessorChain',
+    'isa'      => 'ProcessorList',
     'required' => 1,
     'coerce'   => 1,
 );
