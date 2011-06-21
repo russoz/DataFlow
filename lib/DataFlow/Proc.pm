@@ -17,6 +17,8 @@ use namespace::autoclean;
 use Scalar::Util qw/reftype/;
 use Moose::Util::TypeConstraints 1.01;
 
+with 'MooseX::OneArgNew' => { 'type' => 'CodeRef', 'init_arg' => 'p', };
+
 ################################################################################
 
 has 'name' => (
