@@ -11,8 +11,6 @@ use Moose;
 with 'DataFlow::Role::ProcPolicy';
 
 use namespace::autoclean;
-use Data::Alias;
-use Data::Dumper;
 
 has 'spec' => (
     is       => 'ro',
