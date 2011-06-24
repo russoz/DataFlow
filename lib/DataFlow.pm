@@ -167,7 +167,7 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 SYNOPSIS
 
-use DataFlow;
+	use DataFlow;
 
 	my $flow = DataFlow->new(
 		procs => [

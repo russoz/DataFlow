@@ -68,10 +68,10 @@ sub _is_processor {
 sub _any_to_proc {
     my $elem = shift;
     my $ref  = ref($elem);
-    if ( $ref eq '' ) {    # String?
+    if ( $ref eq '' ) {                # Str?
         return _str_to_proc($elem);
     }
-    elsif ( $ref eq 'ARRAY' ) {
+    elsif ( $ref eq 'ARRAY' ) {        # [ Str, <options> ]
         return _str_to_proc( @{$elem} );
     }
     elsif ( $ref eq 'CODE' ) {
