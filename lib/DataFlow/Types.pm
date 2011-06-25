@@ -143,10 +143,6 @@ coerce 'Encoder' => from 'Str' => via {
     return sub { return encode( $encoding, shift ) };
 };
 
-# subtype for DataFlow::Proc::HTMLFilter ######################
-
-enum 'HTMLFilterTypes', [qw(NODE HTML VALUE)];
-
 1;
 
 =pod
@@ -299,22 +295,6 @@ encoding.
 
 It will automagically create a C<sub> that uses function C<< encode() >> from
 module L<Encode> to encode to a named encoding.
-
-=head2 HTMLFilterTypes
-
-An enumeration used by type L<DataFlow::Proc::HTMLFilter>,
-containing three elements, representing the type of result the HTMLFilter
-object will provide:
-
-=for :list
-* NODE
-Results will be L<HTML::Element> objects
-* HTML
-Results will be HTML content.
-* VALUE
-Results will be literal values
-
-See DataFlow::Proc::HTMLFilter for more information.
 
 =cut
 
