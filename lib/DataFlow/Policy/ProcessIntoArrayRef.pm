@@ -12,17 +12,13 @@ with 'DataFlow::Role::ProcPolicy';
 
 use namespace::autoclean;
 
-has '+handlers' => (
-    'default' => sub {
-        return { 'ARRAY' => \&_handle_array_ref, };
-    },
-);
+sub _build_handlers {
+    return { 'ARRAY' => \&_handle_array_ref, };
+}
 
-has '+default_handler' => (
-    'default' => sub {
-        die q{Must be an array reference!};
-    },
-);
+sub _build_default_handler {
+    return sub { die q{Must be an array reference!} };
+}
 
 __PACKAGE__->meta->make_immutable;
 

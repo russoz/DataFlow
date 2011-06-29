@@ -4,12 +4,12 @@ package Repeat;
 use Moose;
 extends 'DataFlow::Proc';
 has times => ( is => 'ro', isa => 'Int', required => 1 );
-has '+p' => (
-    default => sub {
-        my $self = shift;
-        return sub { $_ x $self->times; };
-    }
-);
+
+sub _build_p {
+    my $self = shift;
+    return sub { $_ x $self->times; };
+}
+
 no Moose;
 
 package main;

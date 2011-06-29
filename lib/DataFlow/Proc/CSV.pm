@@ -66,39 +66,33 @@ sub _parse {
     return [ $self->converter->fields ];
 }
 
-has '+policy' => (
-    'default' => sub {
-        return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
-    },
-);
+sub _policy {
+    return shift->direction eq 'CONVERT_TO' ? 'ArrayRef' : 'Scalar';
+}
 
-has '+converter_subs' => (
-    'lazy'    => 1,
-    'default' => sub {
-        my $self = shift;
-        return {
-            'CONVERT_TO' => sub {
-                my @res = ();
-                if ( $self->header_wanted ) {
-                    $self->header_wanted(0);
-                    push @res, $self->_combine( $self->header );
-                }
+sub _build_subs {
+    my $self = shift;
+    return {
+        'CONVERT_TO' => sub {
+            my @res = ();
+            if ( $self->header_wanted ) {
+                $self->header_wanted(0);
+                push @res, $self->_combine( $self->header );
+            }
 
-                push @res, $self->_combine($_);
-                return @res;
-            },
-            'CONVERT_FROM' => sub {
-                if ( $self->header_wanted ) {
-                    $self->header_wanted(0);
-                    $self->header( $self->_parse($_) );
-                    return;
-                }
-                return $self->_parse($_);
-            },
-        };
-    },
-    'init_arg' => undef,
-);
+            push @res, $self->_combine($_);
+            return @res;
+        },
+        'CONVERT_FROM' => sub {
+            if ( $self->header_wanted ) {
+                $self->header_wanted(0);
+                $self->header( $self->_parse($_) );
+                return;
+            }
+            return $self->_parse($_);
+        },
+    };
+}
 
 __PACKAGE__->meta->make_immutable;
 

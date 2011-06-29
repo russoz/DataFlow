@@ -37,15 +37,13 @@ has 'output_encoder' => (
     'alias' => 'to',
 );
 
-has '+p' => (
-    'default' => sub {
-        my $self = shift;
-        return sub {
-            my $internal = $self->input_decoder->($_);
-            return $self->output_encoder->($internal);
-        };
-    },
-);
+sub _build_p {
+    my $self = shift;
+    return sub {
+        my $internal = $self->input_decoder->($_);
+        return $self->output_encoder->($internal);
+    };
+}
 
 __PACKAGE__->meta->make_immutable;
 

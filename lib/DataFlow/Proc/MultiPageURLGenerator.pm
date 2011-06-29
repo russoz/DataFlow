@@ -61,27 +61,25 @@ has '_paged_url' => (
     'clearer'   => 'clear_paged_url',
 );
 
-has '+p' => (
-    'default' => sub {
-        my $self = shift;
+sub _build_p {
+    my $self = shift;
 
-        return sub {
-            my $url = $_;
+    return sub {
+        my $url = $_;
 
-            $self->_paged_url($url);
+        $self->_paged_url($url);
 
-            my $first = $self->first_page;
-            my $last  = $self->last_page;
-            $first = 1 + $last + $first if $first < 0;
+        my $first = $self->first_page;
+        my $last  = $self->last_page;
+        $first = 1 + $last + $first if $first < 0;
 
-            my @result =
-              map { $self->make_page_url->( $self, $url, $_ ) } $first .. $last;
+        my @result =
+          map { $self->make_page_url->( $self, $url, $_ ) } $first .. $last;
 
-            $self->clear_paged_url;
-            return [@result];
-        };
-    },
-);
+        $self->clear_paged_url;
+        return [@result];
+    };
+}
 
 __PACKAGE__->meta->make_immutable;
 
