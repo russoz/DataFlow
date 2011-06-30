@@ -12,12 +12,11 @@ extends 'DataFlow::Proc';
 
 use namespace::autoclean;
 
-has '+p' => (
-    'default' => sub {
-        sub { }
-    },
-);
+sub _build_p {
+    return sub { }
+}
 
+# avoid all the internal overhead by overriding 'process'
 override 'process' => sub { };
 
 __PACKAGE__->meta->make_immutable;

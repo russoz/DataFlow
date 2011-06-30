@@ -12,6 +12,8 @@ extends 'DataFlow::Proc';
 
 use DataFlow::Types qw(ConversionDirection ConversionSubs);
 
+use namespace::autoclean;
+
 has 'direction' => (
     is       => 'ro',
     isa      => 'ConversionDirection',
@@ -21,7 +23,9 @@ has 'direction' => (
 has 'converter_subs' => (
     is       => 'ro',
     isa      => 'ConversionSubs',
+    lazy     => 1,
     required => 1,
+    builder  => '_build_subs',
 );
 
 has 'converter_opts' => (
@@ -32,13 +36,14 @@ has 'converter_opts' => (
 
 has 'converter' => ( is => 'ro', );
 
-has '+p' => (
-    'lazy'    => 1,
-    'default' => sub {
-        my $self = shift;
-        return $self->converter_subs->{ $self->direction };
-    },
-);
+sub _build_subs {
+    return;
+}
+
+sub _build_p {
+    my $self = shift;
+    return $self->converter_subs->{ $self->direction };
+}
 
 1;
 

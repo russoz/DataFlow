@@ -12,11 +12,9 @@ with 'DataFlow::Role::ProcPolicy';
 
 use namespace::autoclean;
 
-has '+default_handler' => (
-    'default' => sub {
-        sub { }
-    },
-);
+sub _build_default_handler {
+    return sub { };
+}
 
 __PACKAGE__->meta->make_immutable;
 

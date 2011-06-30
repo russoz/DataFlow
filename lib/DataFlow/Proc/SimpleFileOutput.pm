@@ -22,18 +22,16 @@ has 'ors' => (
     'documentation' => 'Output record separator',
 );
 
-has '+p' => (
-    'default' => sub {
-        my $self = shift;
+sub _build_p {
+    my $self = shift;
 
-        return sub {
-            my $fh = $self->file;
-            local $\ = $self->ors if $self->has_ors;
-            print $fh $_;
-            return $_;
-        };
-    },
-);
+    return sub {
+        my $fh = $self->file;
+        local $\ = $self->ors if $self->has_ors;
+        print $fh $_;
+        return $_;
+    };
+}
 
 __PACKAGE__->meta->make_immutable;
 

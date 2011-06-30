@@ -12,12 +12,13 @@ extends 'DataFlow::Proc';
 
 use namespace::autoclean;
 
-has '+policy' => ( 'default' => 'NOP', );
-has '+p' => (
-    'default' => sub {
-        return sub { }
-    }
-);
+sub _policy {
+    return 'NOP';
+}
+
+sub _build_p {
+    return sub { }
+}
 
 __PACKAGE__->meta->make_immutable;
 

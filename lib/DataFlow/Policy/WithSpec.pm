@@ -28,17 +28,13 @@ sub _spec_handle {
     return $item;
 }
 
-has '+handlers' => ( 'default' => sub { return {} }, );
-
-has '+default_handler' => (
-    'default' => sub {
-        my $self = shift;
-        return sub {
-            my ( $p, $item ) = @_;
-            _spec_handle( $self->spec, $p, $item );
-        };
-    },
-);
+sub _build_default_handler {
+    my $self = shift;
+    return sub {
+        my ( $p, $item ) = @_;
+        _spec_handle( $self->spec, $p, $item );
+    };
+}
 
 __PACKAGE__->meta->make_immutable;
 
