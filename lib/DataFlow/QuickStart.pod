@@ -1,0 +1,170 @@
+package DataFlow::QuickStart;
+
+# ABSTRACT: DataFlow Quick Start Guide
+
+1;
+
+__END__
+
+=pod
+
+=head1 DataFlow Quick Start Guide
+
+A guide for quick jumping into the DataFlow bandwagon, programming-wise. That
+means that, despite our long term goals of making a framework that can be used
+by non-programmers, we are still living within the sphere of those who can
+code. Code Perl, as of now.
+
+For the purpose of this guide, we are going to distinguish among three
+different types of uses, for people who want to:
+
+=for :list
+* Use DataFlow to achieve something in a different project
+* Improve DataFlow by adding/improving processors that allow for more sophisticated data manipulation
+* Improve DataFlow by adding/improving features in the core components
+
+DataFlow is built upon L<Moose> and it follows the rules of that system.
+
+If you are really serious about submitting code to DataFlow, please read the
+section called "Joining the DataFlow effort" below.
+
+=head2 Using DataFlow
+
+This is covered in the POD documentation elsewhere, so here we present
+just a summary.
+
+=head3 Proc
+
+A L<DataFlow::Proc> is the basic processing unit of DataFlow. It runs the
+closure pointed to by the C<p> parameter with C<$_> localized to the data
+that has to be processed.
+
+One can create a simple Proc (short for Processor) that converts a string to
+uppercase like this:
+
+    $proc = DataFlow::Proc( p => sub { uc } );
+    $result = $proc->process( 'Abracadabra' );
+    # $result is 'ABRACADABRA'
+
+Since the builtin function C<uc> uses C<$_> if an argument is omitted, there
+is no need to explicitly handle parameters, and the result of the Proc is the
+result of the "sub".
+
+One may want to design a Proc where the C<p> sub is applied in only on data
+that conforms to a certain structure, say "only arrays, and leave the scalars
+alone" or "scalars only, throw an error if anything else comes our way". For
+that refer to the L<DataFlow::Role::ProcPolicy> role.
+
+=head3 DataFlow
+
+A L<DataFlow> is a sequence of Procs, arranged so that each Proc's output is
+fed into the next Proc's input. Sort of like a sequence of commands in a
+shell using pipes "|" to connect one command to the next one.
+
+A simple example of a DataFlow could be:
+
+    $flow = DataFlow->new( [
+        'URLRetriever',          # DataFlow::Proc::URLRetriever
+        [                        # DataFlow::Proc::HTMLFilter with param
+          HTMLFilter => { search_xpath => '//table//tr' }
+        ],
+        [                        # DataFlow::Proc::HTMLFilter with params
+          HTMLFilter => {
+              search_xpath => '//td',
+              result_type  => 'VALUE',
+              ref_result   => 1,
+          }
+        ],
+        sub { s/^\s+//; s/\s+$//; return $_ },  # trim leading/trailing spaces
+        CSV => { direction => 'CONVERT_TO', }
+    ] );
+
+Given an URL, this simple dataflow will retrieve its contents (assuming HTML),
+will parse all the tables in it (specific tables or data i nthe HTML can be
+singled-out using proper XPath expressions for them), it will trim the white
+spaces and produce a CSV output, which can be used in a spreadsheet or to
+load a database.
+
+=head2 Creating Processors and/or Flows
+
+To create a new Proc, one must extend L<DataFlow::Proc>.
+When doing that, do refer to Moose best practices.
+One simple example, the file C<< lib/DataFlow/Proc/UC.pm >> contained in this
+distribution, is approximately like this:
+
+    package DataFlow::Proc::UC;
+    
+    use Moose;
+    extends 'DataFlow::Proc';
+    
+    sub _build_p {
+        my $self = shift;  # not using here, but we do have $self
+        return sub { uc };
+    }
+    
+    1;
+
+Any Proc under the C<DataFlow::Proc::> namespace can be used in a DataFlow by
+its last name, in this case C<UC>.
+
+    $flow = DataFlow->new( [
+        # ... something here
+        'UC',
+        # ... something else
+    ] );
+    my @output = $flow->process( @input );
+
+More sophisticated Procs can also be constructed. Tkae a look at the source
+code of L<DataFLow::Proc::HTMLFilter>, L<DataFlow::Proc::URLRetriever> or
+L<DataFlow::Proc::Converter>.
+
+=head2 Tweaking the Core
+
+DataFlow is not a very sophisticated piece of software on its own, as much
+as a Bourne shell of the 70's was not very sophisticated, 
+but B<it allows and promotes> extending its functionalities to make for 
+sophisticated solutions.
+
+=head3 A DataFlow
+
+A DataFlow is nothing more than queues and processors:
+
+    Information Flow
+
+    ||===>||====>||==  ...  =>||========>||====>||      |
+                                                        |
+                     Queues                             |
+                                                        |
+    Q0    Q1    Q2          Q(n-1)       Qn    Qlast    | => output
+      \  /  \  /  \    ...        \      /  \  /        |
+       P0    P1    P2              P(n-1)    Pn         |
+                                                        |
+                   Processors                           |
+
+Upon calling C<input()>, one adds elements to the B<Q0> queue. When C<output()>
+is called, then the entire flow is run to provide one single element (read
+scalar) at the C<output()> (actually, if C<output()> is called in array context
+it returns all the elements available in B<Qlast> at the time).
+
+When running data through the entire flow, these elements are run, through
+B<P0> and the results (one or many) are enqueued in B<Q1>. One element from
+B<Q1> is then run through  B<P1> and the result (or results) is enqueued into
+B<Q2>, and so forth. Upon running the last processor, B<Pn>, the resulting
+data is put into B<Qlast>, the last queue in the desert.
+
+=head2 Code Repository
+
+DataFlow source code is hosted at the superb L<Github|http://github.com/>
+service, at the address L<http://github.com/russoz/DataFlow>.
+
+Additionally, we strongly recommend that any serious project using Git do take
+a look at gitflow: the
+L<methodology|http://nvie.com/posts/a-successful-git-branching-model/> and the
+L<git flow extension to git|https://github.com/nvie/gitflow>.
+
+DataFlow has been using gitflow for a good while now, but please bear in mind
+that you do not need to have gitflow installed, or even to follow the
+methodology for that matter, to be able to provide a patch or open a pull
+request.
+
+=cut

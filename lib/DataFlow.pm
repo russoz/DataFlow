@@ -42,6 +42,7 @@ has 'procs' => (
     'isa'      => 'ProcessorList',
     'required' => 1,
     'coerce'   => 1,
+    'builder'  => '_build_procs',
 );
 
 has '_queues' => (
@@ -81,6 +82,10 @@ has 'dump_output' => (
     'default'       => 0,
     'documentation' => 'Prints a dump of the output load to STDERR',
 );
+
+sub _build_procs {
+    return;
+}
 
 # functions
 sub _count_queued_items {
