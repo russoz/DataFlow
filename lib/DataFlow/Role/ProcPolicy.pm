@@ -104,7 +104,7 @@ sub _handle_code_ref {
 
 =head2 apply P ITEM
 
-Applies the policy using function P and input data ITEM.
+Applies this policy to the data ITEM using function P.
 
 =cut
 
