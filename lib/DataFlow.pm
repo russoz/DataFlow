@@ -24,12 +24,6 @@ with 'MooseX::OneArgNew' =>
   { 'type' => 'DataFlow::Proc', 'init_arg' => 'procs', };
 
 # attributes
-has 'name' => (
-    'is'        => 'ro',
-    'isa'       => 'Str',
-    'predicate' => 'has_name',
-);
-
 has 'auto_process' => (
     'is'      => 'ro',
     'isa'     => 'Bool',
@@ -164,6 +158,16 @@ sub process {
     return $flow->flush;
 }
 
+sub proc_by_index {
+    my ( $self, $index ) = @_;
+    return $self->procs->[$index];
+}
+
+sub proc_by_name {
+    my ( $self, $name ) = @_;
+    return ( grep { $_->name eq $name } @{ $self->procs } )[0];
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -197,8 +201,8 @@ use DataFlow;
 	my $output = $flow->output( <some other input> );
 
 	# other ways to invoke the constructor
-	my $flow = DataFlow( sub { .. do something } );   # pass a sub
-	my $flow = DataFlow( [                            # pass an array
+	my $flow = DataFlow->new( sub { .. do something } );   # pass a sub
+	my $flow = DataFlow->new( [                            # pass an array
 		sub { ... do this },
 		'UC',
 		[
@@ -208,7 +212,7 @@ use DataFlow;
 		  )
 		]
 	] );
-	my $flow = DataFlow( $another_flow );   # pass another DataFlow or Proc
+	my $flow = DataFlow->new( $another_flow ); # pass another DataFlow or Proc
 
 	# other way to pass the data through
 	my $output = $flow->process( qw/long list of data/ );
@@ -231,9 +235,9 @@ attempt to automatically process queued data. (DEFAULT: true)
 
 =attr procs
 
-(ArrayRef[DataFlow::Proc]) The list of processors that make this DataFlow.
-Optionally, you may pass CodeRefs that will be automatically converted to
-L<DataFlow::Proc> objects. (REQUIRED)
+(ArrayRef[DataFlow::Role::Processor]) The list of processors that make this
+DataFlow. Optionally, you may pass CodeRefs that will be automatically
+converted to L<DataFlow::Proc> objects. (REQUIRED)
 
 The C<procs> parameter will accept some variations in its value. Any
 C<ArrayRef> passed will be parsed, and additionaly to plain
@@ -297,6 +301,17 @@ Flushes all the data through the dataflow, and returns the complete result set.
 
 Immediately processes a bunch of data, without touching the object queues. It
 will process all the provided data and return the complete result set for it.
+
+=method proc_by_index
+
+Expects an index (Num) as parameter. Returns the index-th processor in this
+data flow, or C<undef> otherwise.
+
+=method proc_by_name
+
+Expects a name (Str) as parameter. Returns the first processor in this
+data flow, for which the C<name> attribute has the same value of the C<name>
+parameter, or C<undef> otherwise.
 
 =head1 HISTORY
 

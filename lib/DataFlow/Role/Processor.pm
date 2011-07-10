@@ -9,6 +9,12 @@ use warnings;
 
 use Moose::Role;
 
+has 'name' => (
+    'is'        => 'ro',
+    'isa'       => 'Str',
+    'predicate' => 'has_name',
+);
+
 requires 'process';
 
 1;
