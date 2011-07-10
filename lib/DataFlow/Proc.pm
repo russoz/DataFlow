@@ -21,12 +21,6 @@ with 'MooseX::OneArgNew' => { 'type' => 'CodeRef', 'init_arg' => 'p', };
 
 ################################################################################
 
-has 'name' => (
-    'is'        => 'ro',
-    'isa'       => 'Str',
-    'predicate' => 'has_name',
-);
-
 has 'allows_undef_input' => (
     'is'      => 'ro',
     'isa'     => 'Bool',
