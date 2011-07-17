@@ -6,6 +6,10 @@ _tidy() {
     [ -e "$file" ] || return 1
     find $file \
         \( -name '*.pm' -o -name '*.pl' -o -name '*.t' \) \
+        -exec perl -i -ple 's/\s+$//' {} \;
+
+    find $file \
+        \( -name '*.pm' -o -name '*.pl' -o -name '*.t' \) \
         -print -exec perltidy -b {} \; \
       | xargs -n 1 echo 'TIDY:'
 
