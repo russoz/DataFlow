@@ -20,22 +20,26 @@ has 'input_decoder' => (
     'isa'     => 'Decoder',
     'coerce'  => 1,
     'lazy'    => 1,
-    'default' => sub {
-        sub { $_[0] }
-    },
-    'alias' => 'from',
+    'builder' => '_build_encoder',
+    'alias'   => 'from',
 );
+
+sub _build_encoder {
+    return sub { $_[0] }
+}
 
 has 'output_encoder' => (
     'is'      => 'ro',
     'isa'     => 'Encoder',
     'coerce'  => 1,
     'lazy'    => 1,
-    'default' => sub {
-        sub { $_[0] }
-    },
-    'alias' => 'to',
+    'builder' => '_build_decoder',
+    'alias'   => 'to',
 );
+
+sub _build_decoder {
+    return sub { $_[0] }
+}
 
 sub _build_p {
     my $self = shift;

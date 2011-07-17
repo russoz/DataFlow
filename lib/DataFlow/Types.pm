@@ -26,19 +26,29 @@ use Moose::Util::TypeConstraints 1.01;
 use Scalar::Util qw/blessed/;
 use Encode;
 
+sub _is_loaded {
+    my $class = shift;
+    eval { $class->meta };
+    return 0 if $@;
+    return 1;
+}
+
 sub _load_class {
     my $name = shift;
     return q{DataFlow::Proc} if $name eq 'Proc';
 
     if ( $name =~ m/::/ ) {
+        return $name if _is_loaded($name);
         eval "use $name";    ## no critic
         return $name unless $@;
     }
 
     my $class = "DataFlow::Proc::$name";
+    return $class if _is_loaded($class);
     eval "use $class";       ## no critic
     return $class unless $@;
 
+    return $name if _is_loaded($name);
     eval "use $name";        ## no critic
     return $name unless $@;
     die qq{Cannot load class from '$name'};
