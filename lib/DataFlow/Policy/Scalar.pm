@@ -13,7 +13,6 @@ with 'DataFlow::Role::ProcPolicy';
 use namespace::autoclean;
 
 sub _build_handlers {
-    my $self         = shift;
     my $type_handler = {
         'SCALAR' => \&_nop_handle,
         'ARRAY'  => \&_nop_handle,
