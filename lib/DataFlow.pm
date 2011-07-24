@@ -8,6 +8,7 @@ use warnings;
 # VERSION
 
 use Moose;
+use Moose::Exporter;
 with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
@@ -22,6 +23,8 @@ with 'MooseX::OneArgNew' => { 'type' => 'CodeRef',  'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' => { 'type' => 'DataFlow', 'init_arg' => 'procs', };
 with 'MooseX::OneArgNew' =>
   { 'type' => 'DataFlow::Proc', 'init_arg' => 'procs', };
+
+Moose::Exporter->setup_import_methods( as_is => ['dataflow'] );
 
 # attributes
 has 'auto_process' => (
@@ -166,6 +169,15 @@ sub proc_by_index {
 sub proc_by_name {
     my ( $self, $name ) = @_;
     return ( grep { $_->name eq $name } @{ $self->procs } )[0];
+}
+
+sub dataflow (@) {    ## no critic
+    #my $args = shift;
+	#use Data::Printer colored => 0; p $args;
+    #return __PACKAGE__->new($args);
+    my @args = @_;
+	#use Data::Printer colored => 0; p @args;
+    return __PACKAGE__->new(procs => [@args]);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -313,9 +325,22 @@ Expects a name (Str) as parameter. Returns the first processor in this
 data flow, for which the C<name> attribute has the same value of the C<name>
 parameter, or C<undef> otherwise.
 
+=func dataflow
+
+Syntax sugar function that can be used to instantiate a new flow. It can be
+used like this:
+
+	my $flow = dataflow
+		[ 'Proc' => p => sub { ... } ],
+		...
+		[ 'CSV' => direction => 'CONVERT_TO' ];
+
+	$flow->process('bananas');
+
+
 =head1 HISTORY
 
-This is a framework for data flow processing. It started as a spinoff project
+This is a framework for data flow processing. It started as a spin-off project
 from the L<OpenData-BR|http://www.opendatabr.org/> initiative.
 
 As of now (Mar, 2011) it is still a 'work in progress', and there is a lot of

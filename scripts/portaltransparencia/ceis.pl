@@ -49,10 +49,8 @@ package main;
 use DataFlow;
 
 use Encode;
-use Data::Dumper;
 
-my $flow = DataFlow->new(
-    [
+my $flow = dataflow (
         CeisPages->new( first_page => -5, deref => 1 ),
         'URLRetriever',
         [
@@ -95,8 +93,7 @@ my $flow = DataFlow->new(
                 dump_output => 1,
             }
         ],
-        [ SimpleFileOutput => { file => '> /tmp/ceis.csv', ors => "\n" } ],
-    ],
+        [ SimpleFileOutput => { file => '> /tmp/ceis.csv', ors => "\n" } ]
 );
 
 ##############################################################################
@@ -108,5 +105,6 @@ $flow->input($base);
 
 my @res = $flow->flush;
 
+#use Data::Dumper;
 #print Dumper(\@res);
 
