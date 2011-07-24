@@ -2,7 +2,7 @@ use Test::More tests => 10;
 
 use DataFlow;
 
-$f = DataFlow->new(
+my $f = DataFlow->new(
     [ sub { uc }, sub { scalar reverse }, sub { lc }, sub { scalar reverse }, ]
 );
 ok($f);
