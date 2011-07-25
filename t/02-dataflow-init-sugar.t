@@ -35,7 +35,7 @@ test_uc_with('UC');
 
 # each call = 2 tests
 sub test_ucf_with {
-    my $flow = dataflow  @_;
+    my $flow = dataflow @_;
     ok( $flow, q{test_ucf_wth(} . join( q{,}, @_ ) . q{)} );
     my @res = $flow->process('abcdef');
     is( $res[0], 'Abcdef' );
@@ -45,5 +45,5 @@ my $ucfirst = sub { ucfirst };
 my @mix = ( $nested, $flow, $proc, 'UC', sub { lc }, $ucfirst );
 
 # mix
-test_ucf_with( @mix );
+test_ucf_with(@mix);
 
