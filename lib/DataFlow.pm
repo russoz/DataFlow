@@ -172,11 +172,7 @@ sub proc_by_name {
 }
 
 sub dataflow (@) {    ## no critic
-    #my $args = shift;
-	#use Data::Printer colored => 0; p $args;
-    #return __PACKAGE__->new($args);
     my @args = @_;
-	#use Data::Printer colored => 0; p @args;
     return __PACKAGE__->new(procs => [@args]);
 }
 
