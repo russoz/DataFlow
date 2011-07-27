@@ -237,14 +237,14 @@ processor object will be created wrapping it:
 
 =head2 ProcessorList
 
-An ArrayRef of L<DataFlow::Proc> objects, with at least one element.
+An ArrayRef of L<DataFlow::Role::Processor> objects, with at least one element.
 
 =head3 Coercions
 
 =head4 from ArrayRef
 
-Attempts to make DataFlow::Proc objects out of different things provided in
-an ArrayRef. It currently works for:
+Attempts to make C<DataFlow::Role::Processor> objects out of different things
+provided in an ArrayRef. It currently works for:
 
 =begin :list
 
@@ -272,6 +272,48 @@ coercion section of the C<Processor> subtype above.
 
 An ArrayRef will be created wrapping the processor, as described in the
 coercion section of the C<Processor> subtype above.
+
+=head2 WrappedProcList
+
+An ArrayRef of L<DataFlow::ProcWrapper> objects, with at least one element.
+
+=head3 Coercions
+
+=head4 from ArrayRef
+
+Attempts to make C<DataFlow::ProcWrapper> objects out of different things
+provided in an ArrayRef. It currently works for:
+
+=begin :list
+
+* Str
+* ArrayRef
+* CodeRef
+* DataFlow::Role::Processor
+
+=end :list
+
+using the same rules as in the subtype C<Processor> described above and
+wrapping the resulting C<Processor> in a C<DataFlow::ProcWrapper> object.
+Anything else will trigger an error.
+
+=head4 from Str
+
+An ArrayRef will be created wrapping a named processor, as described in the
+coercion section of the C<Processor> subtype above and
+wrapping the resulting C<Processor> in a C<DataFlow::ProcWrapper> object.
+
+=head4 from CodeRef
+
+An ArrayRef will be created wrapping a processor, as described in the
+coercion section of the C<Processor> subtype above and
+wrapping the resulting C<Processor> in a C<DataFlow::ProcWrapper> object.
+
+=head4 from DataFlow::Role::Processor
+
+An ArrayRef will be created wrapping the processor, as described in the
+coercion section of the C<Processor> subtype above and
+wrapping the resulting C<Processor> in a C<DataFlow::ProcWrapper> object.
 
 =head2 ProcessorSub
 
