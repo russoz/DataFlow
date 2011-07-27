@@ -12,7 +12,7 @@ use Moose::Exporter;
 with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
-use DataFlow::Types qw(ProcessorList);
+use DataFlow::Types qw(WrappedProcList);
 
 use namespace::autoclean;
 use Queue::Base 2.1;
@@ -36,7 +36,7 @@ has 'auto_process' => (
 
 has 'procs' => (
     'is'       => 'ro',
-    'isa'      => 'ProcessorList',
+    'isa'      => 'WrappedProcList',
     'required' => 1,
     'coerce'   => 1,
     'builder'  => '_build_procs',
@@ -120,7 +120,8 @@ sub input {
     $self->prefix_dumper( $self->has_name ? $self->name . ' <<' : '<<', @args )
       if $self->dump_input;
 
-    $self->_firstq->add(@args);
+    $self->_firstq->add( map { DataFlow::Item->itemize( 'default', $_ ) }
+          @args );
     return;
 }
 
@@ -131,6 +132,11 @@ sub process_input {
     return;
 }
 
+sub _unitem {
+    my $item = shift;
+    return $item->get_data('default');
+}
+
 sub output {
     my $self = shift;
 
@@ -138,7 +144,7 @@ sub output {
     my @res = wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>', @res )
       if $self->dump_output;
-    return wantarray ? @res : $res[0];
+    return wantarray ? map { _unitem($_) } @res : _unitem( $res[0] );
 }
 
 sub reset {    ## no critic
@@ -163,12 +169,15 @@ sub process {
 
 sub proc_by_index {
     my ( $self, $index ) = @_;
-    return $self->procs->[$index];
+    return unless $self->procs->[$index];
+    return $self->procs->[$index]->on_proc;
 }
 
 sub proc_by_name {
     my ( $self, $name ) = @_;
-    return ( grep { $_->name eq $name } @{ $self->procs } )[0];
+    my @procs = grep { $_->name eq $name }
+          ( map { $_->on_proc } @{ $self->procs } );
+	return $procs[0];
 }
 
 sub dataflow (@) {    ## no critic

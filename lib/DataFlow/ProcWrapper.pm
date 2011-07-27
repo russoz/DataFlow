@@ -29,7 +29,7 @@ has 'output_chan' => (
     default => sub { shift->input_chan },
 );
 
-has '_on_proc' => (
+has 'on_proc' => (
     is       => 'ro',
     isa      => 'Processor',
     required => 1,
@@ -45,20 +45,20 @@ sub _itemize_response {
 }
 
 sub process {
-    my ( $self, $item, $is_raw ) = @_;
+    my ( $self, $item ) = @_;
 
-    if ($is_raw) {
+    if ( ref($item) eq 'DataFlow::Item' ) {
+        my $data = $item->get_data( $self->input_chan );
+        return ($item) unless $data;
+        return $self->_itemize_response( $item,
+            $self->on_proc->process($data) );
+    }
+    else {
         my $data       = $item;
         my $empty_item = DataFlow::Item->new();
         return ($empty_item) unless $data;
         return $self->_itemize_response( $empty_item,
-            $self->_on_proc->process($data) );
-    }
-    else {
-        my $data = $item->get_data( $self->input_chan );
-        return ($item) unless $data;
-        return $self->_itemize_response( $item,
-            $self->_on_proc->process($data) );
+            $self->on_proc->process($data) );
     }
 }
 

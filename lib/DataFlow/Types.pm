@@ -8,7 +8,7 @@ use warnings;
 # VERSION
 
 use MooseX::Types -declare => [
-    qw(Processor ProcessorList ProcessorSub ProcPolicy),
+    qw(Processor ProcessorList WrappedProcList ProcessorSub ProcPolicy),
     qw(ConversionSubs ConversionDirection),
     qw(Encoder Decoder),
     qw(HTMLFilterTypes),
@@ -19,6 +19,7 @@ use namespace::autoclean;
 use MooseX::Types::Moose qw/Str CodeRef ArrayRef HashRef/;
 class_type 'DataFlow';
 class_type 'DataFlow::Proc';
+class_type 'DataFlow::ProcWrapper';
 role_type 'DataFlow::Role::Processor';
 role_type 'DataFlow::Role::ProcPolicy';
 
@@ -91,6 +92,13 @@ sub _any_to_proc {
     return $elem;
 }
 
+sub _wrap_proc {
+    my $proc = shift;
+    return $proc if ref($proc) eq 'DataFlow::ProcWrapper';
+    eval 'use DataFlow::ProcWrapper';    ## no critic
+    return DataFlow::ProcWrapper->new( wraps => $proc );
+}
+
 # subtypes CORE
 
 subtype 'Processor' => as 'DataFlow::Role::Processor';
@@ -109,6 +117,20 @@ coerce 'ProcessorList' => from 'ArrayRef' => via {
   from
   'CodeRef'                        => via { [ _any_to_proc($_) ] },
   from 'DataFlow::Role::Processor' => via { [$_] };
+
+subtype 'WrappedProcList' => as 'ArrayRef[DataFlow::ProcWrapper]' =>
+  where { scalar @{$_} > 0 } =>
+  message { 'DataFlow must have at least one processor' };
+coerce 'WrappedProcList' => from 'ArrayRef' => via {
+    my @list = @{$_};
+    my @res = map { _wrap_proc( _any_to_proc($_) ) } @list;
+    return [@res];
+},
+  from
+  'Str' => via { [ _wrap_proc( _str_to_proc($_) ) ] },
+  from
+  'CodeRef' => via { [ _wrap_proc( _any_to_proc($_) ) ] },
+  from 'DataFlow::Role::Processor' => via { [ _wrap_proc($_) ] };
 
 subtype 'ProcessorSub' => as 'CodeRef';
 coerce 'ProcessorSub' => from 'DataFlow::Role::Processor' => via {
@@ -132,6 +154,10 @@ sub _make_policy {
 # subtypes for DataFlow::Proc::Converter ######################
 
 enum 'ConversionDirection' => [ 'CONVERT_TO', 'CONVERT_FROM' ];
+coerce 'ConversionDirection' => from 'Str' => via {
+    return 'CONVERT_TO'   if m/to_/i;
+    return 'CONVERT_FROM' if m/from_/i;
+};
 
 subtype 'ConversionSubs' => as 'HashRef[CodeRef]' => where {
     scalar( keys %{$_} ) == 2
