@@ -173,7 +173,7 @@ sub proc_by_name {
 
 sub dataflow (@) {    ## no critic
     my @args = @_;
-    return __PACKAGE__->new(procs => [@args]);
+    return __PACKAGE__->new( procs => [@args] );
 }
 
 __PACKAGE__->meta->make_immutable;
