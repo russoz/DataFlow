@@ -35,22 +35,6 @@ has 'deref' => (
     'default' => 0,
 );
 
-has 'dump_input' => (
-    'is'            => 'ro',
-    'isa'           => 'Bool',
-    'lazy'          => 1,
-    'default'       => 0,
-    'documentation' => 'Prints a dump of the input load to STDERR',
-);
-
-has 'dump_output' => (
-    'is'            => 'ro',
-    'isa'           => 'Bool',
-    'lazy'          => 1,
-    'default'       => 0,
-    'documentation' => 'Prints a dump of the output load to STDERR',
-);
-
 has 'policy' => (
     'is'      => 'ro',
     'isa'     => 'ProcPolicy',
