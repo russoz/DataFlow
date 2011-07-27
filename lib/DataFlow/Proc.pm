@@ -11,6 +11,7 @@ use Moose;
 with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
+use Moose::Autobox;
 use DataFlow::Types qw(ProcessorSub ProcPolicy);
 
 use namespace::autoclean;
@@ -86,7 +87,7 @@ sub process {
 
     my @result =
       $self->deref
-      ? map { _deref($_) } ( $self->_process_one($item) )
+      ? @{ [$self->_process_one($item)]->map( sub { _deref($_) } ) }
       : $self->_process_one($item);
 
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>',

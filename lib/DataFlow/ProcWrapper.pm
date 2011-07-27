@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 with 'DataFlow::Role::Processor';
 
+use Moose::Autobox;
 use namespace::autoclean;
 
 use DataFlow::Item;
@@ -41,7 +42,7 @@ sub _itemize_response {
     my ( $self, $input_item, @response ) = @_;
     return ($input_item) unless @response;
     return
-      map { $input_item->clone->set_data( $self->output_chan, $_ ) } @response;
+      @{ @response->map( sub { $input_item->clone->set_data( $self->output_chan, $_ ) } ) };
 }
 
 sub process {

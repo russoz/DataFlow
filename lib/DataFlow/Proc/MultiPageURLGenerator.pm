@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+use Moose::Autobox;
 use namespace::autoclean;
 use Carp;
 
@@ -73,11 +74,11 @@ sub _build_p {
         my $last  = $self->last_page;
         $first = 1 + $last + $first if $first < 0;
 
-        my @result =
-          map { $self->make_page_url->( $self, $url, $_ ) } $first .. $last;
+        my $result =
+		  [$first .. $last]->map( sub { $self->make_page_url->( $self, $url, $_ ) } );
 
         $self->clear_paged_url;
-        return [@result];
+        return $result;
     };
 }
 

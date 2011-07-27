@@ -58,9 +58,9 @@ sub itemize {    ## no critic
 
 sub clone {
     my $self = shift;
-    my %c    = %{ $self->channels };
+    my @c    = %{ $self->channels };
     return __PACKAGE__->new( metadata => $self->metadata )
-      ->channels( { map { ( $_, $c{$_} ) } keys %c } );
+      ->channels( { @c } );
 }
 
 sub narrow {

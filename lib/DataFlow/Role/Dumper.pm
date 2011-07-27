@@ -8,6 +8,7 @@ use warnings;
 # VERSION
 
 use Moose::Role;
+use Moose::Autobox;
 
 has '_dumper' => (
     'is'      => 'ro',
@@ -17,7 +18,7 @@ has '_dumper' => (
         use Data::Dumper;
         return sub {
             $Data::Dumper::Terse = 1;
-            return join qq{\n}, map { Dumper($_) } @_;
+			return @_->map( sub { Dumper($_) } )->join( qq{\n} );
         };
     },
     'handles' => {

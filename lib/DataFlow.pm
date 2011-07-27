@@ -14,6 +14,8 @@ with 'DataFlow::Role::Dumper';
 
 use DataFlow::Types qw(WrappedProcList);
 
+use Moose::Autobox;
+
 use namespace::autoclean;
 use Queue::Base 2.1;
 
@@ -59,7 +61,7 @@ has '_queues' => (
         'has_queued_data' =>
           sub { return _count_queued_items( shift->_queues ) },
         '_make_queues' => sub {
-            return [ map { Queue::Base->new() } @{ shift->procs } ];
+            shift->procs->map( sub { Queue::Base->new() } );
         },
     },
 );
@@ -82,7 +84,7 @@ sub _count_queued_items {
     my $q     = shift;
     my $count = 0;
 
-    map { $count = $count + $_->size } @{$q};
+    $q->map( sub { $count = $count + $_->size } );
 
     return $count;
 }
@@ -98,7 +100,8 @@ sub _process_queues {
 
 sub _reduce {
     my ( $p, @q ) = @_;
-    map { _process_queues( $p->[$_], $q[$_], $q[ $_ + 1 ] ) } ( 0 .. $#q - 1 );
+    [ 0 .. $#q - 1 ]
+    ->map( sub { _process_queues( $p->[$_], $q[$_], $q[ $_ + 1 ] ) } );
     return;
 }
 
@@ -113,8 +116,8 @@ sub channel_input {
     $self->prefix_dumper( $self->has_name ? $self->name . ' <<' : '<<', @args )
       if $self->dump_input;
 
-    $self->_firstq->add( map { DataFlow::Item->itemize( $channel, $_ ) }
-          @args );
+    $self->_firstq->add(
+        @{ @args->map( sub { DataFlow::Item->itemize( $channel, $_ ) } ) } );
     return;
 }
 
@@ -159,12 +162,12 @@ sub output {
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>', @res )
       if $self->dump_output;
     return wantarray
-      ? map { _unitem( $_, $channel ) } @res
+      ? @{ @res->map( sub { _unitem( $_, $channel ) } ) }
       : _unitem( $res[0], $channel );
 }
 
 sub reset {    ## no critic
-    return map { $_->clear } @{ shift->_queues };
+    return shift->_queues->map( sub { $_->clear } );
 }
 
 sub flush {
@@ -191,9 +194,10 @@ sub proc_by_index {
 
 sub proc_by_name {
     my ( $self, $name ) = @_;
-    my @procs =
-      grep { $_->name eq $name } ( map { $_->on_proc } @{ $self->procs } );
-    return $procs[0];
+    return $self->procs->map( sub { $_->on_proc } )
+      ->grep( sub { $_->name eq $name } )->[0];
+
+    #return $procs[0];
 }
 
 sub dataflow (@) {    ## no critic
