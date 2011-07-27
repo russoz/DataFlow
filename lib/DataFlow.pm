@@ -27,6 +27,13 @@ with 'MooseX::OneArgNew' =>
 Moose::Exporter->setup_import_methods( as_is => ['dataflow'] );
 
 # attributes
+has 'default_channel' => (
+    'is'      => 'ro',
+    'isa'     => 'Str',
+    'lazy'    => 1,
+    'default' => 'default',
+);
+
 has 'auto_process' => (
     'is'      => 'ro',
     'isa'     => 'Bool',
@@ -115,13 +122,19 @@ sub clone {
     return DataFlow->new( procs => $self->procs );
 }
 
-sub input {
-    my ( $self, @args ) = @_;
+sub channel_input {
+    my ( $self, $channel, @args ) = @_;
     $self->prefix_dumper( $self->has_name ? $self->name . ' <<' : '<<', @args )
       if $self->dump_input;
 
-    $self->_firstq->add( map { DataFlow::Item->itemize( 'default', $_ ) }
+    $self->_firstq->add( map { DataFlow::Item->itemize( $channel, $_ ) }
           @args );
+    return;
+}
+
+sub input {
+    my ( $self, @args ) = @_;
+    $self->channel_input( $self->default_channel, @args );
     return;
 }
 
@@ -133,18 +146,35 @@ sub process_input {
 }
 
 sub _unitem {
-    my $item = shift;
-    return $item->get_data('default');
+    my ( $item, $channel ) = @_;
+    return $item->get_data($channel);
+}
+
+sub _output_items {
+    my $self = shift;
+    $self->process_input if ( $self->_lastq->empty && $self->auto_process );
+    my @res = wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
+    return wantarray ? @res : $res[0];
+}
+
+sub output_items {
+    my $self = shift;
+    my @res = wantarray ? $self->_output_items : scalar $self->_output_items;
+    $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>', @res )
+      if $self->dump_output;
+    return wantarray ? @res : $res[0];
 }
 
 sub output {
     my $self = shift;
+    my $channel = shift || $self->default_channel;
 
-    $self->process_input if ( $self->_lastq->empty && $self->auto_process );
-    my @res = wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
+    my @res = wantarray ? $self->_output_items : scalar $self->_output_items;
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>', @res )
       if $self->dump_output;
-    return wantarray ? map { _unitem($_) } @res : _unitem( $res[0] );
+    return wantarray
+      ? map { _unitem( $_, $channel ) } @res
+      : _unitem( $res[0], $channel );
 }
 
 sub reset {    ## no critic
@@ -175,9 +205,9 @@ sub proc_by_index {
 
 sub proc_by_name {
     my ( $self, $name ) = @_;
-    my @procs = grep { $_->name eq $name }
-          ( map { $_->on_proc } @{ $self->procs } );
-	return $procs[0];
+    my @procs =
+      grep { $_->name eq $name } ( map { $_->on_proc } @{ $self->procs } );
+    return $procs[0];
 }
 
 sub dataflow (@) {    ## no critic
@@ -244,6 +274,10 @@ caller.
 
 (Str) A descriptive name for the dataflow. (OPTIONAL)
 
+=attr default_channel
+
+(Str) The name of the default communication channel. (DEFAULT: 'default')
+
 =attr auto_process
 
 (Bool) If there is data available in the output queue, and one calls the
@@ -294,17 +328,32 @@ Processors using the L<DataFlow::Policy::ProcessInto> policy (default) will
 process the items inside an array reference, and the values (not the keys)
 inside a hash reference.
 
+=method channel_input
+
+Accepts input data into a specific channel for the data flow:
+
+	$flow->channel_input( 'mydatachannel', qw/all the simple things/ );
+
 =method process_input
 
 Processes items in the array of queues and place at least one item in the
 output (last) queue. One will typically call this to flush out some unwanted
 data and/or if C<auto_process> has been disabled.
 
+=method output_items
+
+Fetches items, more specifically objects of the type L<DataFlow::Item>, from
+the data flow. If called in scalar context it will return one processed item
+from the flow. If called in list context it will return all the items from
+the last queue.
+
 =method output
 
-Fetches data from the data flow. If called in scalar context it will return
-one processed item from the flow. If called in list context it will return all
-the elements in the last queue.
+Fetches data from the data flow. It accepts a parameter that points from which
+data channel the data must be fetched. If no channel is specified, it will
+default to the 'default' channel.
+If called in scalar context it will return one processed item from the flow.
+If called in list context it will return all the elements in the last queue.
 
 =method reset
 
@@ -341,7 +390,6 @@ used like this:
 		[ 'CSV' => direction => 'CONVERT_TO' ];
 
 	$flow->process('bananas');
-
 
 =head1 HISTORY
 
