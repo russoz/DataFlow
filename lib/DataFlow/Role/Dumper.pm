@@ -18,7 +18,7 @@ has '_dumper' => (
         use Data::Dumper;
         return sub {
             $Data::Dumper::Terse = 1;
-			return @_->map( sub { Dumper($_) } )->join( qq{\n} );
+            return @_->map( sub { Dumper($_) } )->join(qq{\n});
         };
     },
     'handles' => {

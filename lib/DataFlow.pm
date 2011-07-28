@@ -136,19 +136,19 @@ sub process_input {
 
 sub _unitem {
     my ( $item, $channel ) = @_;
+    return unless defined $item;
     return $item->get_data($channel);
 }
 
 sub _output_items {
     my $self = shift;
     $self->process_input if ( $self->_lastq->empty && $self->auto_process );
-    my @res = wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
-    return wantarray ? @res : $res[0];
+    return wantarray ? $self->_lastq->remove_all : $self->_lastq->remove;
 }
 
 sub output_items {
     my $self = shift;
-    my @res = wantarray ? $self->_output_items : scalar $self->_output_items;
+    my @res = wantarray ? $self->_output_items : scalar( $self->_output_items );
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>', @res )
       if $self->dump_output;
     return wantarray ? @res : $res[0];
@@ -158,7 +158,7 @@ sub output {
     my $self = shift;
     my $channel = shift || $self->default_channel;
 
-    my @res = wantarray ? $self->_output_items : scalar $self->_output_items;
+    my @res = wantarray ? $self->_output_items : scalar( $self->_output_items );
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>', @res )
       if $self->dump_output;
     return wantarray

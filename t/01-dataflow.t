@@ -1,4 +1,4 @@
-use Test::More tests => 22;
+use Test::More tests => 25;
 
 use strict;
 
@@ -46,4 +46,11 @@ ok( !defined( $f->output ) );
 
 $f->flush;
 ok( !$f->output );
+
+$f->input(qw/aaa bbb ccc ddd/);
+is( $f->has_queued_data, 4 );
+$f->output;
+is( $f->has_queued_data, 3 );
+$f->flush;
+is( $f->has_queued_data, 0 );
 

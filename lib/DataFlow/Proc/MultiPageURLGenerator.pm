@@ -75,7 +75,8 @@ sub _build_p {
         $first = 1 + $last + $first if $first < 0;
 
         my $result =
-		  [$first .. $last]->map( sub { $self->make_page_url->( $self, $url, $_ ) } );
+          [ $first .. $last ]
+          ->map( sub { $self->make_page_url->( $self, $url, $_ ) } );
 
         $self->clear_paged_url;
         return $result;

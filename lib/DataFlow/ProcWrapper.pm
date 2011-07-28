@@ -41,13 +41,17 @@ has 'on_proc' => (
 sub _itemize_response {
     my ( $self, $input_item, @response ) = @_;
     return ($input_item) unless @response;
-    return
-      @{ @response->map( sub { $input_item->clone->set_data( $self->output_chan, $_ ) } ) };
+    return @{
+        @response->map(
+            sub { $input_item->clone->set_data( $self->output_chan, $_ ) }
+        )
+      };
 }
 
 sub process {
     my ( $self, $item ) = @_;
 
+    return unless defined $item;
     if ( ref($item) eq 'DataFlow::Item' ) {
         my $data = $item->get_data( $self->input_chan );
         return ($item) unless $data;

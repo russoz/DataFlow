@@ -87,7 +87,7 @@ sub process {
 
     my @result =
       $self->deref
-      ? @{ [$self->_process_one($item)]->map( sub { _deref($_) } ) }
+      ? @{ [ $self->_process_one($item) ]->map( sub { _deref($_) } ) }
       : $self->_process_one($item);
 
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>',
