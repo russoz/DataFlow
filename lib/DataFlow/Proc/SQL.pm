@@ -10,6 +10,7 @@ use warnings;
 use Moose;
 extends 'DataFlow::Proc';
 
+use Moose::Autobox;
 use namespace::autoclean;
 use SQL::Abstract;
 
@@ -36,7 +37,7 @@ sub _build_p {
         my ( $insert, @bind ) = $sql->insert( $self->table, $data );
 
         # TODO: regex ?
-        map { $insert =~ s/\?/'$_'/; } @bind;
+        @bind->map( sub { $insert =~ s/\?/'$_'/; } );
         print $insert . "\n";
       }
 }

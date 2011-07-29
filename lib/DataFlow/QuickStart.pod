@@ -2,13 +2,13 @@ package DataFlow::QuickStart;
 
 # ABSTRACT: DataFlow Quick Start Guide
 
+# VERSION
+
 1;
 
 __END__
 
 =pod
-
-=head1 DataFlow Quick Start Guide
 
 A guide for quick jumping into the DataFlow bandwagon, programming-wise. That
 means that, despite our long term goals of making a framework that can be used
@@ -28,12 +28,12 @@ DataFlow is built upon L<Moose> and it follows the rules of that system.
 If you are really serious about submitting code to DataFlow, please read the
 section called "Joining the DataFlow effort" below.
 
-=head2 Using DataFlow
+=head1 Using DataFlow
 
 This is covered in the POD documentation elsewhere, so here we present
 just a summary.
 
-=head3 Proc
+=head2 Proc
 
 A L<DataFlow::Proc> is the basic processing unit of DataFlow. It runs the
 closure pointed to by the C<p> parameter with C<$_> localized to the data
@@ -55,7 +55,7 @@ that conforms to a certain structure, say "only arrays, and leave the scalars
 alone" or "scalars only, throw an error if anything else comes our way". For
 that refer to the L<DataFlow::Role::ProcPolicy> role.
 
-=head3 DataFlow
+=head2 DataFlow
 
 A L<DataFlow> is a sequence of Procs, arranged so that each Proc's output is
 fed into the next Proc's input. Sort of like a sequence of commands in a
@@ -85,7 +85,7 @@ singled-out using proper XPath expressions for them), it will trim the white
 spaces and produce a CSV output, which can be used in a spreadsheet or to
 load a database.
 
-=head2 Creating Processors and/or Flows
+=head1 Creating Processors and/or Flows
 
 To create a new Proc, one must extend L<DataFlow::Proc>.
 When doing that, do refer to Moose best practices.
@@ -118,14 +118,14 @@ More sophisticated Procs can also be constructed. Tkae a look at the source
 code of L<DataFLow::Proc::HTMLFilter>, L<DataFlow::Proc::URLRetriever> or
 L<DataFlow::Proc::Converter>.
 
-=head2 Tweaking the Core
+=head1 Tweaking the Core
 
 DataFlow is not a very sophisticated piece of software on its own, as much
 as a Bourne shell of the 70's was not very sophisticated, 
 but B<it allows and promotes> extending its functionalities to make for 
 sophisticated solutions.
 
-=head3 A DataFlow
+=head2 A DataFlow
 
 A DataFlow is nothing more than queues and processors:
 
@@ -152,7 +152,7 @@ B<Q1> is then run through  B<P1> and the result (or results) is enqueued into
 B<Q2>, and so forth. Upon running the last processor, B<Pn>, the resulting
 data is put into B<Qlast>, the last queue in the desert.
 
-=head2 Code Repository
+=head1 Code Repository
 
 DataFlow source code is hosted at the superb L<Github|http://github.com/>
 service, at the address L<http://github.com/russoz/DataFlow>.

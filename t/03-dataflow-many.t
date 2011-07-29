@@ -55,16 +55,10 @@ ok($flow2);
 # tests: 2
 $flow2->input( 'qwerty', 'yay' );
 
-#use Data::Dumper; diag( Dumper($chain) );
 my $thirty = $flow2->output;
-
-#use Data::Dumper; diag( Dumper($thirty) );
 ok( $thirty == 30 );
 
-#use Data::Dumper; diag( Dumper($chain2) );
 my $fifteen = $flow2->output;
-
-#use Data::Dumper; diag( Dumper($fifteen) );
 ok( $fifteen == 15 );
 
 eval {

@@ -11,6 +11,7 @@ use Moose;
 with 'DataFlow::Role::Processor';
 with 'DataFlow::Role::Dumper';
 
+use Moose::Autobox;
 use DataFlow::Types qw(ProcessorSub ProcPolicy);
 
 use namespace::autoclean;
@@ -33,22 +34,6 @@ has 'deref' => (
     'isa'     => 'Bool',
     'lazy'    => 1,
     'default' => 0,
-);
-
-has 'dump_input' => (
-    'is'            => 'ro',
-    'isa'           => 'Bool',
-    'lazy'          => 1,
-    'default'       => 0,
-    'documentation' => 'Prints a dump of the input load to STDERR',
-);
-
-has 'dump_output' => (
-    'is'            => 'ro',
-    'isa'           => 'Bool',
-    'lazy'          => 1,
-    'default'       => 0,
-    'documentation' => 'Prints a dump of the output load to STDERR',
 );
 
 has 'policy' => (
@@ -102,7 +87,7 @@ sub process {
 
     my @result =
       $self->deref
-      ? map { _deref($_) } ( $self->_process_one($item) )
+      ? @{ [ $self->_process_one($item) ]->map( sub { _deref($_) } ) }
       : $self->_process_one($item);
 
     $self->prefix_dumper( $self->has_name ? $self->name . ' >>' : '>>',
