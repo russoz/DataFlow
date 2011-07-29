@@ -43,12 +43,13 @@ has 'auto_process' => (
     'default' => 1,
 );
 
-has 'procs' => (
+has '_procs' => (
     'is'       => 'ro',
     'isa'      => 'WrappedProcList',
     'required' => 1,
     'coerce'   => 1,
     'builder'  => '_build_procs',
+    'init_arg' => 'procs',
 );
 
 has '_queues' => (
@@ -61,7 +62,7 @@ has '_queues' => (
         'has_queued_data' =>
           sub { return _count_queued_items( shift->_queues ) },
         '_make_queues' => sub {
-            shift->procs->map( sub { Queue::Base->new() } );
+            shift->_procs->map( sub { Queue::Base->new() } );
         },
     },
 );
@@ -77,6 +78,10 @@ has '_lastq' => (
 
 sub _build_procs {
     return;
+}
+
+sub procs {
+    return @{ [ shift->_procs ]->map( sub { $_->on_proc } ) };
 }
 
 # functions
@@ -108,7 +113,7 @@ sub _reduce {
 # methods
 sub clone {
     my $self = shift;
-    return DataFlow->new( procs => $self->procs );
+    return DataFlow->new( procs => $self->_procs );
 }
 
 sub channel_input {
@@ -130,7 +135,7 @@ sub input {
 sub process_input {
     my $self = shift;
     my @q = ( @{ $self->_queues }, $self->_lastq );
-    _reduce( $self->procs, @q );
+    _reduce( $self->_procs, @q );
     return;
 }
 
@@ -188,16 +193,14 @@ sub process {
 
 sub proc_by_index {
     my ( $self, $index ) = @_;
-    return unless $self->procs->[$index];
-    return $self->procs->[$index]->on_proc;
+    return unless $self->_procs->[$index];
+    return $self->_procs->[$index]->on_proc;
 }
 
 sub proc_by_name {
     my ( $self, $name ) = @_;
-    return $self->procs->map( sub { $_->on_proc } )
+    return $self->_procs->map( sub { $_->on_proc } )
       ->grep( sub { $_->name eq $name } )->[0];
-
-    #return $procs[0];
 }
 
 sub dataflow (@) {    ## no critic
