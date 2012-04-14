@@ -9,7 +9,7 @@ use warnings;
 
 use Moose;
 use Moose::Autobox;
-use MooseX::ChainedAccessors;
+use MooseX::Attribute::Chained;
 
 use namespace::autoclean;
 
