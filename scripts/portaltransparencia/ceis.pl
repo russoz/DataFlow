@@ -11,7 +11,7 @@ package CeisPages;
 use Moose;
 extends 'DataFlow::Proc::MultiPageURLGenerator';
 
-use DataFlow::Util::HTTPGet;
+use LWP::UserAgent;
 use HTML::TreeBuilder::XPath;
 use URI;
 
@@ -20,8 +20,8 @@ has '+produce_last_page' => (
         return sub {
             my $url = shift;
 
-            my $get  = DataFlow::Util::HTTPGet->new;
-            my $html = $get->get($url);
+            my $get  = LWP::UserAgent->new;
+            my $html = $get->get($url)->decoded_content;
 
             my $texto =
               HTML::TreeBuilder::XPath->new_from_content($html)
