@@ -37,11 +37,12 @@ has 'deref' => (
 );
 
 has 'policy' => (
-    'is'      => 'ro',
-    'isa'     => 'ProcPolicy',
-    'coerce'  => 1,
-    'lazy'    => 1,
-    'builder' => '_policy',
+    'is'       => 'ro',
+    'isa'      => 'ProcPolicy',
+    'coerce'   => 1,
+    'lazy'     => 1,
+    'builder'  => '_policy',
+    'init_arg' => 'policy',
 );
 
 has 'p' => (

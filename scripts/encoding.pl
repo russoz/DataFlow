@@ -2,7 +2,7 @@
 
 use DataFlow;
 
-$flow =
+my $flow =
   DataFlow->new(
     procs => [ [ Encoding => { from => 'iso-8859-1', to => 'utf8' } ] ] );
 
