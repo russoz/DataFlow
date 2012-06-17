@@ -114,9 +114,9 @@ its last name, in this case C<UC>.
     ] );
     my @output = $flow->process( @input );
 
-More sophisticated Procs can also be constructed. Tkae a look at the source
-code of L<DataFLow::Proc::HTMLFilter>, L<DataFlow::Proc::URLRetriever> or
-L<DataFlow::Proc::Converter>.
+More sophisticated Procs can also be constructed. Take a look at the source
+code of C<DataFLow::Proc::HTMLFilter>, C<DataFlow::Proc::URLRetriever> or
+C<DataFlow::Proc::Converter>.
 
 =head1 Tweaking the Core
 
